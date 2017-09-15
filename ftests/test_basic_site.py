@@ -50,3 +50,12 @@ class BasePageLayoutTests(FunctionalTest):
                 self.assertGreater(
                  link.location["x"], nav_links[index - 1].location["x"]
                 )
+
+
+        # The footer is at the bottom
+        footer = self.browser.find_element_by_tag_name("footer")
+        self.assertGreater(footer.location["y"], 500)
+
+        # The footer lists are side by side
+        lists = footer.find_elements_by_class_name("footer-list")
+        self.assertGreater(lists[1].location["x"], lists[0].location["x"])
