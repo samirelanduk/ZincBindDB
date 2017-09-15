@@ -1,0 +1,38 @@
+body {
+  margin: 0px;
+  font-family: 'Nunito';
+}
+
+nav {
+  padding-left: 5%;
+  font-size: 200%;
+  height: 75px;
+  background-color: #904e4e;
+  color: #FFFFFF;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+nav #logo {
+  font-family: Cinzel;
+  font-weight: bold;
+}
+
+nav ul {
+  margin: 0px;
+  margin-right: 5%;
+  padding: 0px;
+  text-align: right;
+  font-size: 65%;
+  flex-grow: 100;
+}
+
+nav li {
+  list-style-type: none;
+  display: inline;
+  padding: 0px;
+  padding-left: 4%;
+  padding-right: 4%;
+}
