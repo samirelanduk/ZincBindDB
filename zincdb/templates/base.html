@@ -12,12 +12,32 @@
   <!--analytics-->
 </head>
 <body>
-  <nav></nav>
+  <nav>
+    <div id="logo">zincDB</div>
+    <ul id="nav-links">
+      <li>About</li>
+      <li>Help</li>
+    </ul>
+  </nav>
   <main>
     {% block main %}
     {% endblock %}
   </main>
-  <footer></footer>
+  <footer>
+    <div class="footer-list">
+      <div class="footer-header">Useful Links</div>
+      <a href="http://www.bioinf.org.uk/" target="_blank">The Martin Group</a>
+      <a href="https://github.com/samirelanduk/zincDB" target="_blank">Source code</a>
+      <a href="/changelog/">Chagelog</a>
+    </div>
+    <div class="footer-list">
+      <div class="footer-header">Related Projects</div>
+      <a href="http://metalweb.cerm.unifi.it/" target="_blank">MetalPDB</a>
+      <a href="http://synpharm.guidetopharmacology.org/" target="_blank">SynPHARM</a>
+      <a href="https://www.bindingdb.org/bind/index.jsp" target="_blank">The Binding Database</a>
+    </div>
+    <div id="copyright">Copyright 2017</div>
+  </footer>
 </body>
 
 </html>

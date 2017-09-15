@@ -12,3 +12,20 @@ class BasePageLayoutTests(FunctionalTest):
          [element.tag_name for element in body.find_elements_by_xpath("./*")],
          ["nav", "main", "footer"]
         )
+
+        # The nav has a logo and a list of nav links
+        nav = body.find_element_by_tag_name("nav")
+        logo = nav.find_element_by_id("logo")
+        self.assertEqual(logo.text, "zincDB")
+        nav_links = nav.find_element_by_id("nav-links")
+        nav_links = nav_links.find_elements_by_tag_name("li")
+        self.assertGreaterEqual(len(nav_links), 2)
+
+        # The footer has two lists of links, each having at least three
+        footer = body.find_element_by_tag_name("footer")
+        lists = footer.find_elements_by_class_name("footer-list")
+        self.assertGreaterEqual(len(lists), 2)
+        for links in lists:
+            header = links.find_element_by_class_name("footer-header")
+            self.assertGreater(len(links.find_elements_by_tag_name("a")), 2)
+        copyright = footer.find_element_by_id("copyright")
