@@ -13,17 +13,19 @@
     rel='stylesheet' type='text/css'>
   <link rel="stylesheet" type="text/css" href="/static/css/main.css">
   <script src="https://code.jquery.com/jquery.min.js"></script>
+  <script src="/static/js/main.js"></script>
   {% block css %}{% endblock %}
   <!--analytics-->
 </head>
 <body>
   <nav>
     <div id="logo">zincDB</div>
-    <ul id="nav-links">
-      <li>About</li>
-      <li>Help</li>
-    </ul>
+    <div id="mobile-menu"><div id="mobile-menu-icon">&#9776;</div></div>
   </nav>
+  <ul id="nav-links">
+    <li>About</li>
+    <li>Help</li>
+  </ul>
   <main>
     {% block main %}
     {% endblock %}

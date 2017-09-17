@@ -10,14 +10,14 @@ class BasePageLayoutTests(FunctionalTest):
         body = self.browser.find_element_by_tag_name("body")
         self.assertEqual(
          [element.tag_name for element in body.find_elements_by_xpath("./*")],
-         ["nav", "main", "footer"]
+         ["nav", "ul", "main", "footer"]
         )
 
         # The nav has a logo and a list of nav links
         nav = body.find_element_by_tag_name("nav")
         logo = nav.find_element_by_id("logo")
         self.assertEqual(logo.text, "zincDB")
-        nav_links = nav.find_element_by_id("nav-links")
+        nav_links = self.browser.find_element_by_id("nav-links")
         nav_links = nav_links.find_elements_by_tag_name("li")
         self.assertGreaterEqual(len(nav_links), 2)
 
@@ -42,7 +42,12 @@ class BasePageLayoutTests(FunctionalTest):
         )
 
         # The nav links are horizontally aranged
-        nav_links = nav.find_element_by_id("nav-links")
+        nav_links = self.browser.find_element_by_id("nav-links")
+        mobile_menu = nav.find_element_by_id("mobile-menu")
+        self.assertEqual(
+         mobile_menu.value_of_css_property("display"),
+         "none"
+        )
         nav_links = nav_links.find_elements_by_tag_name("li")
         for index, link in enumerate(nav_links):
             self.assertEqual(link.location["y"], nav_links[0].location["y"])
@@ -51,7 +56,6 @@ class BasePageLayoutTests(FunctionalTest):
                  link.location["x"], nav_links[index - 1].location["x"]
                 )
 
-
         # The footer is at the bottom
         footer = self.browser.find_element_by_tag_name("footer")
         self.assertGreater(footer.location["y"], 500)
@@ -59,3 +63,47 @@ class BasePageLayoutTests(FunctionalTest):
         # The footer lists are side by side
         lists = footer.find_elements_by_class_name("footer-list")
         self.assertGreater(lists[1].location["x"], lists[0].location["x"])
+
+
+    def test_basic_page_mobile_css(self):
+        self.browser.set_window_size(350, 600)
+        self.get("/")
+
+        # The nav looks correct
+        nav = self.browser.find_element_by_tag_name("nav")
+        nav_links = self.browser.find_element_by_id("nav-links")
+        mobile_menu = nav.find_element_by_id("mobile-menu")
+        self.assertEqual(
+         nav_links.value_of_css_property("display"),
+         "none"
+        )
+        mobile_menu_icon = mobile_menu.find_element_by_id("mobile-menu-icon")
+        self.assertGreater(
+         mobile_menu_icon.location["x"],
+         300
+        )
+
+        # Clicking the icon makes the nav links appear and disappear
+        mobile_menu_icon.click()
+        self.assertEqual(
+         nav_links.value_of_css_property("display"),
+         "block"
+        )
+        for index, link in enumerate(nav_links.find_elements_by_tag_name("li")):
+            self.assertEqual(link.size["width"], nav.size["width"])
+            if index:
+                self.assertGreater(
+                 link.location["y"],
+                 nav_links.find_elements_by_tag_name("li")[index - 1].location["y"]
+                )
+        mobile_menu_icon.click()
+        sleep(1)
+        self.assertEqual(
+         nav_links.value_of_css_property("display"),
+         "none"
+        )
+
+        # The footer lists are vertically arranged
+        footer = self.browser.find_element_by_tag_name("footer")
+        lists = footer.find_elements_by_class_name("footer-list")
+        self.assertGreater(lists[1].location["y"], lists[0].location["y"])

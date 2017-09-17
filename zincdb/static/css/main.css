@@ -6,13 +6,17 @@ body {
 nav {
   padding-left: 5%;
   font-size: 200%;
-  height: 75px;
-  background-color: #904e4e;
-  color: #FFFFFF;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
+}
+
+nav, #nav-links {
+  height: 75px;
+  line-height: 75px;
+  background-color: #904e4e;
+  color: #FFFFFF;
 }
 
 nav #logo {
@@ -20,21 +24,27 @@ nav #logo {
   font-weight: bold;
 }
 
-nav ul {
+#nav-links {
   margin: 0px;
   margin-right: 5%;
   padding: 0px;
+  width: 50%;
   text-align: right;
-  font-size: 65%;
-  flex-grow: 100;
+  position: absolute;
+  top: 0px;
+  right: 0px;
 }
 
-nav li {
+#nav-links li {
   list-style-type: none;
   display: inline;
   padding: 0px;
   padding-left: 4%;
   padding-right: 4%;
+}
+
+nav #mobile-menu {
+  display: none;
 }
 
 main {
@@ -75,4 +85,42 @@ footer a {
 #copyright {
   color: #AAAAAA;
   text-align: center;
+}
+
+@media only screen and (max-width: 769px) {
+  /* iPad and down */
+  #nav-links {
+    display: none;
+    margin: 0px;
+    position: static;
+    background-color: #af5e5e;
+    width: 100%;
+    height: auto;
+  }
+
+  #nav-links li {
+    display: block;
+    text-align: center;
+    line-height: 40px;
+    border: 1px solid #904e4e;
+    padding: 0px;
+  }
+
+  nav #mobile-menu {
+    display: block;
+    flex-grow: 100;
+    margin-right: 20px;
+    text-align: right;
+    cursor: pointer;
+  }
+
+  nav #mobile-menu-icon {
+    display: inline;
+  }
+
+  footer .footer-list {
+    display: block;
+    width: 100%;
+  }
+
 }
