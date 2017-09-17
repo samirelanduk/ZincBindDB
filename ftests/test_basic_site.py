@@ -107,3 +107,53 @@ class BasePageLayoutTests(FunctionalTest):
         footer = self.browser.find_element_by_tag_name("footer")
         lists = footer.find_elements_by_class_name("footer-list")
         self.assertGreater(lists[1].location["y"], lists[0].location["y"])
+
+
+
+class HomePageTests(FunctionalTest):
+
+    def test_home_page(self):
+        self.get("/about/")
+        logo = self.browser.find_element_by_id("logo")
+        logo.click()
+
+        self.check_page("/")
+
+
+
+class AboutPageTests(FunctionalTest):
+
+    def test_about_page(self):
+        self.get("/")
+        nav_links = self.browser.find_element_by_id("nav-links")
+        nav_links.find_elements_by_tag_name("li")[0].click()
+
+        self.check_page("/about/")
+        self.assertIn("About", self.browser.title)
+        self.assertIn("About", self.browser.find_element_by_tag_name("h1").text)
+
+
+
+class HelpPageTests(FunctionalTest):
+
+    def test_help_page(self):
+        self.get("/")
+        nav_links = self.browser.find_element_by_id("nav-links")
+        nav_links.find_elements_by_tag_name("li")[1].click()
+
+        self.check_page("/help/")
+        self.assertIn("Help", self.browser.title)
+        self.assertIn("Help", self.browser.find_element_by_tag_name("h1").text)
+
+
+
+class ChangelogPageTests(FunctionalTest):
+
+    def test_changelog_page(self):
+        self.get("/")
+        footer = self.browser.find_element_by_tag_name("footer")
+        footer.find_elements_by_tag_name("a")[2].click()
+
+        self.check_page("/changelog/")
+        self.assertIn("Changelog", self.browser.title)
+        self.assertIn("Changelog", self.browser.find_element_by_tag_name("h1").text)

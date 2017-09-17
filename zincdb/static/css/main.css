@@ -43,12 +43,19 @@ nav #logo {
   padding-right: 4%;
 }
 
+#logo a, #nav-links a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
 nav #mobile-menu {
   display: none;
 }
 
 main {
   min-height: calc(75vh);
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 footer {
