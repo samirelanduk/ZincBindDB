@@ -17,3 +17,7 @@ class HomeUrlTests(UrlTest):
 
     def test_changelog_page_url_resolves_to_changelog_page_view(self):
         self.check_url_returns_view("/changelog/", views.changelog_page)
+
+
+    def test_auth_page_url_resolves_to_login_page_view(self):
+        self.check_url_returns_view("/auth/", views.login_page)

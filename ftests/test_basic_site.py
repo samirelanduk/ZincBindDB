@@ -129,8 +129,8 @@ class AboutPageTests(FunctionalTest):
         nav_links.find_elements_by_tag_name("li")[0].click()
 
         self.check_page("/about/")
-        self.assertIn("About", self.browser.title)
-        self.assertIn("About", self.browser.find_element_by_tag_name("h1").text)
+        self.check_title("About")
+        self.check_h1("About")
 
 
 
@@ -142,8 +142,8 @@ class HelpPageTests(FunctionalTest):
         nav_links.find_elements_by_tag_name("li")[1].click()
 
         self.check_page("/help/")
-        self.assertIn("Help", self.browser.title)
-        self.assertIn("Help", self.browser.find_element_by_tag_name("h1").text)
+        self.check_title("Help")
+        self.check_h1("Help")
 
 
 
@@ -155,5 +155,5 @@ class ChangelogPageTests(FunctionalTest):
         footer.find_elements_by_tag_name("a")[2].click()
 
         self.check_page("/changelog/")
-        self.assertIn("Changelog", self.browser.title)
-        self.assertIn("Changelog", self.browser.find_element_by_tag_name("h1").text)
+        self.check_title("Changelog")
+        self.check_h1("Changelog")

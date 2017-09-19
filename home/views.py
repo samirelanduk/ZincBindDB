@@ -14,3 +14,7 @@ def help_page(request):
 
 def changelog_page(request):
     return render(request, "changelog.html")
+
+
+def login_page(request):
+    return render(request, "login.html")
