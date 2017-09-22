@@ -23,6 +23,11 @@ def login_page(request):
          username=request.POST["username"],
          password=request.POST["password"]
         )
-        login(request, user)
-        return redirect("/")
+        if user:
+            login(request, user)
+            return redirect("/")
+        else:
+            return render(
+             request, "login.html", {"error": "Credentials incorrect"}
+            )
     return render(request, "login.html")

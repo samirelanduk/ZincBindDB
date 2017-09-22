@@ -133,6 +133,16 @@ input[type='submit'] {
   cursor: pointer;
 }
 
+#error-message {
+  color: #D8000C;
+  background-color: #FFBABA;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-radius: 30px;
+  padding: 20px;
+  text-align: center;
+}
+
 @media only screen and (max-width: 769px) {
   /* iPad and down */
   #nav-links {

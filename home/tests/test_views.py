@@ -53,3 +53,14 @@ class LoginPageViewTests(ViewTest):
          "/auth/", data={"username": "testuser", "password": "testpassword"}
         )
         self.assertIn("_auth_user_id", self.client.session)
+
+
+    def test_can_handle_incorrect_credentials(self):
+        self.client.logout()
+        self.assertNotIn("_auth_user_id", self.client.session)
+        response = self.client.post(
+         "/auth/", data={"username": "wrong", "password": "wrong"}
+        )
+        self.assertNotIn("_auth_user_id", self.client.session)
+        self.assertTemplateUsed(response, "login.html")
+        self.assertIn("incorrect", response.context["error"])
