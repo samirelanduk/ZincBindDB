@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
 
 def home_page(request):
     return render(request, "home.html")
@@ -17,4 +18,11 @@ def changelog_page(request):
 
 
 def login_page(request):
+    if request.method == "POST":
+        user = authenticate(
+         username=request.POST["username"],
+         password=request.POST["password"]
+        )
+        login(request, user)
+        return redirect("/")
     return render(request, "login.html")

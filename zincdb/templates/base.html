@@ -26,6 +26,9 @@
   <ul id="nav-links">
     <li><a href="/about/">About</a></li>
     <li><a href="/help/">Help</a></li>
+    {% if user.is_authenticated %}
+    <li><a href="/logout/" class="logged-in">Log Out</a></li>
+    {% endif %}
   </ul>
   <main>
     {% block main %}

@@ -34,6 +34,22 @@ class ChangelogPageViewTests(ViewTest):
 
 class LoginPageViewTests(ViewTest):
 
-    def test_changelog_view_uses_changelog_template(self):
+    def test_login_view_uses_login_template(self):
         response = self.client.get("/auth/")
         self.assertTemplateUsed(response, "login.html")
+
+
+    def test_login_view_redirects_to_home(self):
+        response = self.client.post(
+         "/auth/", data={"username": "testuser", "password": "testpassword"}
+        )
+        self.assertRedirects(response, "/")
+
+
+    def test_login_view_can_login(self):
+        self.client.logout()
+        self.assertNotIn("_auth_user_id", self.client.session)
+        response = self.client.post(
+         "/auth/", data={"username": "testuser", "password": "testpassword"}
+        )
+        self.assertIn("_auth_user_id", self.client.session)

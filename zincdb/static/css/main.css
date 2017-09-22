@@ -10,12 +10,12 @@ nav {
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
+  background: linear-gradient(#c57a7a, #9a6464, #904e4e);
 }
 
 nav, #nav-links {
-  height: 75px;
-  line-height: 75px;
-  background-color: #904e4e;
+  height: 55px;
+  line-height: 55px;
   color: #FFFFFF;
 }
 
@@ -92,6 +92,13 @@ footer a {
 #copyright {
   color: #AAAAAA;
   text-align: center;
+}
+
+.logged-in {
+  background-color: green;
+  color: silver;
+  padding-left: 2px;
+  padding-right: 2px;
 }
 
 form {
