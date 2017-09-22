@@ -64,3 +64,17 @@ class LoginPageViewTests(ViewTest):
         self.assertNotIn("_auth_user_id", self.client.session)
         self.assertTemplateUsed(response, "login.html")
         self.assertIn("incorrect", response.context["error"])
+
+
+
+class LogoutViewTests(ViewTest):
+
+    def test_logout_view_redirects_to_home(self):
+        response = self.client.get("/logout/")
+        self.assertRedirects(response, "/")
+
+
+    def test_logout_view_logs_out(self):
+        self.assertIn("_auth_user_id", self.client.session)
+        response = self.client.get("/logout/")
+        self.assertNotIn("_auth_user_id", self.client.session)

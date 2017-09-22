@@ -21,3 +21,7 @@ class HomeUrlTests(UrlTest):
 
     def test_auth_page_url_resolves_to_login_page_view(self):
         self.check_url_returns_view("/auth/", views.login_page)
+
+
+    def test_logout_page_url_resolves_to_logout_page_view(self):
+        self.check_url_returns_view("/logout/", views.logout_page)

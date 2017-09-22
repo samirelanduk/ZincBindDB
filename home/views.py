@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 
 def home_page(request):
     return render(request, "home.html")
@@ -31,3 +31,8 @@ def login_page(request):
              request, "login.html", {"error": "Credentials incorrect"}
             )
     return render(request, "login.html")
+
+
+def logout_page(request):
+    logout(request)
+    return redirect("/")

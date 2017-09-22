@@ -51,3 +51,25 @@ class LoginTests(FunctionalTest):
         form = self.browser.find_element_by_tag_name("form")
         error_message = form.find_element_by_id("error-message")
         self.assertIn("incorrect", error_message.text)
+
+
+
+class LogoutTests(FunctionalTest):
+
+    def test_can_logout(self):
+        self.login()
+
+        # The user is logged in
+        self.get("/about/")
+        nav_links = self.browser.find_element_by_id("nav-links")
+        nav_links = nav_links.find_elements_by_tag_name("a")
+        self.assertEqual(nav_links[-1].text, "Log Out")
+
+        # They log out
+        nav_links[-1].click()
+
+        # They are logged out
+        self.check_page("/")
+        nav_links = self.browser.find_element_by_id("nav-links")
+        nav_links = nav_links.find_elements_by_tag_name("a")
+        self.assertNotEqual(nav_links[-1].text, "Log Out")
