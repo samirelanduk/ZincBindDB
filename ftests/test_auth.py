@@ -53,6 +53,15 @@ class LoginTests(FunctionalTest):
         self.assertIn("incorrect", error_message.text)
 
 
+    def test_protected_pages(self):
+        protected_pages = [
+         "/sites/new/"
+        ]
+        for page in protected_pages:
+            self.get(page)
+            self.check_page("/")
+
+
 
 class LogoutTests(FunctionalTest):
 

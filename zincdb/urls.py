@@ -15,7 +15,9 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 import home.urls as home_urls
+import zincsites.urls as sites_urls
 
 urlpatterns = [
+ url(r"^sites/", include(sites_urls)),
  url(r"^", include(home_urls)),
 ]
