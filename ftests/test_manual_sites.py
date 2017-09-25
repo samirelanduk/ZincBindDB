@@ -16,3 +16,42 @@ class SiteCreationTests(FunctionalTest):
         self.check_page("/sites/new/")
         self.check_title("New Zinc Site")
         self.check_h1("New Zinc Site")
+
+        # There is a form
+        site_form = self.browser.find_element_by_tag_name("form")
+
+        # They enter the PDB code
+        pdb_input = site_form.find_elements_by_tag_name("input")[0]
+        pdb_input.send_keys("1TON")
+
+        # They enter the residues
+        residue_input_div = site_form.find_element_by_id("residue-inputs")
+        inputs = residue_input_div.find_elements_by_tag_name("input")
+        self.assertEqual(len(inputs), 1)
+        inputs[0].send_keys("A57")
+        buttons = residue_input_div.find_elements_by_tag_name("button")
+        self.assertEqual(len(buttons), 2)
+        buttons[-1].click()
+        inputs = residue_input_div.find_elements_by_tag_name("input")
+        self.assertEqual(len(inputs), 2)
+        inputs[1].send_keys("A97")
+        buttons = residue_input_div.find_elements_by_tag_name("button")
+        self.assertEqual(len(buttons), 3)
+        buttons[-1].click()
+        inputs = residue_input_div.find_elements_by_tag_name("input")
+        self.assertEqual(len(inputs), 3)
+        inputs[2].send_keys("WRONG")
+        buttons = residue_input_div.find_elements_by_tag_name("button")
+        self.assertEqual(len(buttons), 4)
+        buttons[-1].click()
+        inputs = residue_input_div.find_elements_by_tag_name("input")
+        self.assertEqual(len(inputs), 4)
+        inputs[3].send_keys("A99")
+        buttons = residue_input_div.find_elements_by_tag_name("button")
+        self.assertEqual(len(buttons), 5)
+        buttons[-3].click()
+        inputs = residue_input_div.find_elements_by_tag_name("input")
+        self.assertEqual(len(inputs), 3)
+        buttons = residue_input_div.find_elements_by_tag_name("button")
+        self.assertEqual(len(buttons), 4)
+        sleep(10)

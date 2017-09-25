@@ -123,8 +123,20 @@ input {
   margin-bottom: 30px;
 }
 
+fieldset {
+  display: inline-block;
+  border: 1px solid silver;
+  border-radius: 15px;
+  padding: 30px;
+  width: auto;
+}
+
 input[type='text'], input[type='password'] {
   width: 100%;
+}
+
+input-placeholder {
+  color: red;
 }
 
 input[type='submit'] {

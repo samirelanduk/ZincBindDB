@@ -1,7 +1,23 @@
 {% extends "base.html" %}
 
 {% block title %}New Zinc Site{% endblock %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="/static/css/sites.css">
+{% endblock %}
 
 {% block main %}
 <h1>New Zinc Site</h1>
+
+<form method="POST">
+  <input name="PDB" autocomplete="off" placeholder="PDB code">
+  <script src="/static/js/site-entry.js"></script>
+  <fieldset id="residue-inputs">
+    <div class="residue-input">
+      <input placeholder="Residue ID"><button type="button" onclick="removeResidueInput(this);">x</button>
+    </div>
+    <button type="button" id="new-residue-input" onclick="newResidueInput();">+</button>
+
+  </fieldset>
+
+</form>
 {% endblock %}
