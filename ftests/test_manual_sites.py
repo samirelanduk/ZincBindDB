@@ -24,6 +24,10 @@ class SiteCreationTests(FunctionalTest):
         pdb_input = site_form.find_elements_by_tag_name("input")[0]
         pdb_input.send_keys("1TON")
 
+        # They enter the zinc ID
+        zinc_input = site_form.find_elements_by_tag_name("input")[1]
+        zinc_input.send_keys("A247")
+
         # They enter the residues
         residue_input_div = site_form.find_element_by_id("residue-inputs")
         inputs = residue_input_div.find_elements_by_tag_name("input")
@@ -54,4 +58,10 @@ class SiteCreationTests(FunctionalTest):
         self.assertEqual(len(inputs), 3)
         buttons = residue_input_div.find_elements_by_tag_name("button")
         self.assertEqual(len(buttons), 4)
-        sleep(10)
+
+        # They submit the site
+        submit_button = zinc_input = site_form.find_elements_by_tag_name("input")[-1]
+        submit_button.click()
+
+        # They are on the page for the new site
+        self.check_page("/sites/1TONA247/")
