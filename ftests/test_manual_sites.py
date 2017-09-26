@@ -65,3 +65,5 @@ class SiteCreationTests(FunctionalTest):
 
         # They are on the page for the new site
         self.check_page("/sites/1TONA247/")
+        self.check_title("Site 1TONA247")
+        self.check_h1("Zinc Site: 1TONA247")

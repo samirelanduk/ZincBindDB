@@ -1,3 +1,5 @@
 from django.db import models
 
-# Create your models here.
+class ZincSite(models.Model):
+
+    id = models.TextField(primary_key=True)
