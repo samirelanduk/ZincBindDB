@@ -8,12 +8,12 @@
 {% block main %}
 <form method="POST">
   <h1>New Zinc Site</h1>
-  <input name="PDB" autocomplete="off" placeholder="PDB code">
+  <input name="pdb" autocomplete="off" placeholder="PDB code">
   <input name="zinc" autocomplete="off" placeholder="Zinc ID">
   <script src="/static/js/site-entry.js"></script>
   <fieldset id="residue-inputs">
     <div class="residue-input">
-      <input placeholder="Residue ID"><button type="button" onclick="removeResidueInput(this);">x</button>
+      <input name="residue1" placeholder="Residue ID"><button type="button" onclick="removeResidueInput(this);">x</button>
     </div>
     <button type="button" id="new-residue-input" onclick="newResidueInput();">+</button>
   </fieldset>
