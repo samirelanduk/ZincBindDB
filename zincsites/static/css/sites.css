@@ -22,6 +22,7 @@
   box-sizing: border-box;
   border: 0px;
   background-color: #FFBABA;
+  color: #500000;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   font-size: 100%;
@@ -32,6 +33,7 @@
 #new-residue-input {
   margin-top: 10px;
   background-color: #CEFDCE;
+  color: #005000;
   cursor: pointer;
   border: 0px;
   width: 100px;
