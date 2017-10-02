@@ -95,3 +95,35 @@ class SiteCreationTests(FunctionalTest):
         self.assertIn(
          "SUBMAXILLARY GLAND", rows[2].find_elements_by_tag_name("td")[1].text,
         )
+
+        # There is a residues section
+        residues_section = self.browser.find_element_by_id("site-residues")
+        residues_title = residues_section.find_element_by_tag_name("h2")
+        self.assertIn("Residues", residues_section.text)
+
+        # There are three residue divs
+        residue_divs = self.browser.find_elements_by_class_name("residue")
+        self.assertEqual(len(residue_divs), 3)
+
+        # The residue divs are correct
+        for index, residue_div in enumerate(residue_divs):
+            table = residue_div.find_element_by_tag_name("table")
+            rows = table.find_elements_by_tag_name("tr")
+            self.assertEqual(
+             rows[0].find_elements_by_tag_name("td")[0].text, "Chain"
+            )
+            self.assertEqual(
+             rows[1].find_elements_by_tag_name("td")[0].text, "ID"
+            )
+            self.assertEqual(
+             rows[2].find_elements_by_tag_name("td")[0].text, "Name"
+            )
+            self.assertEqual(
+             rows[0].find_elements_by_tag_name("td")[1].text, "A"
+            )
+            self.assertEqual(
+             rows[1].find_elements_by_tag_name("td")[1].text, ["A57", "A97", "A99"][index]
+            )
+            self.assertEqual(
+             rows[2].find_elements_by_tag_name("td")[1].text, "HIS"
+            )
