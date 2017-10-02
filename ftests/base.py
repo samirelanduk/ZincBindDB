@@ -10,6 +10,7 @@ class FunctionalTest(StaticLiveServerTestCase):
          password="testpassword"
         )
         self.browser = webdriver.Chrome()
+        self.browser.set_window_size(800, 700)
 
 
     def tearDown(self):

@@ -41,6 +41,9 @@ class SiteCreationTests(FunctionalTest):
         inputs[1].send_keys("A97")
         buttons = residue_input_div.find_elements_by_tag_name("button")
         self.assertEqual(len(buttons), 3)
+        self.browser.execute_script(
+         "window.scrollTo(0, document.body.scrollHeight);"
+        )
         buttons[-1].click()
         inputs = residue_input_div.find_elements_by_tag_name("input")
         self.assertEqual(len(inputs), 3)
@@ -67,3 +70,28 @@ class SiteCreationTests(FunctionalTest):
         self.check_page("/sites/1TONA247/")
         self.check_title("Site 1TONA247")
         self.check_h1("Zinc Site: 1TONA247")
+
+        # There is a PDB section
+        pdb_section = self.browser.find_element_by_id("site-pdb")
+        pdb_title = pdb_section.find_element_by_tag_name("h2")
+        self.assertIn("PDB", pdb_title.text)
+        table = pdb_section.find_element_by_tag_name("table")
+        rows = table.find_elements_by_tag_name("tr")
+        self.assertEqual(
+         rows[0].find_elements_by_tag_name("td")[0].text, "PDB Code"
+        )
+        self.assertEqual(
+         rows[1].find_elements_by_tag_name("td")[0].text, "Deposition Date"
+        )
+        self.assertEqual(
+         rows[2].find_elements_by_tag_name("td")[0].text, "Title"
+        )
+        self.assertEqual(
+         rows[0].find_elements_by_tag_name("td")[1].text, "1TON"
+        )
+        self.assertEqual(
+         rows[1].find_elements_by_tag_name("td")[1].text, "3 June, 1987"
+        )
+        self.assertIn(
+         "SUBMAXILLARY GLAND", rows[2].find_elements_by_tag_name("td")[1].text,
+        )

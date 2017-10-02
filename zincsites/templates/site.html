@@ -9,4 +9,13 @@
 {% block main %}
 <h1>Zinc Site: {{ site.id }}</h1>
 
+<div id="site-pdb">
+  <h2>PDB</h2>
+  <table>
+    <tr><td>PDB Code</td><td>{{ site.pdb.id }}</td></tr>
+    <tr><td>Deposition Date</td><td>{{ site.pdb.deposition_date|date:"j F, Y" }}</td></tr>
+    <tr><td>Title</td><td>{{ site.pdb.title }}</td></tr>
+  </table>
+</div>
+
 {% endblock %}
