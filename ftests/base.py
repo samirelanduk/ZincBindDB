@@ -41,3 +41,113 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def check_h1(self, text):
         self.assertIn(text, self.browser.find_element_by_tag_name("h1").text)
+
+
+    def input_site(self, pdb, zincid, res1, res2, res3):
+        # There is a form
+        site_form = self.browser.find_element_by_tag_name("form")
+
+        # They enter the PDB code
+        pdb_input = site_form.find_elements_by_tag_name("input")[0]
+        pdb_input.send_keys(pdb)
+
+        # They enter the zinc ID
+        zinc_input = site_form.find_elements_by_tag_name("input")[1]
+        zinc_input.send_keys(zincid)
+
+        # They enter the residues
+        residue_input_div = site_form.find_element_by_id("residue-inputs")
+        inputs = residue_input_div.find_elements_by_tag_name("input")
+        self.assertEqual(len(inputs), 1)
+        inputs[0].send_keys(res1)
+        buttons = residue_input_div.find_elements_by_tag_name("button")
+        self.assertEqual(len(buttons), 2)
+        buttons[-1].click()
+        inputs = residue_input_div.find_elements_by_tag_name("input")
+        self.assertEqual(len(inputs), 2)
+        inputs[1].send_keys(res2)
+        buttons = residue_input_div.find_elements_by_tag_name("button")
+        self.assertEqual(len(buttons), 3)
+        self.browser.execute_script(
+         "window.scrollTo(0, document.body.scrollHeight);"
+        )
+        buttons[-1].click()
+        inputs = residue_input_div.find_elements_by_tag_name("input")
+        self.assertEqual(len(inputs), 3)
+        inputs[2].send_keys("WRONG")
+        buttons = residue_input_div.find_elements_by_tag_name("button")
+        self.assertEqual(len(buttons), 4)
+        buttons[-1].click()
+        inputs = residue_input_div.find_elements_by_tag_name("input")
+        self.assertEqual(len(inputs), 4)
+        inputs[3].send_keys(res3)
+        buttons = residue_input_div.find_elements_by_tag_name("button")
+        self.assertEqual(len(buttons), 5)
+        buttons[-3].click()
+        inputs = residue_input_div.find_elements_by_tag_name("input")
+        self.assertEqual(len(inputs), 3)
+        buttons = residue_input_div.find_elements_by_tag_name("button")
+        self.assertEqual(len(buttons), 4)
+
+        # They submit the site
+        submit_button = zinc_input = site_form.find_elements_by_tag_name("input")[-1]
+        submit_button.click()
+
+
+    def check_site_page(self, pdb, date, title, residue_ids, residue_names):
+        # There is a PDB section
+        pdb_section = self.browser.find_element_by_id("site-pdb")
+        pdb_title = pdb_section.find_element_by_tag_name("h2")
+        self.assertIn("PDB", pdb_title.text)
+        table = pdb_section.find_element_by_tag_name("table")
+        rows = table.find_elements_by_tag_name("tr")
+        self.assertEqual(
+         rows[0].find_elements_by_tag_name("td")[0].text, "PDB Code"
+        )
+        self.assertEqual(
+         rows[1].find_elements_by_tag_name("td")[0].text, "Deposition Date"
+        )
+        self.assertEqual(
+         rows[2].find_elements_by_tag_name("td")[0].text, "Title"
+        )
+        self.assertEqual(
+         rows[0].find_elements_by_tag_name("td")[1].text, pdb
+        )
+        self.assertEqual(
+         rows[1].find_elements_by_tag_name("td")[1].text, date
+        )
+        self.assertIn(
+         title, rows[2].find_elements_by_tag_name("td")[1].text,
+        )
+
+        # There is a residues section
+        residues_section = self.browser.find_element_by_id("site-residues")
+        residues_title = residues_section.find_element_by_tag_name("h2")
+        self.assertIn("Residues", residues_section.text)
+
+        # There are residue divs
+        residue_divs = self.browser.find_elements_by_class_name("residue")
+        self.assertEqual(len(residue_divs), len(residue_ids))
+
+        # The residue divs are correct
+        for index, residue_div in enumerate(residue_divs):
+            table = residue_div.find_element_by_tag_name("table")
+            rows = table.find_elements_by_tag_name("tr")
+            self.assertEqual(
+             rows[0].find_elements_by_tag_name("td")[0].text, "Chain"
+            )
+            self.assertEqual(
+             rows[1].find_elements_by_tag_name("td")[0].text, "ID"
+            )
+            self.assertEqual(
+             rows[2].find_elements_by_tag_name("td")[0].text, "Name"
+            )
+            self.assertEqual(
+             rows[0].find_elements_by_tag_name("td")[1].text, residue_ids[index][0]
+            )
+            self.assertEqual(
+             rows[1].find_elements_by_tag_name("td")[1].text, residue_ids[index]
+            )
+            self.assertEqual(
+             rows[2].find_elements_by_tag_name("td")[1].text, residue_names[index]
+            )
