@@ -37,9 +37,11 @@ def create_site(pdb, zinc, residues):
 
 def create_pdb(code):
     data = atomium.fetch_data(code, pdbe=True)
-    Pdb.objects.create(
-     id=code, deposition_date=data["deposition_date"], title=data["title"]
-    )
+    try:
+        Pdb.objects.create(
+         id=code, deposition_date=data["deposition_date"], title=data["title"]
+        )
+    except: pass
     return data
 
 

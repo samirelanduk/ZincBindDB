@@ -1,6 +1,7 @@
 from selenium import webdriver
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.contrib.auth.models import User
+from zincsites.models import Pdb, Residue, ZincSite
 
 class FunctionalTest(StaticLiveServerTestCase):
 
@@ -9,6 +10,10 @@ class FunctionalTest(StaticLiveServerTestCase):
          username="testuser",
          password="testpassword"
         )
+        pdb = Pdb.objects.create(
+         id="2CAB", deposition_date="1983-10-05", title="CARBONIC ANHYDRASE"
+        )
+
         self.browser = webdriver.Chrome()
         self.browser.set_window_size(800, 700)
 

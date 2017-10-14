@@ -30,3 +30,27 @@ class SiteCreationTests(FunctionalTest):
          "1TON", "3 June, 1987", "SUBMAXILLARY GLAND",
          ["A57", "A97", "A99"], ["HIS"] * 3
         )
+
+
+    def test_can_create_site_in_existing_pdb(self):
+        self.login()
+
+        # There is a nav link to the creation page
+        nav_links = self.browser.find_element_by_id("nav-links")
+        nav_links = nav_links.find_elements_by_tag_name("a")
+        self.assertEqual(nav_links[-2].text, "New Site")
+        nav_links[-2].click()
+
+        # They enter a zinc binding site and submit
+        self.input_site("2CAB", "A308", "A69", "A72", "A196")
+
+        # They are on the page for the new site
+        self.check_page("/sites/2CABA308/")
+        self.check_title("Site 2CABA308")
+        self.check_h1("Zinc Site: 2CABA308")
+
+        # The new site looks fine
+        self.check_site_page(
+         "2CAB", "5 October, 1983", "CARBONIC ANHYDRASE",
+         ["A69", "A72", "A196"], ["HIS", "GLU", "HIS"]
+        )

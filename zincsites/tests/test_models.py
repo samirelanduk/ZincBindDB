@@ -22,14 +22,14 @@ class ZincSiteTests(ModelTest):
 
 
     def test_save_and_retrieve_zinc_sites(self):
-        self.assertEqual(ZincSite.objects.all().count(), 0)
+        self.assertEqual(ZincSite.objects.all().count(), 1)
         site = ZincSite(id="1XXXA999")
         site.save()
         site.residues.add(self.residue1)
         site.residues.add(self.residue2)
         site.save()
-        self.assertEqual(ZincSite.objects.all().count(), 1)
-        retrieved_site = ZincSite.objects.first()
+        self.assertEqual(ZincSite.objects.all().count(), 2)
+        retrieved_site = ZincSite.objects.last()
         self.assertEqual(retrieved_site, site)
         self.assertEqual(site.residues.all().count(), 2)
         self.assertEqual(self.residue1.zincsite_set.all().count(), 1)
@@ -42,11 +42,11 @@ class PdbTests(ModelTest):
 
     def test_save_and_retrieve_pdbs(self):
         date = datetime(1970, 1, 1).date()
-        self.assertEqual(Pdb.objects.all().count(), 0)
-        pdb = Pdb(id="1XXX", title="The PDB Title", deposition_date=date)
-        pdb.save()
         self.assertEqual(Pdb.objects.all().count(), 1)
-        retrieved_pdb = Pdb.objects.first()
+        pdb = Pdb(id="1XXY", title="The PDB Title", deposition_date=date)
+        pdb.save()
+        self.assertEqual(Pdb.objects.all().count(), 2)
+        retrieved_pdb = Pdb.objects.last()
         self.assertEqual(retrieved_pdb, pdb)
 
 
@@ -55,12 +55,11 @@ class ResidueTests(ModelTest):
 
     def test_save_and_retrieve_residues(self):
         date = datetime(1970, 1, 1).date()
-        self.assertEqual(Residue.objects.all().count(), 0)
-        pdb = Pdb(id="1XXX", title="The PDB Title", deposition_date=date)
-        pdb.save()
-        residue = Residue(id="1XXXA12", residue_id="A12", chain="A", name="VAL", pdb=pdb)
+        self.assertEqual(Residue.objects.all().count(), 2)
+        pdb = Pdb.objects.first()
+        residue = Residue(id="1XXYA12", residue_id="A12", chain="A", name="VAL", pdb=pdb)
         residue.save()
-        self.assertEqual(Residue.objects.all().count(), 1)
-        retrieved_residue = Residue.objects.first()
+        self.assertEqual(Residue.objects.all().count(), 3)
+        retrieved_residue = Residue.objects.get(residue_id="A12")
         self.assertEqual(retrieved_residue, residue)
         self.assertEqual(pdb.residue_set.all().first(), residue)
