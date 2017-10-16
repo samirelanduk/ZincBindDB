@@ -10,12 +10,15 @@ class Pdb(models.Model):
 
 class Residue(models.Model):
 
+    class Meta:
+        ordering = ["chain", "number"]
+
     id = models.TextField(primary_key=True)
     residue_id = models.TextField()
+    number = models.IntegerField()
     chain = models.TextField()
     name = models.TextField()
     pdb = models.ForeignKey(Pdb)
-
 
 
 class ZincSite(models.Model):

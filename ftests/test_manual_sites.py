@@ -42,15 +42,15 @@ class SiteCreationTests(FunctionalTest):
         nav_links[-2].click()
 
         # They enter a zinc binding site and submit
-        self.input_site("2CAB", "A308", "A69", "A72", "A196")
+        self.input_site("5O8H", "A502", "A38", "A62", "A153")
 
         # They are on the page for the new site
-        self.check_page("/sites/2CABA308/")
-        self.check_title("Site 2CABA308")
-        self.check_h1("Zinc Site: 2CABA308")
+        self.check_page("/sites/5O8HA502/")
+        self.check_title("Site 5O8HA502")
+        self.check_h1("Zinc Site: 5O8HA502")
 
         # The new site looks fine
         self.check_site_page(
-         "2CAB", "5 October, 1983", "CARBONIC ANHYDRASE",
-         ["A69", "A72", "A196"], ["HIS", "GLU", "HIS"]
+         "5O8H", "11 October, 2017", "CRYSTAL STRUCTURE OF R. RUBER",
+         ["A38", "A62", "A153"], ["CYS", "HIS", "ASP"]
         )

@@ -11,8 +11,18 @@ class FunctionalTest(StaticLiveServerTestCase):
          password="testpassword"
         )
         pdb = Pdb.objects.create(
-         id="2CAB", deposition_date="1983-10-05", title="CARBONIC ANHYDRASE"
+         id="5O8H", deposition_date="2017-10-11",
+         title="CRYSTAL STRUCTURE OF R. RUBER ADH-A, MUTANT Y294F, W295A, F43H, H39Y"
         )
+        r1 = Residue.objects.create(id="A92", number=92, name="CYS", chain="A", pdb=pdb)
+        r2 = Residue.objects.create(id="A95", number=95, name="CYS", chain="A", pdb=pdb)
+        r3 = Residue.objects.create(id="A98", number=98, name="CYS", chain="A", pdb=pdb)
+        r4 = Residue.objects.create(id="A106", number=106, name="CYS", chain="A", pdb=pdb)
+        site = ZincSite.objects.create(id="508HA501")
+        site.residues.add(r1)
+        site.residues.add(r2)
+        site.residues.add(r3)
+        site.residues.add(r4)
 
         self.browser = webdriver.Chrome()
         self.browser.set_window_size(800, 700)

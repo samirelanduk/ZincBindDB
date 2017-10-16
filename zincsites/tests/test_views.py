@@ -74,7 +74,7 @@ class SiteCreationTests(ViewTest):
     @patch("zincsites.views.create_residue")
     def test_can_create_site(self, mock_res, mock_pdb):
         pdb = Pdb.objects.get(id="1XXX")
-        mock_res.side_effect = [Residue.objects.create(id="A{}".format(i * 10), pdb=pdb) for i in range(2)]
+        mock_res.side_effect = [Residue.objects.create(id="A{}".format(i * 10), number=i * 10, pdb=pdb) for i in range(2)]
         self.assertEqual(ZincSite.objects.all().count(), 1)
         mock_pdb.return_value = {"pdb": "dict"}
         site = create_site("1TON", "A247", ["A57", "A97"])
@@ -131,6 +131,7 @@ class ResidueCreationTests(ViewTest):
         residue = create_residue("A12", data)
         self.assertEqual(Residue.objects.all().count(), 3)
         self.assertEqual(Residue.objects.get(id="A12").id, "A12")
+        self.assertEqual(Residue.objects.get(id="A12").number, 12)
         self.assertEqual(Residue.objects.get(id="A12").chain, "A")
         self.assertEqual(Residue.objects.get(id="A12").name, "TRP")
         self.assertEqual(Residue.objects.get(id="A12").pdb, Pdb.objects.get(pk="1YYY"))

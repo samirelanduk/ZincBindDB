@@ -51,7 +51,8 @@ def create_residue(residue_id, pdb_data):
         for chain in model["chains"]:
             for residue in chain["residues"]:
                 if residue["id"] == residue_id:
+                    number = int("".join(char for char in residue_id if char.isdigit()))
                     return Residue.objects.create(
-                     id=residue["id"], chain=chain["chain_id"],
+                     id=residue["id"], chain=chain["chain_id"], number=number,
                      name=residue["name"], pdb=pdb
                     )

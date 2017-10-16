@@ -12,11 +12,11 @@ class ZincSiteTests(ModelTest):
         self.pdb = Pdb(id="1XXX", title="The PDB Title", deposition_date=date)
         self.pdb.save()
         self.residue1 = Residue(
-         id="1XXXA12", residue_id="A12", chain="A", name="VAL", pdb=self.pdb
+         id="1XXXA12", residue_id="A12", number=12, chain="A", name="VAL", pdb=self.pdb
         )
         self.residue1.save()
         self.residue2 = Residue(
-         id="1XXXA15", residue_id="A15", chain="A", name="VAL", pdb=self.pdb
+         id="1XXXA15", residue_id="A15", number=15, chain="A", name="VAL", pdb=self.pdb
         )
         self.residue2.save()
 
@@ -54,12 +54,24 @@ class PdbTests(ModelTest):
 class ResidueTests(ModelTest):
 
     def test_save_and_retrieve_residues(self):
-        date = datetime(1970, 1, 1).date()
         self.assertEqual(Residue.objects.all().count(), 2)
         pdb = Pdb.objects.first()
-        residue = Residue(id="1XXYA12", residue_id="A12", chain="A", name="VAL", pdb=pdb)
+        residue = Residue(
+         id="1XXYA12", residue_id="A12", number=12, chain="A", name="VAL", pdb=pdb
+        )
         residue.save()
         self.assertEqual(Residue.objects.all().count(), 3)
         retrieved_residue = Residue.objects.get(residue_id="A12")
         self.assertEqual(retrieved_residue, residue)
-        self.assertEqual(pdb.residue_set.all().first(), residue)
+        self.assertIn(residue, pdb.residue_set.all())
+
+
+    def test_residue_number_property(self):
+        pdb = Pdb.objects.first()
+        residue = Residue(
+         id="1XXYA12", residue_id="A12", number=12, chain="A", name="VAL", pdb=pdb
+        )
+        residue.save()
+        self.assertEqual(Residue.objects.all().count(), 3)
+        retrieved_residue = Residue.objects.get(residue_id="A12")
+        self.assertEqual(retrieved_residue.number, 12)
