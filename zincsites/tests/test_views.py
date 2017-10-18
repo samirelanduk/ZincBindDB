@@ -55,6 +55,13 @@ class NewSiteViewTests(ViewTest):
         self.assertIn("invalid", response.context["error_message"].lower())
 
 
+    def test_new_site_view_handles_missing_pdb(self):
+        self.data["pdb"] = ""
+        response = self.client.post("/sites/new/", self.data)
+        self.assertTemplateUsed(response, "new-site.html")
+        self.assertIn("didn't enter", response.context["error_message"].lower())
+
+
 
 class SiteViewTests(ViewTest):
 

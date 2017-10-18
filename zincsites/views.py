@@ -9,6 +9,10 @@ from zincsites.exceptions import InvalidPdbError
 @login_required(login_url="/", redirect_field_name=None)
 def new_site_page(request):
     if request.method == "POST":
+        if not request.POST["pdb"]:
+            return render(request, "new-site.html", {
+             "error_message": "You didn't enter a PDB code"
+            })
         residues = list(filter(bool, [
          request.POST[key] for key in request.POST if key.startswith("residue")
         ]))
