@@ -18,7 +18,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         r2 = Residue.objects.create(id="A95", number=95, name="CYS", chain="A", pdb=pdb)
         r3 = Residue.objects.create(id="A98", number=98, name="CYS", chain="A", pdb=pdb)
         r4 = Residue.objects.create(id="A106", number=106, name="CYS", chain="A", pdb=pdb)
-        site = ZincSite.objects.create(id="508HA501")
+        site = ZincSite.objects.create(id="5O8HA501")
         site.residues.add(r1)
         site.residues.add(r2)
         site.residues.add(r3)

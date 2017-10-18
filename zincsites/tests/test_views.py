@@ -5,7 +5,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from zincdb.tests import ViewTest
 from zincsites.models import ZincSite, Pdb, Residue
 from zincsites.views import *
-from zincsites.exceptions import InvalidPdbError
+from zincsites.exceptions import InvalidPdbError, DuplicateSiteError
 
 class NewSiteViewTests(ViewTest):
 
@@ -62,6 +62,13 @@ class NewSiteViewTests(ViewTest):
         self.assertIn("didn't enter", response.context["error_message"].lower())
 
 
+    def test_new_site_view_handles_duplicate_zinc_site(self):
+        self.mock_create.side_effect = DuplicateSiteError
+        response = self.client.post("/sites/new/", self.data)
+        self.assertTemplateUsed(response, "new-site.html")
+        self.assertIn("already", response.context["error_message"].lower())
+
+
 
 class SiteViewTests(ViewTest):
 
@@ -102,6 +109,11 @@ class SiteCreationTests(ViewTest):
         self.assertEqual(ZincSite.objects.first().id, "1TONA247")
         self.assertEqual(ZincSite.objects.last().residues.count(), 2)
         self.assertEqual(site, ZincSite.objects.first())
+
+
+    def test_can_warn_of_duplicate_site(self):
+        with self.assertRaises(DuplicateSiteError):
+            create_site("1XXX", "A500", ["A57", "A97"])
 
 
 

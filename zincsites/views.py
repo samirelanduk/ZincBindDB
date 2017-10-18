@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.http import Http404
 from django.contrib.auth.decorators import login_required
 from zincsites.models import ZincSite, Pdb, Residue
-from zincsites.exceptions import InvalidPdbError
+from zincsites.exceptions import *
 
 # Create your views here.
 @login_required(login_url="/", redirect_field_name=None)
@@ -22,6 +22,12 @@ def new_site_page(request):
             return render(request, "new-site.html", {
              "error_message": "{} is an invalid PDB".format(request.POST["pdb"])
             })
+        except DuplicateSiteError:
+            return render(request, "new-site.html", {
+             "error_message": "There's already a site called {} in {}".format(
+              request.POST["zinc"], request.POST["pdb"]
+             )
+            })
         return redirect(
          "/sites/{}{}/".format(request.POST["pdb"], request.POST["zinc"])
         )
@@ -37,6 +43,8 @@ def site_page(request, site_id):
 
 def create_site(pdb, zinc, residues):
     zinc_id = pdb + zinc
+    if ZincSite.objects.filter(pk=zinc_id):
+        raise DuplicateSiteError
     pdb = create_pdb(pdb)
     residues = [create_residue(res, pdb) for res in residues]
     site = ZincSite.objects.create(id=zinc_id)
