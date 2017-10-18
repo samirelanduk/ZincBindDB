@@ -144,7 +144,7 @@ input[type='submit'] {
   cursor: pointer;
 }
 
-#error-message {
+.error-message {
   color: #D8000C;
   background-color: #FFBABA;
   margin-top: 10px;

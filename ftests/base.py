@@ -58,6 +58,15 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.assertIn(text, self.browser.find_element_by_tag_name("h1").text)
 
 
+    def scroll_to(self, element):
+        self.browser.execute_script("arguments[0].scrollIntoView();", element)
+
+
+    def click(self, element):
+        self.scroll_to(element)
+        element.click()
+
+
     def input_site(self, pdb, zincid, res1, res2, res3):
         # There is a form
         site_form = self.browser.find_element_by_tag_name("form")
@@ -77,7 +86,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         inputs[0].send_keys(res1)
         buttons = residue_input_div.find_elements_by_tag_name("button")
         self.assertEqual(len(buttons), 2)
-        buttons[-1].click()
+        self.click(buttons[-1])
         inputs = residue_input_div.find_elements_by_tag_name("input")
         self.assertEqual(len(inputs), 2)
         inputs[1].send_keys(res2)
@@ -86,19 +95,19 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.browser.execute_script(
          "window.scrollTo(0, document.body.scrollHeight);"
         )
-        buttons[-1].click()
+        self.click(buttons[-1])
         inputs = residue_input_div.find_elements_by_tag_name("input")
         self.assertEqual(len(inputs), 3)
         inputs[2].send_keys("WRONG")
         buttons = residue_input_div.find_elements_by_tag_name("button")
         self.assertEqual(len(buttons), 4)
-        buttons[-1].click()
+        self.click(buttons[-1])
         inputs = residue_input_div.find_elements_by_tag_name("input")
         self.assertEqual(len(inputs), 4)
         inputs[3].send_keys(res3)
         buttons = residue_input_div.find_elements_by_tag_name("button")
         self.assertEqual(len(buttons), 5)
-        buttons[-3].click()
+        self.click(buttons[-3])
         inputs = residue_input_div.find_elements_by_tag_name("input")
         self.assertEqual(len(inputs), 3)
         buttons = residue_input_div.find_elements_by_tag_name("button")
@@ -106,7 +115,7 @@ class FunctionalTest(StaticLiveServerTestCase):
 
         # They submit the site
         submit_button = zinc_input = site_form.find_elements_by_tag_name("input")[-1]
-        submit_button.click()
+        self.click(submit_button)
 
 
     def check_site_page(self, pdb, date, title, residue_ids, residue_names):

@@ -5,6 +5,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from zincdb.tests import ViewTest
 from zincsites.models import ZincSite, Pdb, Residue
 from zincsites.views import *
+from zincsites.exceptions import InvalidPdbError
 
 class NewSiteViewTests(ViewTest):
 
@@ -44,6 +45,14 @@ class NewSiteViewTests(ViewTest):
         self.mock_create.return_value = "SITE"
         response = self.client.post("/sites/new/", self.data)
         self.mock_create.assert_called_with("1TON", "A247", ["A57", "A97"])
+
+
+    def test_new_site_view_handles_invalid_pdb(self):
+        self.mock_create.side_effect = InvalidPdbError
+        response = self.client.post("/sites/new/", self.data)
+        self.assertTemplateUsed(response, "new-site.html")
+        self.assertIn("1TON", response.context["error_message"])
+        self.assertIn("invalid", response.context["error_message"].lower())
 
 
 
@@ -117,6 +126,19 @@ class PdbCreationTests(ViewTest):
         self.assertEqual(Pdb.objects.first().deposition_date, date)
         self.assertEqual(Pdb.objects.first().title, "TTT")
         self.assertEqual(pdb, {"deposition_date": date, "title": "TTT"})
+
+
+    @patch("atomium.fetch_data")
+    def test_can_handle_invalid_pdb(self, mock_data):
+        mock_data.return_value = None
+        self.assertEqual(Pdb.objects.all().count(), 1)
+        with self.assertRaises(InvalidPdbError):
+            pdb = create_pdb("1XXX")
+        mock_data.assert_called_with("1XXX", pdbe=True)
+        self.assertEqual(Pdb.objects.all().count(), 1)
+        mock_data.side_effect = ValueError
+        with self.assertRaises(InvalidPdbError):
+            pdb = create_pdb("1XXX")
 
 
 

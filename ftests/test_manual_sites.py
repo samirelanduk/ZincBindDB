@@ -54,3 +54,33 @@ class SiteCreationTests(FunctionalTest):
          "5O8H", "11 October, 2017", "CRYSTAL STRUCTURE OF R. RUBER",
          ["A38", "A62", "A153"], ["CYS", "HIS", "ASP"]
         )
+
+
+    def test_invalid_pdb(self):
+        self.login()
+
+        # There is a nav link to the creation page
+        nav_links = self.browser.find_element_by_id("nav-links")
+        nav_links = nav_links.find_elements_by_tag_name("a")
+        self.assertEqual(nav_links[-2].text, "New Site")
+        nav_links[-2].click()
+
+        # They enter a zinc binding site and submit
+        self.input_site("XXXX", "A502", "A38", "A62", "A153")
+
+        # They are still on the same page
+        self.check_page("/sites/new/")
+
+        # There is an error message
+        error = self.browser.find_element_by_class_name("error-message")
+        self.assertIn("invalid pdb", error.text.lower())
+
+        # They try again
+        self.input_site("gweauyfeuyf", "A502", "A38", "A62", "A153")
+        
+        # They are still on the same page
+        self.check_page("/sites/new/")
+
+        # There is an error message
+        error = self.browser.find_element_by_class_name("error-message")
+        self.assertIn("invalid pdb", error.text.lower())

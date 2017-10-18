@@ -1,0 +1,2 @@
+class InvalidPdbError(Exception):
+    pass

@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.http import Http404
 from django.contrib.auth.decorators import login_required
 from zincsites.models import ZincSite, Pdb, Residue
+from zincsites.exceptions import InvalidPdbError
 
 # Create your views here.
 @login_required(login_url="/", redirect_field_name=None)
@@ -11,7 +12,12 @@ def new_site_page(request):
         residues = list(filter(bool, [
          request.POST[key] for key in request.POST if key.startswith("residue")
         ]))
-        create_site(request.POST["pdb"], request.POST["zinc"], residues)
+        try:
+            create_site(request.POST["pdb"], request.POST["zinc"], residues)
+        except InvalidPdbError:
+            return render(request, "new-site.html", {
+             "error_message": "{} is an invalid PDB".format(request.POST["pdb"])
+            })
         return redirect(
          "/sites/{}{}/".format(request.POST["pdb"], request.POST["zinc"])
         )
@@ -36,7 +42,11 @@ def create_site(pdb, zinc, residues):
 
 
 def create_pdb(code):
-    data = atomium.fetch_data(code, pdbe=True)
+    try:
+        data = atomium.fetch_data(code, pdbe=True)
+        if data is None: raise InvalidPdbError
+    except Exception as e:
+        raise InvalidPdbError
     try:
         Pdb.objects.create(
          id=code, deposition_date=data["deposition_date"], title=data["title"]
