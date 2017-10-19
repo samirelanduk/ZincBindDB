@@ -1,77 +1,121 @@
 from datetime import datetime
+from mixer.backend.django import mixer
 from django.core.exceptions import ValidationError
-from unittest.mock import patch
+from unittest.mock import patch, Mock, MagicMock
 from zincdb.tests import ModelTest
 from zincsites.models import ZincSite, Pdb, Residue
 
-class ZincSiteTests(ModelTest):
-
-    def setUp(self):
-        ModelTest.setUp(self)
-        date = datetime(1970, 1, 1).date()
-        self.pdb = Pdb(id="1XXX", title="The PDB Title", deposition_date=date)
-        self.pdb.save()
-        self.residue1 = Residue(
-         id="1XXXA12", residue_id="A12", number=12, chain="A", name="VAL", pdb=self.pdb
-        )
-        self.residue1.save()
-        self.residue2 = Residue(
-         id="1XXXA15", residue_id="A15", number=15, chain="A", name="VAL", pdb=self.pdb
-        )
-        self.residue2.save()
-
-
-    def test_save_and_retrieve_zinc_sites(self):
-        self.assertEqual(ZincSite.objects.all().count(), 1)
-        site = ZincSite(id="1XXXA999")
-        site.save()
-        site.residues.add(self.residue1)
-        site.residues.add(self.residue2)
-        site.save()
-        self.assertEqual(ZincSite.objects.all().count(), 2)
-        retrieved_site = ZincSite.objects.last()
-        self.assertEqual(retrieved_site, site)
-        self.assertEqual(site.residues.all().count(), 2)
-        self.assertEqual(self.residue1.zincsite_set.all().count(), 1)
-        self.assertEqual(self.residue2.zincsite_set.all().count(), 1)
-        self.assertEqual(site.pdb, self.pdb)
-
-
-
 class PdbTests(ModelTest):
 
-    def test_save_and_retrieve_pdbs(self):
-        date = datetime(1970, 1, 1).date()
-        self.assertEqual(Pdb.objects.all().count(), 1)
-        pdb = Pdb(id="1XXY", title="The PDB Title", deposition_date=date)
+    def test_can_create_pdb(self):
+        pdb = Pdb(pk="1XXY", title="The PDB Title", deposition_date=self.date)
+        pdb.full_clean()
         pdb.save()
-        self.assertEqual(Pdb.objects.all().count(), 2)
-        retrieved_pdb = Pdb.objects.last()
+        self.assertEqual(Pdb.objects.all().count(), 1)
+        retrieved_pdb = Pdb.objects.first()
         self.assertEqual(retrieved_pdb, pdb)
+
+
+    def test_pdb_title_is_needed(self):
+        with self.assertRaises(ValidationError):
+            pdb = Pdb(pk="1XXY", title="", deposition_date=self.date)
+            pdb.full_clean()
+
+
+    def test_pdb_date_is_needed(self):
+        with self.assertRaises(ValidationError):
+            pdb = Pdb(pk="1XXY", title="Title", deposition_date=None)
+            pdb.full_clean()
 
 
 
 class ResidueTests(ModelTest):
 
-    def test_save_and_retrieve_residues(self):
-        self.assertEqual(Residue.objects.all().count(), 2)
-        pdb = Pdb.objects.first()
+    def setUp(self):
+        self.pdb = mixer.blend(Pdb)
+
+
+    def test_can_create_residue(self):
         residue = Residue(
-         id="1XXYA12", residue_id="A12", number=12, chain="A", name="VAL", pdb=pdb
+         pk="1RRRA1", residue_id="A12", number=12,
+         chain="A", name="VAL", pdb=self.pdb
         )
+        self.assertEqual(residue.zincsite_set.count(), 0)
+        residue.full_clean()
         residue.save()
-        self.assertEqual(Residue.objects.all().count(), 3)
-        retrieved_residue = Residue.objects.get(residue_id="A12")
+        self.assertEqual(Residue.objects.all().count(), 1)
+        retrieved_residue = Residue.objects.first()
         self.assertEqual(retrieved_residue, residue)
-        self.assertIn(residue, pdb.residue_set.all())
 
 
-    def test_residue_number_property(self):
-        pdb = Pdb.objects.first()
-        residue = Residue(
-         id="1XXYA12", residue_id="A12", number=12, chain="A", name="VAL", pdb=pdb
+    def test_residue_id_is_needed(self):
+        with self.assertRaises(ValidationError):
+            residue = Residue(
+             pk="1RRRA1", residue_id="", number=12,
+             chain="A", name="VAL", pdb=self.pdb
+            )
+            residue.full_clean()
+
+
+    def test_residue_number_is_needed(self):
+        with self.assertRaises(ValidationError):
+            residue = Residue(
+             pk="1RRRA1", residue_id="A1", number=None,
+             chain="A", name="VAL", pdb=self.pdb
+            )
+            residue.full_clean()
+
+
+    def test_residue_chain_is_needed(self):
+        with self.assertRaises(ValidationError):
+            residue = Residue(
+             pk="1RRRA1", residue_id="A1", number=12,
+             chain="", name="VAL", pdb=self.pdb
+            )
+            residue.full_clean()
+
+
+    def test_residue_name_is_needed(self):
+        with self.assertRaises(ValidationError):
+            residue = Residue(
+             pk="1RRRA1", residue_id="A1", number=12,
+             chain="A", name="", pdb=self.pdb
+            )
+            residue.full_clean()
+
+
+    def test_residue_pdb_is_needed(self):
+        with self.assertRaises(ValidationError):
+            residue = Residue(
+             pk="1RRRA1", residue_id="A1", number=12,
+             chain="A", name="", pdb=None
+            )
+            residue.full_clean()
+
+
+    def test_residue_ordering(self):
+        for chain in ["B", "A"]:
+            for number in [11, 9, 10]:
+                residue = Residue(
+                 pk="1RRR{}{}".format(chain, number), residue_id="A1",
+                 number=number, chain=chain, name="VAL", pdb=self.pdb
+                )
+                residue.save()
+        self.assertEqual(Residue.objects.all().count(), 6)
+        self.assertEqual(
+         [res.id for res in Residue.objects.all()],
+         ["1RRRA9", "1RRRA10", "1RRRA11", "1RRRB9", "1RRRB10", "1RRRB11"]
         )
-        residue.save()
-        self.assertEqual(Residue.objects.all().count(), 3)
-        retrieved_residue = Residue.objects.get(residue_id="A12")
-        self.assertEqual(retrieved_residue.number, 12)
+
+
+
+class ZincSiteTests(ModelTest):
+
+    def test_can_create_zinc_site(self):
+        site = ZincSite(pk="1ZZZA500")
+        self.assertEqual(site.residues.count(), 0)
+        site.full_clean()
+        site.save()
+        self.assertEqual(ZincSite.objects.all().count(), 1)
+        retrieved_site = ZincSite.objects.first()
+        self.assertEqual(retrieved_site, site)
