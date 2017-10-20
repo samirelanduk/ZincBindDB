@@ -1,5 +1,5 @@
 from datetime import datetime
-from unittest.mock import Mock
+from unittest.mock import Mock, MagicMock
 from django.core.urlresolvers import resolve
 from django.contrib.auth.models import User
 from django.test import TransactionTestCase, RequestFactory
@@ -47,3 +47,34 @@ class FactoryTest(ZincDbTest):
         self.zinc.molecule_id.return_value = "B505"
         self.res1 = Mock()
         self.res2 = Mock()
+        self.res1.residue_id.return_value = "B10"
+        self.res1.name.return_value = "VAL"
+        chain = Mock(name="chain")
+        chain.chain_id.return_value = "C"
+        residues_list = Mock(name="res_list")
+        residues_list.index = MagicMock()
+        residues_list.index.return_value = 20
+        chain.residues = MagicMock()
+        chain.residues.return_value = residues_list
+        self.res1.chain = MagicMock()
+        self.res1.chain.return_value = chain
+        self.atom1, self.atom2 = Mock(), Mock()
+        self.atom1.atom_id.return_value = 1
+        self.atom1.x.return_value = 15
+        self.atom1.y.return_value = 16
+        self.atom1.z.return_value = 17
+        self.atom1.element.return_value = "N"
+        self.atom1.name.return_value = "N2"
+        self.atom1.charge.return_value = -1
+        self.atom1.bfactor.return_value = 101
+        self.atom2.atom_id.return_value = 2
+        self.atom2.x.return_value = 25
+        self.atom2.y.return_value = 26
+        self.atom2.z.return_value = 27
+        self.atom2.element.return_value = "Z"
+        self.atom2.name.return_value = "Z5"
+        self.atom2.charge.return_value = -2
+        self.atom2.bfactor.return_value = 202
+        self.res1.atoms.return_value = set([self.atom1, self.atom2])
+        self.pdb_record = Mock()
+        self.pdb_record.id = "1ABC"

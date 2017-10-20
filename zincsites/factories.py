@@ -1,9 +1,9 @@
-from .models import Pdb, ZincSite
+from .models import Pdb, ZincSite, Residue, Atom
 
 def create_zinc_site(pdb, zinc, residues):
     """Creates a new ZincSite from atomium Pdb, Molecule, and Residues objects.
     Any components that don't exist will be created first."""
-    
+
     pdb_record = create_pdb(pdb)
     residue_records = [create_residue(res, pdb_record) for res in residues]
     site = ZincSite.objects.create(pk=pdb_record.id + zinc.molecule_id())
@@ -24,5 +24,23 @@ def create_pdb(pdb):
     )
 
 
-def create_residue():
-    pass
+def create_residue(residue, pdb_record):
+    """Creates a new Residue record and any associated Atom records, and returns
+    it. If it already exists it will just be returned."""
+    
+    residue_pk = pdb_record.id + residue.residue_id()
+    existing_residues = Residue.objects.filter(pk=residue_pk)
+    if existing_residues: return existing_residues[0]
+    residue_record = Residue.objects.create(
+     pk=residue_pk, residue_id=residue.residue_id(),
+     number=residue.chain().residues().index(residue) + 1,
+     chain=residue.chain().chain_id(), pdb=pdb_record
+    )
+    for atom in residue.atoms():
+        Atom.objects.create(
+         pk=pdb_record.id + str(atom.atom_id()), atom_id=atom.atom_id(),
+         x = atom.x(), y=atom.y(), z=atom.z(), element=atom.element(),
+         name=atom.name(), charge=atom.charge(), bfactor=atom.bfactor(),
+         residue=residue_record
+        )
+    return residue_record
