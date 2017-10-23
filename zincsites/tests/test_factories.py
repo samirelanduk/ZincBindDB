@@ -1,6 +1,7 @@
 from unittest.mock import patch, Mock, MagicMock
 from zincdb.tests import FactoryTest
 from zincsites.factories import *
+from zincsites.exceptions import InvalidPdbError
 
 class PdbFactoryTests(FactoryTest):
 
@@ -75,6 +76,21 @@ class ManualZincSiteFactoryTests(FactoryTest):
         model.residue.assert_any_call(residue_id="A6")
         mock_create.assert_called_with(pdb, zinc, [residue1, residue2])
         self.assertEqual(site, "ZINCSITE")
+
+
+    @patch("atomium.fetch")
+    def test_raises_invalid_pdb_error_on_value_error(self, mock_fetch):
+        mock_fetch.side_effect = ValueError()
+        with self.assertRaises(InvalidPdbError):
+            create_manual_zinc_site("1MMM", "A600", ["A2", "A6"])
+
+
+    @patch("atomium.fetch")
+    def test_raises_invalid_pdb_error_on_none_pdb(self, mock_fetch):
+        mock_fetch.return_value = None
+        with self.assertRaises(InvalidPdbError):
+            create_manual_zinc_site("1MMM", "A600", ["A2", "A6"])
+
 
 
 

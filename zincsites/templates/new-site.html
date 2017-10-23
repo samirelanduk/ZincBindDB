@@ -8,8 +8,8 @@
 {% block main %}
 <form method="POST">
   <h1>New Zinc Site</h1>
-  {% if error_message %}
-  <div class="error-message">{{ error_message }}</div>
+  {% if error %}
+  <div class="error-message">{{ error }}</div>
   {% endif %}
   <input name="pdb" autocomplete="off" placeholder="PDB code">
   <input name="zinc" autocomplete="off" placeholder="Zinc ID">

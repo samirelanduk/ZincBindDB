@@ -47,6 +47,24 @@ class NewSiteViewTests(ViewTest):
         self.mock_create.assert_called_with("1TON", "A247", ["A57", "A97", "A99"])
 
 
+    def test_can_handle_missing_pdb(self):
+        self.data["pdb"] = ""
+        request = self.get_user_request("/sites/new/", method="post", data=self.data)
+        self.check_view_uses_template(new_site_page, request, "new-site.html")
+        self.check_view_has_context(
+         new_site_page, request, {"error": "No PDB code supplied"}
+        )
+
+
+    def test_can_handle_invalid_pdb_format(self):
+        self.mock_create.side_effect = InvalidPdbError()
+        request = self.get_user_request("/sites/new/", method="post", data=self.data)
+        self.check_view_uses_template(new_site_page, request, "new-site.html")
+        self.check_view_has_context(
+         new_site_page, request, {"error": "'1TON' is not a valid PDB"}
+        )
+
+
 
 class SiteViewTests(ViewTest):
 
@@ -75,7 +93,7 @@ class SiteViewTests(ViewTest):
 
 
     def test_404_on_incorrect_id(self):
-        self.mock_get.side_effect = ObjectDoesNotExist
+        self.mock_get.side_effect = ObjectDoesNotExist()
         request = self.get_user_request("/sites/1XXXA500/")
         with self.assertRaises(Http404):
             response = site_page(request, "1XXXA500")
@@ -89,11 +107,7 @@ class SiteViewTests(ViewTest):
         self.assertIn("invalid", response.context["error_message"].lower())
 
 
-    def test_new_site_view_handles_missing_pdb(self):
-        self.data["pdb"] = ""
-        response = self.client.post("/sites/new/", self.data)
-        self.assertTemplateUsed(response, "new-site.html")
-        self.assertIn("didn't enter", response.context["error_message"].lower())
+
 
 
     def test_new_site_view_handles_duplicate_zinc_site(self):

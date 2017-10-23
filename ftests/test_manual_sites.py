@@ -94,12 +94,6 @@ class SiteCreationTests(ManualSiteTest):
     def test_can_create_site_in_existing_pdb(self):
         self.login()
 
-        # There is a nav link to the creation page
-        nav_links = self.browser.find_element_by_id("nav-links")
-        nav_links = nav_links.find_elements_by_tag_name("a")
-        self.assertEqual(nav_links[-2].text, "New Site")
-        nav_links[-2].click()
-
         # They enter a zinc binding site and submit
         self.input_site("5O8H", "A502", "A38", "A62", "A153")
 
@@ -115,44 +109,8 @@ class SiteCreationTests(ManualSiteTest):
         )
 
 
-    def test_invalid_pdb(self):
-        self.login()
-
-        # There is a nav link to the creation page
-        nav_links = self.browser.find_element_by_id("nav-links")
-        nav_links = nav_links.find_elements_by_tag_name("a")
-        self.assertEqual(nav_links[-2].text, "New Site")
-        nav_links[-2].click()
-
-        # They enter a zinc binding site and submit
-        self.input_site("XXXX", "A502", "A38", "A62", "A153")
-
-        # They are still on the same page
-        self.check_page("/sites/new/")
-
-        # There is an error message
-        error = self.browser.find_element_by_class_name("error-message")
-        self.assertIn("invalid pdb", error.text.lower())
-
-        # They try again
-        self.input_site("gweauyfeuyf", "A502", "A38", "A62", "A153")
-
-        # They are still on the same page
-        self.check_page("/sites/new/")
-
-        # There is an error message
-        error = self.browser.find_element_by_class_name("error-message")
-        self.assertIn("invalid pdb", error.text.lower())
-
-
     def test_missing_pdb(self):
         self.login()
-
-        # There is a nav link to the creation page
-        nav_links = self.browser.find_element_by_id("nav-links")
-        nav_links = nav_links.find_elements_by_tag_name("a")
-        self.assertEqual(nav_links[-2].text, "New Site")
-        nav_links[-2].click()
 
         # They enter a zinc binding site and submit
         self.input_site("", "A502", "A38", "A62", "A153")
@@ -162,7 +120,31 @@ class SiteCreationTests(ManualSiteTest):
 
         # There is an error message
         error = self.browser.find_element_by_class_name("error-message")
-        self.assertIn("didn't enter", error.text.lower())
+        self.assertIn("no pdb", error.text.lower())
+
+
+    def test_invalid_pdb(self):
+        self.login()
+
+        # They enter a zinc binding site and submit
+        self.input_site("XXXX", "A502", "A38", "A62", "A153")
+
+        # They are still on the same page
+        self.check_page("/sites/new/")
+
+        # There is an error message
+        error = self.browser.find_element_by_class_name("error-message")
+        self.assertIn("valid pdb", error.text.lower())
+
+        # They try again
+        self.input_site("gweauyfeuyf", "A502", "A38", "A62", "A153")
+
+        # They are still on the same page
+        self.check_page("/sites/new/")
+
+        # There is an error message
+        error = self.browser.find_element_by_class_name("error-message")
+        self.assertIn("valid pdb", error.text.lower())
 
 
     def test_cannot_create_same_site_in_pdb(self):

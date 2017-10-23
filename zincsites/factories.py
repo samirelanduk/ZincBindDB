@@ -1,5 +1,6 @@
 import atomium
 from .models import Pdb, ZincSite, Residue, Atom
+from .exceptions import *
 
 def create_zinc_site(pdb, zinc, residues):
     """Creates a new ZincSite from atomium Pdb, Molecule, and Residues objects.
@@ -17,7 +18,11 @@ def create_manual_zinc_site(pdb_code, zinc_id, residue_ids):
     """Creates a new ZincSite from information passed in from the manual
     form."""
 
-    pdb = atomium.fetch(pdb_code, pdbe=True)
+    try:
+        pdb = atomium.fetch(pdb_code, pdbe=True)
+        if pdb is None: raise ValueError
+    except ValueError:
+        raise InvalidPdbError
     model = pdb.model()
     zinc = model.molecule(molecule_id=zinc_id)
     residues = [model.residue(residue_id=res_id) for res_id in residue_ids]

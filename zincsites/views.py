@@ -11,12 +11,21 @@ from zincsites.exceptions import *
 @login_required(login_url="/", redirect_field_name=None)
 def new_site_page(request):
     if request.method == "POST":
+        if not request.POST["pdb"]:
+            return shortcuts.render(request, "new-site.html", {
+             "error": "No PDB code supplied"
+            })
         residues = list(filter(bool, [
          request.POST[key] for key in request.POST if key.startswith("residue")
         ]))
-        create_manual_zinc_site(
-         request.POST["pdb"], request.POST["zinc"], residues
-        )
+        try:
+            create_manual_zinc_site(
+             request.POST["pdb"], request.POST["zinc"], residues
+            )
+        except InvalidPdbError:
+            return shortcuts.render(request, "new-site.html", {
+             "error": "'{}' is not a valid PDB".format(request.POST["pdb"])
+            })
         return shortcuts.redirect(
          "/sites/{}{}/".format(request.POST["pdb"], request.POST["zinc"])
         )
