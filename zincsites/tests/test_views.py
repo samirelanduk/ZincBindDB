@@ -65,6 +65,33 @@ class NewSiteViewTests(ViewTest):
         )
 
 
+    def test_can_handle_missing_zinc(self):
+        self.data["zinc"] = ""
+        request = self.get_user_request("/sites/new/", method="post", data=self.data)
+        self.check_view_uses_template(new_site_page, request, "new-site.html")
+        self.check_view_has_context(
+         new_site_page, request, {"error": "No Zinc ID supplied"}
+        )
+
+
+    def test_can_handle_duplicate_zinc_site(self):
+        self.mock_create.side_effect = DuplicateSiteError()
+        request = self.get_user_request("/sites/new/", method="post", data=self.data)
+        self.check_view_uses_template(new_site_page, request, "new-site.html")
+        self.check_view_has_context(new_site_page, request, {
+         "error": "There is already a zinc site called '1TONA247'"
+        })
+
+
+    def test_can_handle_invalid_zinc_site(self):
+        self.mock_create.side_effect = NoSuchZincError()
+        request = self.get_user_request("/sites/new/", method="post", data=self.data)
+        self.check_view_uses_template(new_site_page, request, "new-site.html")
+        self.check_view_has_context(new_site_page, request, {
+         "error": "There is no Zinc with ID 'A247' in 1TON"
+        })
+
+
 
 class SiteViewTests(ViewTest):
 

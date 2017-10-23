@@ -1,7 +1,9 @@
 from unittest.mock import patch, Mock, MagicMock
+from django.db import IntegrityError
 from zincdb.tests import FactoryTest
 from zincsites.factories import *
-from zincsites.exceptions import InvalidPdbError
+from zincsites.exceptions import InvalidPdbError, DuplicateSiteError
+from zincsites.exceptions import NoSuchZincError
 
 class PdbFactoryTests(FactoryTest):
 
@@ -54,6 +56,15 @@ class ZincSiteFactoryTests(FactoryTest):
         residue_set.add.assert_any_call(residue_record2)
 
 
+    @patch("zincsites.factories.create_pdb")
+    @patch("zincsites.factories.create_residue")
+    @patch("zincsites.models.ZincSite.objects.create")
+    def test_error_on_duplicate_zinc_sites(self, mock_zinc, mock_res, mock_pdb):
+        mock_zinc.side_effect = IntegrityError()
+        with self.assertRaises(DuplicateSiteError):
+            create_zinc_site(self.pdb, self.zinc, [self.res1, self.res2])
+
+
 
 class ManualZincSiteFactoryTests(FactoryTest):
 
@@ -91,6 +102,18 @@ class ManualZincSiteFactoryTests(FactoryTest):
         with self.assertRaises(InvalidPdbError):
             create_manual_zinc_site("1MMM", "A600", ["A2", "A6"])
 
+
+    @patch("atomium.fetch")
+    @patch("zincsites.factories.create_zinc_site")
+    def test_raises_nosuchzinc_error_on_invalid_zinc(self, mock_create, mock_fetch):
+        pdb = Mock()
+        mock_fetch.return_value = pdb
+        model = Mock()
+        pdb.model.return_value = model
+        zinc = Mock()
+        model.molecule.return_value = None
+        with self.assertRaises(NoSuchZincError):
+            create_manual_zinc_site("1MMM", "A600", ["A2", "A6"])
 
 
 

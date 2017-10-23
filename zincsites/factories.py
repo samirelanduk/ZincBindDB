@@ -1,4 +1,5 @@
 import atomium
+from django.db import IntegrityError
 from .models import Pdb, ZincSite, Residue, Atom
 from .exceptions import *
 
@@ -8,7 +9,9 @@ def create_zinc_site(pdb, zinc, residues):
 
     pdb_record = create_pdb(pdb)
     residue_records = [create_residue(res, pdb_record) for res in residues]
-    site = ZincSite.objects.create(pk=pdb_record.id + zinc.molecule_id())
+    try:
+        site = ZincSite.objects.create(pk=pdb_record.id + zinc.molecule_id())
+    except IntegrityError: raise DuplicateSiteError
     for residue in residue_records:
         site.residues.add(residue)
     return site
@@ -25,6 +28,7 @@ def create_manual_zinc_site(pdb_code, zinc_id, residue_ids):
         raise InvalidPdbError
     model = pdb.model()
     zinc = model.molecule(molecule_id=zinc_id)
+    if zinc is None: raise NoSuchZincError
     residues = [model.residue(residue_id=res_id) for res_id in residue_ids]
     return create_zinc_site(pdb, zinc, residues)
 

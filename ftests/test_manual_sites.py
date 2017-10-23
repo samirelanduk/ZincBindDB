@@ -113,7 +113,7 @@ class SiteCreationTests(ManualSiteTest):
         self.login()
 
         # They enter a zinc binding site and submit
-        self.input_site("", "A502", "A38", "A62", "A153")
+        self.input_site("", "A247", "A57", "A97", "A99")
 
         # They are still on the same page
         self.check_page("/sites/new/")
@@ -147,14 +147,22 @@ class SiteCreationTests(ManualSiteTest):
         self.assertIn("valid pdb", error.text.lower())
 
 
-    def test_cannot_create_same_site_in_pdb(self):
+    def test_missing_zinc(self):
         self.login()
 
-        # There is a nav link to the creation page
-        nav_links = self.browser.find_element_by_id("nav-links")
-        nav_links = nav_links.find_elements_by_tag_name("a")
-        self.assertEqual(nav_links[-2].text, "New Site")
-        nav_links[-2].click()
+        # They enter a zinc binding site and submit
+        self.input_site("1TON", "", "A57", "A97", "A99")
+
+        # They are still on the same page
+        self.check_page("/sites/new/")
+
+        # There is an error message
+        error = self.browser.find_element_by_class_name("error-message")
+        self.assertIn("no zinc", error.text.lower())
+
+
+    def test_cannot_create_same_site_in_pdb(self):
+        self.login()
 
         # They enter a zinc binding site and submit
         self.input_site("5O8H", "A501", "A38", "A62", "A153")
@@ -170,14 +178,8 @@ class SiteCreationTests(ManualSiteTest):
     def test_cannot_create_zinc_site_with_zinc_that_doesnt_exist(self):
         self.login()
 
-        # There is a nav link to the creation page
-        nav_links = self.browser.find_element_by_id("nav-links")
-        nav_links = nav_links.find_elements_by_tag_name("a")
-        self.assertEqual(nav_links[-2].text, "New Site")
-        nav_links[-2].click()
-
         # They enter a zinc binding site and submit
-        self.input_site("5O8H", "A1111", "A38", "A62", "A153")
+        self.input_site("1TON", "A1111", "A38", "A62", "A153")
 
         # They are still on the same page
         self.check_page("/sites/new/")
