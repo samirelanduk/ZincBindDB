@@ -90,7 +90,7 @@ class ResidueFactoryTests(FactoryTest):
         residue = create_residue(self.res1, self.pdb_record)
         mock_filter.assert_called_with(pk="1ABCB10")
         mock_res.assert_called_with(
-         pk="1ABCB10", residue_id="B10", number=21, chain="C", pdb=self.pdb_record
+         pk="1ABCB10", residue_id="B10", number=21, chain="C", name="VAL", pdb=self.pdb_record
         )
         mock_atom.assert_any_call(
          pk="1ABC1", atom_id=1, x=15, y=16, z=17, element="N", name="N2",

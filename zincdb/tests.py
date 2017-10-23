@@ -42,11 +42,11 @@ class ViewTest(ZincDbTest):
         return request
 
 
-    def check_view_uses_template(self, view, request, template):
+    def check_view_uses_template(self, view, request, template, *args):
         render_patcher = patch("django.shortcuts.render")
         mock_render = render_patcher.start()
         try:
-            response = view(request)
+            response = view(request, *args)
             self.assertTrue(mock_render.called)
             self.assertEqual(mock_render.call_args_list[0][0][1], template)
         finally:
@@ -57,6 +57,21 @@ class ViewTest(ZincDbTest):
         response = view(request)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, url)
+
+
+    def check_view_has_context(self, view, request, context, *args):
+        render_patcher = patch("django.shortcuts.render")
+        mock_render = render_patcher.start()
+        try:
+            response = view(request, *args)
+            self.assertTrue(mock_render.called)
+            if len(mock_render.call_args_list[0][0]) <= 2:
+                self.fail("No context sent")
+            sent_context = mock_render.call_args_list[0][0][2]
+            for key in context:
+                self.assertEqual(sent_context[key], context[key])
+        finally:
+            render_patcher.stop()
 
 
 

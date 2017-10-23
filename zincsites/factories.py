@@ -44,7 +44,7 @@ def create_residue(residue, pdb_record):
     existing_residues = Residue.objects.filter(pk=residue_pk)
     if existing_residues: return existing_residues[0]
     residue_record = Residue.objects.create(
-     pk=residue_pk, residue_id=residue.residue_id(),
+     pk=residue_pk, residue_id=residue.residue_id(), name=residue.name(),
      number=residue.chain().residues().index(residue) + 1,
      chain=residue.chain().chain_id(), pdb=pdb_record
     )

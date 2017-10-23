@@ -83,13 +83,12 @@ class SiteCreationTests(ManualSiteTest):
         self.check_page("/sites/1TONA247/")
         self.check_title("Site 1TONA247")
         self.check_h1("Zinc Site: 1TONA247")
-        sleep(10)
 
-        '''# The new site looks fine
+        # The new site looks fine
         self.check_site_page(
          "1TON", "3 June, 1987", "SUBMAXILLARY GLAND",
          ["A57", "A97", "A99"], ["HIS"] * 3
-        )'''
+        )
 
 
     def test_can_create_site_in_existing_pdb(self):

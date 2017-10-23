@@ -2,6 +2,7 @@ import atomium
 import django.shortcuts as shortcuts
 from django.http import Http404
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from zincsites.models import ZincSite, Pdb, Residue
 from zincsites.factories import create_manual_zinc_site
 from zincsites.exceptions import *
@@ -53,8 +54,12 @@ def new_site_page(request):
 def site_page(request, site_id):
     try:
         site = ZincSite.objects.get(pk=site_id)
-    except: raise Http404
+    except ObjectDoesNotExist: raise Http404
     return shortcuts.render(request, "site.html", {"site": site})
+    '''try:
+        site = ZincSite.objects.get(pk=site_id)
+    except: raise Http404
+    return shortcuts.render(request, "site.html", {"site": site})'''
 
 
 def create_site(pdb, zinc, residues):
