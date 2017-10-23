@@ -187,3 +187,68 @@ class SiteCreationTests(ManualSiteTest):
         # There is an error message
         error = self.browser.find_element_by_class_name("error-message")
         self.assertIn("there is no zinc", error.text.lower())
+
+
+    def test_missing_residues(self):
+        self.login()
+
+        # They enter a zinc binding site and submit
+        self.input_site("1TON", "A247", "", "", "")
+
+        # They are still on the same page
+        self.check_page("/sites/new/")
+
+        # There is an error message
+        error = self.browser.find_element_by_class_name("error-message")
+        self.assertIn("no residue", error.text.lower())
+
+
+    def test_some_missing_residues(self):
+        self.login()
+
+        # They enter a zinc binding site and submit
+        self.input_site("1TON", "A247", "A57", "", "A99")
+
+        # They are on the page for the new site
+        self.check_page("/sites/1TONA247/")
+        self.check_title("Site 1TONA247")
+        self.check_h1("Zinc Site: 1TONA247")
+
+        # The new site looks fine
+        self.check_site_page(
+         "1TON", "3 June, 1987", "SUBMAXILLARY GLAND",
+         ["A57", "A99"], ["HIS"] * 2
+        )
+
+
+    def test_can_create_zinc_site_from_existing_residues(self):
+        self.login()
+
+        # They enter a zinc binding site and submit
+        self.input_site("5O8H", "A502", "A38", "A62", "A98")
+
+        # They are on the page for the new site
+        self.check_page("/sites/5O8HA502/")
+        self.check_title("Site 5O8HA502")
+        self.check_h1("Zinc Site: 5O8HA502")
+
+        # The new site looks fine
+        self.check_site_page(
+         "5O8H", "11 October, 2017", "CRYSTAL STRUCTURE OF R. RUBER",
+         ["A38", "A62", "A98"], ["CYS", "HIS", "CYS"]
+        )
+
+
+    def test_cannot_create_zinc_site_with_residues_that_doesnt_exist(self):
+        self.login()
+
+        # They enter a zinc binding site and submit
+        self.input_site("1TON", "A247", "A57", "A99999", "A99")
+
+        # They are still on the same page
+        self.check_page("/sites/new/")
+
+        # There is an error message
+        error = self.browser.find_element_by_class_name("error-message")
+        self.assertIn("there is no residue", error.text.lower())
+        self.assertIn("a99999", error.text.lower())

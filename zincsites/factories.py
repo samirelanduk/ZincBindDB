@@ -30,6 +30,9 @@ def create_manual_zinc_site(pdb_code, zinc_id, residue_ids):
     zinc = model.molecule(molecule_id=zinc_id)
     if zinc is None: raise NoSuchZincError
     residues = [model.residue(residue_id=res_id) for res_id in residue_ids]
+    for index, residue in enumerate(residues):
+        if residue is None:
+            raise NoSuchResidueError(residue_ids[index])
     return create_zinc_site(pdb, zinc, residues)
 
 

@@ -8,3 +8,7 @@ class DuplicateSiteError(Exception):
 
 class NoSuchZincError(Exception):
     pass
+
+
+class NoSuchResidueError(Exception):
+    pass

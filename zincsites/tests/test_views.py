@@ -92,6 +92,26 @@ class NewSiteViewTests(ViewTest):
         })
 
 
+    def test_can_handle_all_missing_residues(self):
+        self.data["residue1"] = ""
+        self.data["residue2"] = ""
+        self.data["residue3"] = ""
+        request = self.get_user_request("/sites/new/", method="post", data=self.data)
+        self.check_view_uses_template(new_site_page, request, "new-site.html")
+        self.check_view_has_context(
+         new_site_page, request, {"error": "No Residue IDs supplied"}
+        )
+
+
+    def test_can_handle_invalid_residue(self):
+        self.mock_create.side_effect = NoSuchResidueError("A999")
+        request = self.get_user_request("/sites/new/", method="post", data=self.data)
+        self.check_view_uses_template(new_site_page, request, "new-site.html")
+        self.check_view_has_context(new_site_page, request, {
+         "error": "There is no Residue with ID 'A999' in 1TON"
+        })
+
+
 
 class SiteViewTests(ViewTest):
 

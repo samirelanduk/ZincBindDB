@@ -22,6 +22,10 @@ def new_site_page(request):
         residues = list(filter(bool, [
          request.POST[key] for key in request.POST if key.startswith("residue")
         ]))
+        if not residues:
+            return shortcuts.render(request, "new-site.html", {
+             "error": "No Residue IDs supplied"
+            })
         try:
             create_manual_zinc_site(
              request.POST["pdb"], request.POST["zinc"], residues
@@ -40,6 +44,12 @@ def new_site_page(request):
             return shortcuts.render(request, "new-site.html", {
              "error": "There is no Zinc with ID '{}' in {}".format(
               request.POST["zinc"], request.POST["pdb"]
+             )
+            })
+        except NoSuchResidueError as e:
+            return shortcuts.render(request, "new-site.html", {
+             "error": "There is no Residue with ID '{}' in {}".format(
+              str(e), request.POST["pdb"]
              )
             })
         return shortcuts.redirect(

@@ -3,7 +3,7 @@ from django.db import IntegrityError
 from zincdb.tests import FactoryTest
 from zincsites.factories import *
 from zincsites.exceptions import InvalidPdbError, DuplicateSiteError
-from zincsites.exceptions import NoSuchZincError
+from zincsites.exceptions import NoSuchZincError, NoSuchResidueError
 
 class PdbFactoryTests(FactoryTest):
 
@@ -114,6 +114,22 @@ class ManualZincSiteFactoryTests(FactoryTest):
         model.molecule.return_value = None
         with self.assertRaises(NoSuchZincError):
             create_manual_zinc_site("1MMM", "A600", ["A2", "A6"])
+
+
+    @patch("atomium.fetch")
+    @patch("zincsites.factories.create_zinc_site")
+    def test_raises_nosuchresidue_error_on_invalid_residue(self, mock_create, mock_fetch):
+        pdb = Mock()
+        mock_fetch.return_value = pdb
+        model = Mock()
+        pdb.model.return_value = model
+        zinc = Mock()
+        model.molecule.return_value = zinc
+        residue1, residue2 = Mock(), Mock()
+        model.residue.side_effect = [residue1, None]
+        with self.assertRaises(NoSuchResidueError) as e:
+            create_manual_zinc_site("1MMM", "A600", ["A2", "A6"])
+            self.assertEqual(str(e.exception), "A6")
 
 
 
