@@ -1,6 +1,6 @@
 from unittest.mock import patch, Mock, MagicMock
 from zincdb.tests import FactoryTest
-from zincsites.factories import create_pdb, create_zinc_site, create_residue
+from zincsites.factories import *
 
 class PdbFactoryTests(FactoryTest):
 
@@ -51,6 +51,30 @@ class ZincSiteFactoryTests(FactoryTest):
         self.assertIs(site, site_record)
         residue_set.add.assert_any_call(residue_record1)
         residue_set.add.assert_any_call(residue_record2)
+
+
+
+class ManualZincSiteFactoryTests(FactoryTest):
+
+    @patch("atomium.fetch")
+    @patch("zincsites.factories.create_zinc_site")
+    def test_can_create_zinc_site_from_manual_information(self, mock_create, mock_fetch):
+        pdb = Mock()
+        mock_fetch.return_value = pdb
+        model = Mock()
+        pdb.model.return_value = model
+        zinc = Mock()
+        model.molecule.return_value = zinc
+        residue1, residue2 = Mock(), Mock()
+        model.residue.side_effect = [residue1, residue2]
+        mock_create.return_value = "ZINCSITE"
+        site = create_manual_zinc_site("1MMM", "A600", ["A2", "A6"])
+        mock_fetch.assert_called_with("1MMM", pdbe=True)
+        model.molecule.assert_called_with(molecule_id="A600")
+        model.residue.assert_any_call(residue_id="A2")
+        model.residue.assert_any_call(residue_id="A6")
+        mock_create.assert_called_with(pdb, zinc, [residue1, residue2])
+        self.assertEqual(site, "ZINCSITE")
 
 
 

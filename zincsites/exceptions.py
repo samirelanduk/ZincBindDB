@@ -4,3 +4,7 @@ class InvalidPdbError(Exception):
 
 class DuplicateSiteError(Exception):
     pass
+
+
+class NoSuchZincError(Exception):
+    pass

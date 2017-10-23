@@ -11,12 +11,13 @@ class NewSiteViewTests(ViewTest):
 
     def setUp(self):
         ViewTest.setUp(self)
-        self.creation_patcher = patch("zincsites.views.create_site")
-        self.mock_create = self.creation_patcher.start()
         self.data = {
          "pdb": "1TON", "zinc": "A247",
-         "residue1": "A57", "residue2": "A97", "residue3": ""
+         "residue1": "A57", "residue2": "A97", "residue3": "A99"
         }
+        self.creation_patcher = patch("zincsites.views.create_manual_zinc_site")
+        self.mock_create = self.creation_patcher.start()
+
 
 
     def tearDown(self):
@@ -24,30 +25,28 @@ class NewSiteViewTests(ViewTest):
 
 
     def test_new_site_view_uses_new_site_template(self):
-        response = self.client.get("/sites/new/")
-        self.assertTemplateUsed(response, "new-site.html")
+        request = self.get_user_request("/sites/new/")
+        self.check_view_uses_template(new_site_page, request, "new-site.html")
 
 
     def test_new_site_view_is_protected(self):
-        self.client.logout()
-        response = self.client.get("/sites/new/")
-        self.assertRedirects(response, "/")
+        request = self.factory.get("/sites/new/")
+        request.user = AnonymousUser()
+        self.check_view_redirects(new_site_page, request, "/")
 
 
     def test_new_site_view_redirects_to_new_site_on_successful_post(self):
-        self.data["pdb"] = "1XXX"
-        self.data["zinc"] = "A500"
-        response = self.client.post("/sites/new/", data=self.data)
-        self.assertRedirects(response, "/sites/1XXXA500/")
+        request = self.get_user_request("/sites/new/", method="post", data=self.data)
+        self.check_view_redirects(new_site_page, request, "/sites/1TONA247/")
 
 
     def test_new_site_view_creates_new_site(self):
-        self.mock_create.return_value = "SITE"
-        response = self.client.post("/sites/new/", self.data)
-        self.mock_create.assert_called_with("1TON", "A247", ["A57", "A97"])
+        request = self.get_user_request("/sites/new/", method="post", data=self.data)
+        new_site_page(request)
+        self.mock_create.assert_called_with("1TON", "A247", ["A57", "A97", "A99"])
 
 
-    def test_new_site_view_handles_invalid_pdb(self):
+    '''def test_new_site_view_handles_invalid_pdb(self):
         self.mock_create.side_effect = InvalidPdbError
         response = self.client.post("/sites/new/", self.data)
         self.assertTemplateUsed(response, "new-site.html")
@@ -69,7 +68,14 @@ class NewSiteViewTests(ViewTest):
         self.assertIn("already", response.context["error_message"].lower())
 
 
+    def test_new_site_view_handles_invalid_zinc(self):
+        self.mock_create.side_effect = NoSuchZincError
+        response = self.client.post("/sites/new/", self.data)
+        self.assertTemplateUsed(response, "new-site.html")
+        self.assertIn("is no zinc", response.context["error_message"].lower())'''
 
+
+'''
 class SiteViewTests(ViewTest):
 
     def test_site_view_uses_site_template(self):
@@ -176,4 +182,4 @@ class ResidueCreationTests(ViewTest):
         self.assertEqual(Residue.objects.get(id="A12").chain, "A")
         self.assertEqual(Residue.objects.get(id="A12").name, "TRP")
         self.assertEqual(Residue.objects.get(id="A12").pdb, Pdb.objects.get(pk="1YYY"))
-        self.assertEqual(residue, Residue.objects.get(id="A12"))
+        self.assertEqual(residue, Residue.objects.get(id="A12"))'''

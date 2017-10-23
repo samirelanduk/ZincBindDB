@@ -1,3 +1,4 @@
+import atomium
 from .models import Pdb, ZincSite, Residue, Atom
 
 def create_zinc_site(pdb, zinc, residues):
@@ -10,6 +11,17 @@ def create_zinc_site(pdb, zinc, residues):
     for residue in residue_records:
         site.residues.add(residue)
     return site
+
+
+def create_manual_zinc_site(pdb_code, zinc_id, residue_ids):
+    """Creates a new ZincSite from information passed in from the manual
+    form."""
+
+    pdb = atomium.fetch(pdb_code, pdbe=True)
+    model = pdb.model()
+    zinc = model.molecule(molecule_id=zinc_id)
+    residues = [model.residue(residue_id=res_id) for res_id in residue_ids]
+    return create_zinc_site(pdb, zinc, residues)
 
 
 def create_pdb(pdb):
@@ -27,7 +39,7 @@ def create_pdb(pdb):
 def create_residue(residue, pdb_record):
     """Creates a new Residue record and any associated Atom records, and returns
     it. If it already exists it will just be returned."""
-    
+
     residue_pk = pdb_record.id + residue.residue_id()
     existing_residues = Residue.objects.filter(pk=residue_pk)
     if existing_residues: return existing_residues[0]

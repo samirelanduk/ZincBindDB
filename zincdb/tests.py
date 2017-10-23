@@ -1,6 +1,7 @@
 from datetime import datetime
-from unittest.mock import Mock, MagicMock
+from unittest.mock import Mock, MagicMock, patch
 from django.core.urlresolvers import resolve
+from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.test import TransactionTestCase, RequestFactory
 from zincsites.models import *
@@ -26,7 +27,36 @@ class UrlTest(ZincDbTest):
 
 
 class ViewTest(ZincDbTest):
-    pass
+
+    def setUp(self):
+        ZincDbTest.setUp(self)
+        self.factory = RequestFactory()
+
+
+    def get_user_request(self, path, method="get", data=None):
+        request = self.factory.get(path)
+        if method=="post":
+            data = data if data else {}
+            request = self.factory.post(path, data=data)
+        request.user = self.user
+        return request
+
+
+    def check_view_uses_template(self, view, request, template):
+        render_patcher = patch("django.shortcuts.render")
+        mock_render = render_patcher.start()
+        try:
+            response = view(request)
+            self.assertTrue(mock_render.called)
+            self.assertEqual(mock_render.call_args_list[0][0][1], template)
+        finally:
+            render_patcher.stop()
+
+
+    def check_view_redirects(self, view, request, url):
+        response = view(request)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, url)
 
 
 

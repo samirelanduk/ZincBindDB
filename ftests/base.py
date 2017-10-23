@@ -67,57 +67,6 @@ class FunctionalTest(StaticLiveServerTestCase):
         element.click()
 
 
-    def input_site(self, pdb, zincid, res1, res2, res3):
-        # There is a form
-        site_form = self.browser.find_element_by_tag_name("form")
-
-        # They enter the PDB code
-        pdb_input = site_form.find_elements_by_tag_name("input")[0]
-        pdb_input.send_keys(pdb)
-
-        # They enter the zinc ID
-        zinc_input = site_form.find_elements_by_tag_name("input")[1]
-        zinc_input.send_keys(zincid)
-
-        # They enter the residues
-        residue_input_div = site_form.find_element_by_id("residue-inputs")
-        inputs = residue_input_div.find_elements_by_tag_name("input")
-        self.assertEqual(len(inputs), 1)
-        inputs[0].send_keys(res1)
-        buttons = residue_input_div.find_elements_by_tag_name("button")
-        self.assertEqual(len(buttons), 2)
-        self.click(buttons[-1])
-        inputs = residue_input_div.find_elements_by_tag_name("input")
-        self.assertEqual(len(inputs), 2)
-        inputs[1].send_keys(res2)
-        buttons = residue_input_div.find_elements_by_tag_name("button")
-        self.assertEqual(len(buttons), 3)
-        self.browser.execute_script(
-         "window.scrollTo(0, document.body.scrollHeight);"
-        )
-        self.click(buttons[-1])
-        inputs = residue_input_div.find_elements_by_tag_name("input")
-        self.assertEqual(len(inputs), 3)
-        inputs[2].send_keys("WRONG")
-        buttons = residue_input_div.find_elements_by_tag_name("button")
-        self.assertEqual(len(buttons), 4)
-        self.click(buttons[-1])
-        inputs = residue_input_div.find_elements_by_tag_name("input")
-        self.assertEqual(len(inputs), 4)
-        inputs[3].send_keys(res3)
-        buttons = residue_input_div.find_elements_by_tag_name("button")
-        self.assertEqual(len(buttons), 5)
-        self.click(buttons[-3])
-        inputs = residue_input_div.find_elements_by_tag_name("input")
-        self.assertEqual(len(inputs), 3)
-        buttons = residue_input_div.find_elements_by_tag_name("button")
-        self.assertEqual(len(buttons), 4)
-
-        # They submit the site
-        submit_button = zinc_input = site_form.find_elements_by_tag_name("input")[-1]
-        self.click(submit_button)
-
-
     def check_site_page(self, pdb, date, title, residue_ids, residue_names):
         # There is a PDB section
         pdb_section = self.browser.find_element_by_id("site-pdb")

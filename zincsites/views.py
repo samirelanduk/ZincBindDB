@@ -1,14 +1,26 @@
 import atomium
-from django.shortcuts import render, redirect
+import django.shortcuts as shortcuts
 from django.http import Http404
 from django.contrib.auth.decorators import login_required
 from zincsites.models import ZincSite, Pdb, Residue
+from zincsites.factories import create_manual_zinc_site
 from zincsites.exceptions import *
 
 # Create your views here.
 @login_required(login_url="/", redirect_field_name=None)
 def new_site_page(request):
     if request.method == "POST":
+        residues = list(filter(bool, [
+         request.POST[key] for key in request.POST if key.startswith("residue")
+        ]))
+        create_manual_zinc_site(
+         request.POST["pdb"], request.POST["zinc"], residues
+        )
+        return shortcuts.redirect(
+         "/sites/{}{}/".format(request.POST["pdb"], request.POST["zinc"])
+        )
+    return shortcuts.render(request, "new-site.html")
+    '''if request.method == "POST":
         if not request.POST["pdb"]:
             return render(request, "new-site.html", {
              "error_message": "You didn't enter a PDB code"
@@ -28,17 +40,21 @@ def new_site_page(request):
               request.POST["zinc"], request.POST["pdb"]
              )
             })
+        except NoSuchZincError:
+            return render(request, "new-site.html", {
+             "error_message": "There is no zinc with ID".format(request.POST["zinc"])
+            })
         return redirect(
          "/sites/{}{}/".format(request.POST["pdb"], request.POST["zinc"])
         )
-    return render(request, "new-site.html")
+    return render(request, "new-site.html")'''
 
 
 def site_page(request, site_id):
     try:
         site = ZincSite.objects.get(pk=site_id)
     except: raise Http404
-    return render(request, "site.html", {"site": site})
+    return shortcuts.render(request, "site.html", {"site": site})
 
 
 def create_site(pdb, zinc, residues):
