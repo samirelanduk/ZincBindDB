@@ -126,7 +126,7 @@ class AboutPageTests(FunctionalTest):
     def test_about_page(self):
         self.get("/")
         nav_links = self.browser.find_element_by_id("nav-links")
-        nav_links.find_elements_by_tag_name("li")[0].click()
+        nav_links.find_elements_by_tag_name("li")[1].click()
 
         self.check_page("/about/")
         self.check_title("About")
@@ -139,7 +139,7 @@ class HelpPageTests(FunctionalTest):
     def test_help_page(self):
         self.get("/")
         nav_links = self.browser.find_element_by_id("nav-links")
-        nav_links.find_elements_by_tag_name("li")[1].click()
+        nav_links.find_elements_by_tag_name("li")[2].click()
 
         self.check_page("/help/")
         self.check_title("Help")

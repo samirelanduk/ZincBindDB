@@ -63,3 +63,7 @@ def site_page(request, site_id):
         site = ZincSite.objects.get(pk=site_id)
     except ObjectDoesNotExist: raise Http404
     return shortcuts.render(request, "site.html", {"site": site})
+
+
+def sites_page(request):
+    return shortcuts.render(request, "sites.html")

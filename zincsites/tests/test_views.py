@@ -169,3 +169,11 @@ class SiteViewTests(ViewTest):
         response = self.client.post("/sites/new/", self.data)
         self.assertTemplateUsed(response, "new-site.html")
         self.assertIn("is no zinc", response.context["error_message"].lower())'''
+
+
+
+class SitesViewTest(ViewTest):
+
+    def test_sites_view_uses_sites_template(self):
+        request = self.get_user_request("/sites/")
+        self.check_view_uses_template(sites_page, request, "sites.html")
