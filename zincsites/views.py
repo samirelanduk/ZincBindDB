@@ -66,4 +66,5 @@ def site_page(request, site_id):
 
 
 def sites_page(request):
-    return shortcuts.render(request, "sites.html")
+    sites = ZincSite.objects.all()
+    return shortcuts.render(request, "sites.html", {"sites": sites})

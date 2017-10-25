@@ -9,4 +9,10 @@
 {% block main %}
 <h1>All Zinc Sites</h1>
 
+<table>
+  {% for site in sites %}
+  <tr><td><a href="/sites/{{ site.id }}/">{{ site.id }}</a></td></tr>
+  {% endfor %}
+</table>
+
 {% endblock %}

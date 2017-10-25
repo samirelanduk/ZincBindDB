@@ -146,34 +146,28 @@ class SiteViewTests(ViewTest):
             response = site_page(request, "1XXXA500")
 
 
-    '''def test_new_site_view_handles_invalid_pdb(self):
-        self.mock_create.side_effect = InvalidPdbError
-        response = self.client.post("/sites/new/", self.data)
-        self.assertTemplateUsed(response, "new-site.html")
-        self.assertIn("1TON", response.context["error_message"])
-        self.assertIn("invalid", response.context["error_message"].lower())
-
-
-
-
-
-    def test_new_site_view_handles_duplicate_zinc_site(self):
-        self.mock_create.side_effect = DuplicateSiteError
-        response = self.client.post("/sites/new/", self.data)
-        self.assertTemplateUsed(response, "new-site.html")
-        self.assertIn("already", response.context["error_message"].lower())
-
-
-    def test_new_site_view_handles_invalid_zinc(self):
-        self.mock_create.side_effect = NoSuchZincError
-        response = self.client.post("/sites/new/", self.data)
-        self.assertTemplateUsed(response, "new-site.html")
-        self.assertIn("is no zinc", response.context["error_message"].lower())'''
-
-
 
 class SitesViewTest(ViewTest):
+
+    def setUp(self):
+        ViewTest.setUp(self)
+        self.get_patcher = patch("zincsites.views.ZincSite.objects.all")
+        self.mock_get = self.get_patcher.start()
+
+
+    def tearDown(self):
+        self.get_patcher.stop()
+
 
     def test_sites_view_uses_sites_template(self):
         request = self.get_user_request("/sites/")
         self.check_view_uses_template(sites_page, request, "sites.html")
+
+
+    def test_sites_view_sends_all_sites(self):
+        self.mock_get.return_value = "ZINCSITES"
+        request = self.get_user_request("/sites/")
+        self.check_view_has_context(
+         sites_page, request, {"sites": "ZINCSITES"}
+        )
+        self.mock_get.assert_called_with()
