@@ -280,3 +280,27 @@ class SiteModificationTests(ManualSiteTest):
         self.assertEqual(zinc_input.get_attribute("value"), "A501")
         self.assertFalse(pdb_input.is_enabled())
         self.assertFalse(zinc_input.is_enabled())
+
+        # The residues are there
+        residue_input_div = site_form.find_element_by_id("residue-inputs")
+        inputs = residue_input_div.find_elements_by_tag_name("input")
+        self.assertEqual(len(inputs), 3)
+        self.assertEqual(inputs[0].get_attribute("value"), "A92")
+        self.assertEqual(inputs[1].get_attribute("value"), "A95")
+        self.assertEqual(inputs[2].get_attribute("value"), "A98")
+
+        # They delete the second residue
+        inputs[1].find_element_by_xpath("..").find_element_by_tag_name("button").click()
+        inputs = residue_input_div.find_elements_by_tag_name("input")
+        self.assertEqual(len(inputs), 2)
+        self.assertEqual(inputs[0].get_attribute("value"), "A92")
+        self.assertEqual(inputs[1].get_attribute("value"), "A98")
+        submit_button = zinc_input = site_form.find_elements_by_tag_name("input")[-1]
+        self.click(submit_button)
+        self.check_page("/sites/5O8HA501/")
+
+        # The residue is gone
+        self.check_site_page(
+         "5O8H", "11 October, 2017", "CRYSTAL STRUCTURE OF R. RUBER",
+         ["A92", "A98"], ["CYS"] * 2
+        )

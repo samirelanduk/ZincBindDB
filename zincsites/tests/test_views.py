@@ -20,7 +20,6 @@ class NewSiteViewTests(ViewTest):
         self.mock_create = self.creation_patcher.start()
 
 
-
     def tearDown(self):
         self.creation_patcher.stop()
 
@@ -178,12 +177,17 @@ class EditSiteViewTests(ViewTest):
 
     def setUp(self):
         ViewTest.setUp(self)
-        self.get_patcher = patch("zincsites.views.ZincSite.objects.get")
-        self.mock_get = self.get_patcher.start()
+        self.data = {
+         "residue1": "A57", "residue3": "A99"
+        }
+        self.get_patcher1 = patch("zincsites.views.ZincSite.objects.get")
+        self.mock_get = self.get_patcher1.start()
+        self.get_patcher2 = patch("zincsites.views.update_zinc_residues")
+        self.mock_update = self.get_patcher2.start()
 
 
     def tearDown(self):
-        self.get_patcher.stop()
+        self.get_patcher1.stop()
 
 
     def test_edit_site_view_uses_edit_site_template(self):
@@ -211,3 +215,15 @@ class EditSiteViewTests(ViewTest):
         request = self.get_user_request("/sites/1XXXA500/edit/")
         with self.assertRaises(Http404):
             response = edit_site_page(request, "1XXXA500")
+
+
+    def test_edit_site_view_redirects_to_site_on_successful_post(self):
+        request = self.get_user_request("/sites/1TONA247/edit/", method="post", data=self.data)
+        self.check_view_redirects(edit_site_page, request, "/sites/1TONA247/", "1TONA247")
+
+
+    def test_edit_site_view_updates_site(self):
+        self.mock_get.return_value = "ZINCSITE"
+        request = self.get_user_request("/sites/1TONA247/edit/", method="post", data=self.data)
+        edit_site_page(request, "1TONA247")
+        self.mock_update.assert_called_with(["A57", "A99"], "ZINCSITE")

@@ -4,7 +4,7 @@ from django.http import Http404
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from zincsites.models import ZincSite, Pdb, Residue
-from zincsites.factories import create_manual_zinc_site
+from zincsites.factories import create_manual_zinc_site, update_zinc_residues
 from zincsites.exceptions import *
 
 # Create your views here.
@@ -75,4 +75,10 @@ def edit_site_page(request, site_id):
     try:
         site = ZincSite.objects.get(pk=site_id)
     except ObjectDoesNotExist: raise Http404
+    if request.method == "POST":
+        residues = list(filter(bool, [
+         request.POST[key] for key in request.POST if key.startswith("residue")
+        ]))
+        update_zinc_residues(residues, site)
+        return shortcuts.redirect("/sites/{}/".format(site_id))
     return shortcuts.render(request, "edit-site.html", {"site": site})

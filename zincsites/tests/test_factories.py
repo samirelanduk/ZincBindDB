@@ -168,3 +168,23 @@ class ResidueFactoryTests(FactoryTest):
         self.assertFalse(mock_res.called)
         self.assertFalse(mock_atom.called)
         self.assertIs(residue, residue_record)
+
+
+
+class ZincSiteModificationTests(FactoryTest):
+
+    def test_can_remove_residues(self):
+        zinc = Mock()
+        residues = Mock()
+        zinc.residues = residues
+        residues.values_list = MagicMock()
+        residues.values_list.return_value = ["A10", "A20", "A30", "A40"]
+        residues.get = MagicMock()
+        residue1, residue2 = Mock(), Mock()
+        residues.get.side_effect = [residue1, residue2]
+        update_zinc_residues(["A10", "A30"], zinc)
+        residues.values_list.assert_called_with("residue_id", flat=True)
+        residues.get.assert_any_call(residue_id="A20")
+        residues.get.assert_any_call(residue_id="A40")
+        residue1.delete.assert_called_with()
+        residue2.delete.assert_called_with()

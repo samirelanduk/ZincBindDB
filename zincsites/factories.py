@@ -68,3 +68,10 @@ def create_residue(residue, pdb_record):
          residue=residue_record
         )
     return residue_record
+
+
+def update_zinc_residues(residue_ids, zinc):
+    current_ids = zinc.residues.values_list("residue_id", flat=True)
+    for current_id in current_ids:
+        if current_id not in residue_ids:
+            zinc.residues.get(residue_id=current_id).delete()

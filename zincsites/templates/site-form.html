@@ -11,9 +11,17 @@
   <input name="zinc" autocomplete="off" placeholder="Zinc ID" {% if site %}value="{{ site.zinc_id }}" disabled{% endif %}>
   <script src="/static/js/site-entry.js"></script>
   <fieldset id="residue-inputs">
+    {% if site %}
+      {% for residue in site.residues.all %}
+      <div class="residue-input">
+        <input name="residue{{ forloop.count }}" value="{{ residue.residue_id }}"><button type="button" onclick="removeResidueInput(this);">x</button>
+      </div>
+      {% endfor %}
+    {% else %}
     <div class="residue-input">
       <input name="residue1" placeholder="Residue ID"><button type="button" onclick="removeResidueInput(this);">x</button>
     </div>
+    {% endif %}
     <button type="button" id="new-residue-input" onclick="newResidueInput();">+</button>
   </fieldset>
   {% csrf_token %}
