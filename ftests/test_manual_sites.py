@@ -271,3 +271,12 @@ class SiteModificationTests(ManualSiteTest):
         self.check_page("/sites/5O8HA501/edit/")
         self.check_title("Edit Zinc Site 5O8HA501")
         self.check_h1("Edit Zinc Site 5O8HA501")
+
+        # There is a form there with values present for PDB and zinc ID
+        site_form = self.browser.find_element_by_tag_name("form")
+        pdb_input = site_form.find_elements_by_tag_name("input")[0]
+        zinc_input = site_form.find_elements_by_tag_name("input")[1]
+        self.assertEqual(pdb_input.get_attribute("value"), "5O8H")
+        self.assertEqual(zinc_input.get_attribute("value"), "A501")
+        self.assertFalse(pdb_input.is_enabled())
+        self.assertFalse(zinc_input.is_enabled())

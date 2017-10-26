@@ -137,6 +137,12 @@ class ZincSiteTests(ModelTest):
         self.assertIs(site.pdb, pdb)
 
 
+    @patch("zincsites.models.ZincSite.residues")
+    def test_zinc_site_zinc_id_property(self, mock_residues):
+        site = ZincSite(pk="1ZZZA500")
+        self.assertEqual(site.zinc_id, "A500")
+
+
 
 class AtomTests(ModelTest):
 

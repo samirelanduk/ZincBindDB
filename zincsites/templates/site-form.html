@@ -7,8 +7,8 @@
   {% if error %}
   <div class="error-message">{{ error }}</div>
   {% endif %}
-  <input name="pdb" autocomplete="off" placeholder="PDB code">
-  <input name="zinc" autocomplete="off" placeholder="Zinc ID">
+  <input name="pdb" autocomplete="off" placeholder="PDB code" {% if site %}value="{{ site.pdb.id }}" disabled{% endif %}>
+  <input name="zinc" autocomplete="off" placeholder="Zinc ID" {% if site %}value="{{ site.zinc_id }}" disabled{% endif %}>
   <script src="/static/js/site-entry.js"></script>
   <fieldset id="residue-inputs">
     <div class="residue-input">

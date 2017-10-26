@@ -31,6 +31,11 @@ class ZincSite(models.Model):
         return self.residues.first().pdb
 
 
+    @property
+    def zinc_id(self):
+        return self.id[4:]
+
+
 class Atom(models.Model):
 
     id = models.TextField(primary_key=True)
