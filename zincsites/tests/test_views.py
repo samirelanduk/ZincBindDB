@@ -171,3 +171,43 @@ class SitesViewTest(ViewTest):
          sites_page, request, {"sites": "ZINCSITES"}
         )
         self.mock_get.assert_called_with()
+
+
+
+class EditSiteViewTests(ViewTest):
+
+    def setUp(self):
+        ViewTest.setUp(self)
+        self.get_patcher = patch("zincsites.views.ZincSite.objects.get")
+        self.mock_get = self.get_patcher.start()
+
+
+    def tearDown(self):
+        self.get_patcher.stop()
+
+
+    def test_edit_site_view_uses_edit_site_template(self):
+        request = self.get_user_request("/sites/edit/")
+        self.check_view_uses_template(edit_site_page, request, "edit-site.html", "siteid")
+
+
+    def test_edit_site_view_is_protected(self):
+        request = self.factory.get("/sites/edit/")
+        request.user = AnonymousUser()
+        self.check_view_redirects(edit_site_page, request, "/", "siteid")
+
+
+    def test_edit_site_view_sends_site(self):
+        self.mock_get.return_value = "ZINCSITE"
+        request = self.get_user_request("/sites/1XXXA500/edit/")
+        self.check_view_has_context(
+         edit_site_page, request, {"site": "ZINCSITE"}, "1XXXA500"
+        )
+        self.mock_get.assert_called_with(pk="1XXXA500")
+
+
+    def test_404_on_incorrect_id(self):
+        self.mock_get.side_effect = ObjectDoesNotExist()
+        request = self.get_user_request("/sites/1XXXA500/edit/")
+        with self.assertRaises(Http404):
+            response = edit_site_page(request, "1XXXA500")

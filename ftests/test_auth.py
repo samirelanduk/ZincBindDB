@@ -55,7 +55,8 @@ class LoginTests(FunctionalTest):
 
     def test_protected_pages(self):
         protected_pages = [
-         "/sites/new/"
+         "/sites/new/",
+         "/sites/5O8HA501/edit/"
         ]
         for page in protected_pages:
             self.get(page)

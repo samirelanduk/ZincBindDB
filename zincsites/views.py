@@ -68,3 +68,11 @@ def site_page(request, site_id):
 def sites_page(request):
     sites = ZincSite.objects.all()
     return shortcuts.render(request, "sites.html", {"sites": sites})
+
+
+@login_required(login_url="/", redirect_field_name=None)
+def edit_site_page(request, site_id):
+    try:
+        site = ZincSite.objects.get(pk=site_id)
+    except ObjectDoesNotExist: raise Http404
+    return shortcuts.render(request, "edit-site.html", {"site": site})

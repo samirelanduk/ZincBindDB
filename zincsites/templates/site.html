@@ -7,6 +7,9 @@
 {% endblock %}
 
 {% block main %}
+{% if user.is_authenticated %}
+<div class="edit-link"><a href="edit/">Edit</a></a>
+{% endif %}
 <h1>Zinc Site: {{ site.id }}</h1>
 
 <div id="site-pdb">

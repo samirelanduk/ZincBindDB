@@ -53,8 +53,8 @@ class ViewTest(ZincDbTest):
             render_patcher.stop()
 
 
-    def check_view_redirects(self, view, request, url):
-        response = view(request)
+    def check_view_redirects(self, view, request, url, *args):
+        response = view(request, *args)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, url)
 

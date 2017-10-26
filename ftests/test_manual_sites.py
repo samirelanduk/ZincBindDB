@@ -252,3 +252,22 @@ class SiteCreationTests(ManualSiteTest):
         error = self.browser.find_element_by_class_name("error-message")
         self.assertIn("there is no residue", error.text.lower())
         self.assertIn("a99999", error.text.lower())
+
+
+
+class SiteModificationTests(ManualSiteTest):
+
+    def test_can_remove_residues(self):
+        # User goes to site page, and there's no edit link
+        self.get("/sites/5O8HA501/")
+        edit_links = self.browser.find_elements_by_class_name("edit-link")
+        self.assertFalse(edit_links)
+
+        # They log in and there is an edit link, which they click
+        self.login()
+        self.get("/sites/5O8HA501/")
+        edit_link = self.browser.find_element_by_class_name("edit-link")
+        edit_link.find_element_by_tag_name("a").click()
+        self.check_page("/sites/5O8HA501/edit/")
+        self.check_title("Edit Zinc Site 5O8HA501")
+        self.check_h1("Edit Zinc Site 5O8HA501")
