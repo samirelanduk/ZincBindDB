@@ -55,6 +55,7 @@ nav #mobile-menu {
 main {
   min-height: calc(75vh);
   margin: 20px;
+  position: relative;
 }
 
 footer {
@@ -152,6 +153,20 @@ input[type='submit'] {
   border-radius: 30px;
   padding: 20px;
   text-align: center;
+}
+
+.edit-link {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #000099;
+  padding: 2px;
+  border-radius: 3px;
+}
+
+.edit-link a {
+  color: white;
+  text-decoration: none;
 }
 
 table {
