@@ -295,7 +295,7 @@ class SiteModificationTests(ManualSiteTest):
         self.assertEqual(len(inputs), 2)
         self.assertEqual(inputs[0].get_attribute("value"), "A92")
         self.assertEqual(inputs[1].get_attribute("value"), "A98")
-        submit_button = zinc_input = site_form.find_elements_by_tag_name("input")[-1]
+        submit_button = site_form.find_elements_by_tag_name("input")[-1]
         self.click(submit_button)
         self.check_page("/sites/5O8HA501/")
 

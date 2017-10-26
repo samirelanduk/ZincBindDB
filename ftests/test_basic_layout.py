@@ -37,9 +37,6 @@ class BasePageLayoutTests(FunctionalTest):
         # The nav is correct
         nav = self.browser.find_element_by_tag_name("nav")
         self.assertGreater(nav.size["height"], 50)
-        self.assertNotEqual(
-         nav.value_of_css_property("background-color"), "rgba(0, 0, 0, 0)"
-        )
 
         # The nav links are horizontally aranged
         nav_links = self.browser.find_element_by_id("nav-links")
@@ -134,25 +131,12 @@ class AboutPageTests(FunctionalTest):
 
 
 
-class HelpPageTests(FunctionalTest):
-
-    def test_help_page(self):
-        self.get("/")
-        nav_links = self.browser.find_element_by_id("nav-links")
-        nav_links.find_elements_by_tag_name("li")[2].click()
-
-        self.check_page("/help/")
-        self.check_title("Help")
-        self.check_h1("Help")
-
-
-
 class ChangelogPageTests(FunctionalTest):
 
     def test_changelog_page(self):
         self.get("/")
         footer = self.browser.find_element_by_tag_name("footer")
-        footer.find_elements_by_tag_name("a")[2].click()
+        self.click(footer.find_elements_by_tag_name("a")[2])
 
         self.check_page("/changelog/")
         self.check_title("Changelog")
