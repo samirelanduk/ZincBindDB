@@ -1,6 +1,7 @@
 __pycache__
 *.pyc
 .DS_Store
+.coverage
 
 *.sqlite3
 *.json
