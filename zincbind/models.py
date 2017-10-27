@@ -41,3 +41,14 @@ class Atom(models.Model):
     charge = models.FloatField()
     bfactor = models.FloatField()
     residue = models.ForeignKey(Residue)
+
+
+
+class ZincSite(models.Model):
+    """Represents a Zinc binding site."""
+
+    id = models.TextField(primary_key=True)
+    residues = models.ManyToManyField(Residue)
+    x = models.FloatField()
+    y = models.FloatField()
+    z = models.FloatField()
