@@ -1,6 +1,7 @@
 import requests
 import re
 from .exceptions import RcsbError
+from .models import Pdb
 
 def get_all_pdb_codes():
     """Gets a list of all current PDB IDs, by querying the RCSB web services.
@@ -15,3 +16,11 @@ def get_all_pdb_codes():
     if not pdbs:
         raise RcsbError("Could not parse PDB codes from RCSB's response")
     return pdbs
+
+
+def remove_checked_pdbs(pdbs):
+    checked_pdb_codes = set(Pdb.objects.all().values_list("id", flat=True))
+    for code in checked_pdb_codes:
+        try:
+            pdbs.remove(code)
+        except ValueError: pass

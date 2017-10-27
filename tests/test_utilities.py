@@ -34,3 +34,17 @@ class PdbCodeGrabTests(ZincBindTest):
         mock_get.return_value = response
         with self.assertRaises(RcsbError):
             get_all_pdb_codes()
+
+
+
+class CheckedPdbRemovalTests(ZincBindTest):
+
+    @patch("zincbind.utilities.Pdb.objects.all")
+    def test_can_remove_checked_pdbs(self, mock_filter):
+        result_set = Mock()
+        mock_filter.return_value = result_set
+        result_set.values_list.return_value = ["1AAA", "2AAA", "4AAA"]
+        pdbs = ["1AAA", "2AAA", "3AAA", "4AAA", "5AAA"]
+        remove_checked_pdbs(pdbs)
+        result_set.values_list.assert_called_with("id", flat=True)
+        self.assertEqual(pdbs, ["3AAA", "5AAA"])
