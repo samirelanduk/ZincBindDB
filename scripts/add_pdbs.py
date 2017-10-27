@@ -15,3 +15,12 @@ print("There are {} current PDB codes.".format(len(pdb_codes)))
 
 remove_checked_pdbs(pdb_codes)
 print("There are {} which have never been checked.".format(len(pdb_codes)))
+
+print("Checking PDBs...")
+for code in pdb_codes:
+    print("\tChecking {}...".format(code))
+    if zinc_in_pdb(code):
+        print("\tFound Zinc")
+    else:
+        print("\tNo Zinc")
+    print("")

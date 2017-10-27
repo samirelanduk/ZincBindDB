@@ -48,3 +48,46 @@ class CheckedPdbRemovalTests(ZincBindTest):
         remove_checked_pdbs(pdbs)
         result_set.values_list.assert_called_with("id", flat=True)
         self.assertEqual(pdbs, ["3AAA", "5AAA"])
+
+
+
+class PdbTextLoadingTests(ZincBindTest):
+
+    @patch("atomium.files.utilities.fetch_string")
+    def test_can_get_pdb_text_from_web(self, mock_string):
+        mock_string.return_value = "FILESTRING"
+        filestring = get_pdb_filestring("1ABC")
+        mock_string.assert_called_with("1ABC")
+        self.assertEqual(filestring, "FILESTRING")
+
+
+    @patch("atomium.files.utilities.fetch_string")
+    def test_getting_pdb_from_web_can_trhow_error(self, mock_string):
+        mock_string.return_value = None
+        with self.assertRaises(RcsbError):
+            get_pdb_filestring("1ABC")
+
+
+
+class ZincInFileCheckingTests(ZincBindTest):
+
+    @patch("zincbind.utilities.get_pdb_filestring")
+    def test_can_find_zinc_in_file(self, mock_string):
+        mock_string.return_value = "\n".join([
+         "SEQRES  19 A  235  PRO    ",
+         "HET     ZN  A 247       1    ",
+         "HETNAM      ZN ZINC ION    "
+        ])
+        self.assertTrue(zinc_in_pdb("1ABC"))
+        mock_string.assert_called_with("1ABC")
+
+
+    @patch("zincbind.utilities.get_pdb_filestring")
+    def test_can_reject_zinc_in_file(self, mock_string):
+        mock_string.return_value = "\n".join([
+         "SEQRES  19 A  235  PRO    ",
+         "HET     MOL  A 247       1    ",
+         "HETNAM      ZN ZINC ION    "
+        ])
+        self.assertFalse(zinc_in_pdb("1ABC"))
+        mock_string.assert_called_with("1ABC")

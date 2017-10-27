@@ -1,5 +1,6 @@
 import requests
 import re
+import atomium
 from .exceptions import RcsbError
 from .models import Pdb
 
@@ -19,8 +20,27 @@ def get_all_pdb_codes():
 
 
 def remove_checked_pdbs(pdbs):
+    """Takes a list of PDB codes and removes those which are already in the
+    database. The list is changed in place and nothing is returned."""
+
     checked_pdb_codes = set(Pdb.objects.all().values_list("id", flat=True))
     for code in checked_pdb_codes:
         try:
             pdbs.remove(code)
         except ValueError: pass
+
+
+def get_pdb_filestring(pdb_code):
+    """Gets the text of a PDB file from a PDB code - currently by just grabbing
+    it from the RCSB web services."""
+
+    filestring = atomium.files.utilities.fetch_string(pdb_code)
+    if filestring:
+        return filestring
+    else:
+        raise RcsbError("Could not get PDB {} from RCSB".format(pdb_code))
+
+
+def zinc_in_pdb(pdb_code):
+    filestring = get_pdb_filestring(pdb_code)
+    return bool(re.search(r"HET\s+ZN\s+", filestring))
