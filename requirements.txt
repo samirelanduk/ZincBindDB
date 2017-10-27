@@ -1,5 +1,0 @@
-django==1.10.7
-selenium
-gunicorn
-psycopg2
-atomium==0.6

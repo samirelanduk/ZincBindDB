@@ -1,7 +1,7 @@
 __pycache__
 *.pyc
 .DS_Store
-dist
-*env
+
 *.sqlite3
-secrets.py
+*.json
+*.pdb
