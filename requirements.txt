@@ -3,4 +3,4 @@ atomium==0.7
 selenium==3.6
 mixer==5.6.6
 requests==2.18.4
-coverage
+python-coveralls
