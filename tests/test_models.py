@@ -3,7 +3,7 @@ from mixer.backend.django import mixer
 from django.core.exceptions import ValidationError
 from unittest.mock import patch, Mock, MagicMock
 from .base import ZincBindTest
-from zincbind.models import Pdb, Residue
+from zincbind.models import Pdb, Residue, Atom
 
 class PdbTests(ZincBindTest):
 
@@ -143,3 +143,142 @@ class ResidueTests(ZincBindTest):
         )
         with self.assertRaises(ValidationError):
             residue.full_clean()
+
+
+
+class AtomTests(ZincBindTest):
+
+    def setUp(self):
+        ZincBindTest.setUp(self)
+        self.residue = mixer.blend(Residue)
+
+
+    def test_can_create_atom(self):
+        atom = Atom(
+         pk="1XYZ555", atom_id=555, name="CA", x=1.5, y=-1.5, z=0.0,
+         element="C", charge=-1, bfactor=13.4, residue=self.residue
+        )
+        atom.full_clean()
+
+
+    def test_atomid_is_required(self):
+        atom = Atom(
+         pk="1XYZ555", atom_id=None, name="CA", x=1.5, y=-1.5, z=0.0,
+         element="C", charge=-1, bfactor=13.4, residue=self.residue
+        )
+        with self.assertRaises(ValidationError):
+            atom.full_clean()
+        atom = Atom(
+         pk="1XYZ555", atom_id=0, name="CA", x=1.5, y=-1.5, z=0.0,
+         element="C", charge=-1, bfactor=13.4, residue=self.residue
+        )
+        atom.full_clean()
+
+
+    def test_name_is_required(self):
+        atom = Atom(
+         pk="1XYZ555", atom_id=555, name=None, x=1.5, y=-1.5, z=0.0,
+         element="C", charge=-1, bfactor=13.4, residue=self.residue
+        )
+        with self.assertRaises(ValidationError):
+            atom.full_clean()
+        atom = Atom(
+         pk="1XYZ555", atom_id=555, name="", x=1.5, y=-1.5, z=0.0,
+         element="C", charge=-1, bfactor=13.4, residue=self.residue
+        )
+        with self.assertRaises(ValidationError):
+            atom.full_clean()
+
+
+    def test_x_is_required(self):
+        atom = Atom(
+         pk="1XYZ555", atom_id=555, name="CA", x=None, y=-1.5, z=0.0,
+         element="C", charge=-1, bfactor=13.4, residue=self.residue
+        )
+        with self.assertRaises(ValidationError):
+            atom.full_clean()
+        atom = Atom(
+         pk="1XYZ555", atom_id=555, name="CA", x=0, y=-1.5, z=0.0,
+         element="C", charge=-1, bfactor=13.4, residue=self.residue
+        )
+        atom.full_clean()
+
+
+    def test_y_is_required(self):
+        atom = Atom(
+         pk="1XYZ555", atom_id=555, name="CA", x=1.5, y=None, z=0.0,
+         element="C", charge=-1, bfactor=13.4, residue=self.residue
+        )
+        with self.assertRaises(ValidationError):
+            atom.full_clean()
+        atom = Atom(
+         pk="1XYZ555", atom_id=555, name="CA", x=1.5, y=0, z=0.0,
+         element="C", charge=-1, bfactor=13.4, residue=self.residue
+        )
+        atom.full_clean()
+
+
+    def test_z_is_required(self):
+        atom = Atom(
+         pk="1XYZ555", atom_id=555, name="CA", x=1.5, y=-1.5, z=None,
+         element="C", charge=-1, bfactor=13.4, residue=self.residue
+        )
+        with self.assertRaises(ValidationError):
+            atom.full_clean()
+        atom = Atom(
+         pk="1XYZ555", atom_id=555, name="CA", x=1.5, y=-1.5, z=0,
+         element="C", charge=-1, bfactor=13.4, residue=self.residue
+        )
+        atom.full_clean()
+
+
+    def test_element_is_required(self):
+        atom = Atom(
+         pk="1XYZ555", atom_id=555, name="CA", x=1.5, y=-1.5, z=0.0,
+         element=None, charge=-1, bfactor=13.4, residue=self.residue
+        )
+        with self.assertRaises(ValidationError):
+            atom.full_clean()
+        atom = Atom(
+         pk="1XYZ555", atom_id=555, name="CA", x=1.5, y=-1.5, z=0.0,
+         element="", charge=-1, bfactor=13.4, residue=self.residue
+        )
+        with self.assertRaises(ValidationError):
+            atom.full_clean()
+
+
+    def test_charge_is_required(self):
+        atom = Atom(
+         pk="1XYZ555", atom_id=555, name="CA", x=1.5, y=-1.5, z=0.0,
+         element="C", charge=None, bfactor=13.4, residue=self.residue
+        )
+        with self.assertRaises(ValidationError):
+            atom.full_clean()
+        atom = Atom(
+         pk="1XYZ555", atom_id=555, name="CA", x=1.5, y=-1.5, z=0.0,
+         element="C", charge=0, bfactor=13.4, residue=self.residue
+        )
+        atom.full_clean()
+
+
+    def test_bfactor_is_required(self):
+        atom = Atom(
+         pk="1XYZ555", atom_id=555, name="CA", x=1.5, y=-1.5, z=0.0,
+         element="C", charge=-1, bfactor=None, residue=self.residue
+        )
+        with self.assertRaises(ValidationError):
+            atom.full_clean()
+        atom = Atom(
+         pk="1XYZ555", atom_id=555, name="CA", x=1.5, y=-1.5, z=0.0,
+         element="C", charge=-1, bfactor=0, residue=self.residue
+        )
+        atom.full_clean()
+
+
+    def test_residue_is_required(self):
+        atom = Atom(
+         pk="1XYZ555", atom_id=555, name="CA", x=1.5, y=-1.5, z=0.0,
+         element="C", charge=-1, bfactor=13.4, residue=None
+        )
+        with self.assertRaises(ValidationError):
+            atom.full_clean()

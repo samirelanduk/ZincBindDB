@@ -25,3 +25,19 @@ class Residue(models.Model):
     chain = models.CharField(max_length=16)
     number = models.IntegerField()
     pdb = models.ForeignKey(Pdb)
+
+
+
+class Atom(models.Model):
+    """Represents an Atom from a PDB."""
+
+    id = models.TextField(primary_key=True)
+    atom_id = models.IntegerField()
+    name = models.CharField(max_length=32)
+    x = models.FloatField()
+    y = models.FloatField()
+    z = models.FloatField()
+    element = models.CharField(max_length=8)
+    charge = models.FloatField()
+    bfactor = models.FloatField()
+    residue = models.ForeignKey(Residue)
