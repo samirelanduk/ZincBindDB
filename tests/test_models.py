@@ -16,50 +16,37 @@ class PdbTests(ZincBindTest):
         pdb.full_clean()
 
 
-    def test_title_is_required(self):
+    def test_title_is_not_required(self):
         pdb = Pdb(
-         pk="1XXY", title=None, deposited="1990-09-28",
+         pk="1XXY", deposited="1990-09-28",
          resolution=4.5, checked="2017-01-01"
         )
-        with self.assertRaises(ValidationError):
-            pdb.full_clean()
-        pdb = Pdb(
-         pk="1XXY", title="", deposited="1990-09-28",
-         resolution=4.5, checked="2017-01-01"
-        )
-        with self.assertRaises(ValidationError):
-            pdb.full_clean()
+        pdb.full_clean()
 
 
-    def test_date_is_required(self):
+    def test_date_is_not_required(self):
         pdb = Pdb(
          pk="1XXY", title="The PDB Title", deposited=None,
          resolution=4.5, checked="2017-01-01"
         )
-        with self.assertRaises(ValidationError):
-            pdb.full_clean()
+        pdb.full_clean()
 
 
-    def test_resolution_is_required(self):
+    def test_resolution_is_not_required(self):
         pdb = Pdb(
          pk="1XXY", title="The PDB Title", deposited="1990-09-28",
          resolution=None, checked="2017-01-01"
         )
-        with self.assertRaises(ValidationError):
-            pdb.full_clean()
-        pdb = Pdb(
-         pk="1XXY", title="The PDB Title", deposited="1990-09-28",
-         resolution=0, checked="2017-01-01"
-        )
         pdb.full_clean()
 
 
-    def test_checked_can_be_null(self):
+    def test_checked_is_required(self):
         pdb = Pdb(
          pk="1XXY", title="The PDB Title", deposited="1990-09-28",
          resolution=4.5, checked=None
         )
-        pdb.full_clean()
+        with self.assertRaises(ValidationError):
+            pdb.full_clean()
 
 
 

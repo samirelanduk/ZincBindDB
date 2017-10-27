@@ -7,6 +7,7 @@ sys.path.append(os.path.join("..", "zincbind"))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "zincbind.settings")
 django.setup()
 from zincbind.utilities import *
+from zincbind.factories import create_empty_pdb
 
 
 print("Fetching PDB codes...")
@@ -23,4 +24,5 @@ for code in pdb_codes:
         print("\tFound Zinc")
     else:
         print("\tNo Zinc")
+        create_empty_pdb(code)
     print("")

@@ -7,10 +7,10 @@ class Pdb(models.Model):
     ther is."""
 
     id = models.CharField(primary_key=True, max_length=64)
-    title = models.TextField()
-    deposited = models.DateField()
-    resolution = models.FloatField()
-    checked = models.DateField(blank=True, null=True)
+    title = models.TextField(blank=True, null=True)
+    deposited = models.DateField(blank=True, null=True)
+    resolution = models.FloatField(blank=True, null=True)
+    checked = models.DateTimeField()
 
 
 
