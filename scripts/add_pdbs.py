@@ -7,7 +7,7 @@ sys.path.append(os.path.join("..", "zincbind"))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "zincbind.settings")
 django.setup()
 from zincbind.utilities import *
-from zincbind.factories import create_empty_pdb
+from zincbind.factories import create_empty_pdb, create_zinc_site
 
 
 print("Fetching PDB codes...")
@@ -26,7 +26,7 @@ for code in pdb_codes:
         model = pdb.model()
         for zinc in model.molecules(name="ZN"):
             site = zinc.site()
-            # create_zinc_site(pdb, zinc, site.residues())
+            create_zinc_site(pdb, zinc, site.residues())
     else:
         print("\tNo Zinc")
         create_empty_pdb(code)

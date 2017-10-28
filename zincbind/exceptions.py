@@ -9,3 +9,9 @@ class AtomiumError(Exception):
     """The exception raised if there is some problem parsing PDBs with
     the atomium library."""
     pass
+
+
+
+class DuplicateSiteError(Exception):
+    """The exception raised if a ZincSite is created which already exists."""
+    pass
