@@ -17,3 +17,5 @@ INSTALLED_APPS = [
  "django.contrib.contenttypes",
  "zincbind"
 ]
+
+TIME_ZONE = "UTC"

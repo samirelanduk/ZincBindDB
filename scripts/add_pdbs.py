@@ -22,6 +22,11 @@ for code in pdb_codes:
     print("\tChecking {}...".format(code))
     if zinc_in_pdb(code):
         print("\tFound Zinc")
+        pdb = get_pdb(code)
+        model = pdb.model()
+        for zinc in model.molecules(name="ZN"):
+            site = zinc.site()
+            # create_zinc_site(pdb, zinc, site.residues())
     else:
         print("\tNo Zinc")
         create_empty_pdb(code)

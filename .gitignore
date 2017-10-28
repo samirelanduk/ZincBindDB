@@ -3,6 +3,6 @@ __pycache__
 .DS_Store
 .coverage
 
-*.sqlite3
+*.sqlite3*
 *.json
 *.pdb
