@@ -19,3 +19,5 @@ INSTALLED_APPS = [
 ]
 
 TIME_ZONE = "UTC"
+
+STATIC_URL = "/static/"
