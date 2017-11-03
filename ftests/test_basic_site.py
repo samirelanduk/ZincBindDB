@@ -32,3 +32,34 @@ class BasePageLayoutTests(BrowserTest):
             header = links.find_element_by_class_name("footer-header")
             self.assertGreater(len(links.find_elements_by_tag_name("a")), 2)
         copyright = footer.find_element_by_id("copyright")
+
+
+    def test_basic_page_css(self):
+        self.get("/")
+
+        # The header is correct
+        header = self.browser.find_element_by_tag_name("header")
+        self.assertGreater(header.size["height"], 50)
+
+        # The nav links are horizontally aranged
+        mobile_menu = header.find_element_by_id("mobile-menu")
+        self.assertEqual(
+         mobile_menu.value_of_css_property("display"),
+         "none"
+        )
+        nav = self.browser.find_element_by_tag_name("nav")
+        nav_links = nav.find_elements_by_tag_name("li")
+        for index, link in enumerate(nav_links):
+            self.assertEqual(link.location["y"], nav_links[0].location["y"])
+            if index:
+                self.assertGreater(
+                 link.location["x"], nav_links[index - 1].location["x"]
+                )
+
+        # The footer is at the bottom
+        footer = self.browser.find_element_by_tag_name("footer")
+        self.assertGreater(footer.location["y"], 500)
+
+        # The footer lists are side by side
+        lists = footer.find_elements_by_class_name("footer-list")
+        self.assertGreater(lists[1].location["x"], lists[0].location["x"])

@@ -8,6 +8,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/gif" href="/static/images/favicon.png">
   <title>{% block title %}{% endblock %} - ZincBind</title>
+  <link href='https://fonts.googleapis.com/css?family=Exo+2'
+   rel='stylesheet' type='text/css'>
+   <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro'
+    rel='stylesheet' type='text/css'>
   <link rel="stylesheet" type="text/css" href="/static/css/main.css">
   <script src="https://code.jquery.com/jquery.min.js"></script>
   <script src="/static/js/main.js"></script>
@@ -20,12 +24,8 @@
     <div id="mobile-menu"><div id="mobile-menu-icon">&#9776;</div></div>
   </header>
   <nav>
-    <li><a href="/sites/">Zinc Sites</a></li>
-    <li><a href="/about/">About</a></li>
-    {% if user.is_authenticated %}
-    <li><a href="/sites/new/" class="logged-in">New Site</a></li>
-    <li><a href="/logout/" class="logged-in">Log Out</a></li>
-    {% endif %}
+    <li><a href="/sites/">Link 1</a></li>
+    <li><a href="/about/">Link 2</a></li>
   </nav>
   <main>
     {% block main %}

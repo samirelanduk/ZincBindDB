@@ -15,6 +15,7 @@ DATABASES = {"default": {
 
 INSTALLED_APPS = [
  "django.contrib.contenttypes",
+ "django.contrib.staticfiles",
  "zincbind"
 ]
 
