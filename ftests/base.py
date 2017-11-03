@@ -84,10 +84,12 @@ class BrowserTest(FunctionalTest):
 
     def setUp(self):
         FunctionalTest.setUp(self)
-        if os.environ.get("djangovar") == "headless":
+        self.headless = os.environ.get("djangovar") == "headless"
+        if self.headless:
             self.browser = webdriver.PhantomJS()
         else:
             self.browser = webdriver.Chrome()
+        self.browser.set_window_size(800, 700)
 
 
     def tearDown(self):

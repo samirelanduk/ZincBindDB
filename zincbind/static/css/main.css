@@ -93,3 +93,42 @@ footer a {
   color: #AAAAAA;
   text-align: center;
 }
+
+
+@media only screen and (max-width: 769px) {
+  /* iPad and down */
+  nav {
+    display: none;
+    margin: 0px;
+    position: static;
+    background-color: #8c5f9e;
+    width: 100%;
+    height: auto;
+  }
+
+  nav li {
+    display: block;
+    text-align: center;
+    line-height: 40px;
+    border: 1px solid #67317d;
+    padding: 0px;
+  }
+
+  #mobile-menu {
+    display: block;
+    flex-grow: 100;
+    margin-right: 20px;
+    text-align: right;
+    cursor: pointer;
+  }
+
+  #mobile-menu-icon {
+    display: inline;
+  }
+
+  footer .footer-list {
+    display: block;
+    width: 100%;
+  }
+
+}
