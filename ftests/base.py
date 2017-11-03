@@ -78,22 +78,37 @@ class FunctionalTest(StaticLiveServerTestCase):
 
 
 
-        '''for index, code in enumerate(pdb_codes):
-            if index > 23:
-                Pdb.objects.create(pk=code, checked=datetime.now())
-            else:
-                day = datetime(2012, 1, 1) + timedelta(days=index)
-                Pdb.objects.create(
-                 pk=code, checked=datetime.now(),
-                 title="PDB {}".format(index + 1), deposited=day,
-                 resolution=5-(index / 10)
-                )
-        for index, pdb in enumerate(Pdb.objects.exclude(title=None)):
-            site = ZincSite.objects.create(
-             pk=pdb.id + "A{}0".format((index + 1) * 10),
-             x = index, y=-index, z=100-index
-            )
-            residue1 = Residue.objects.create(
-             pk=pdbid + "A" + index + 10, residue_id="A" + index + 10,
-             name="VAL" if index % 2 else "CYS"
-            )'''
+class BrowserTest(FunctionalTest):
+
+    def setUp(self):
+        FunctionalTest.setUp(self)
+        self.browser = webdriver.Chrome()
+
+
+    def tearDown(self):
+        self.browser.quit()
+
+
+    def get(self, url):
+        self.browser.get(self.live_server_url + url)
+
+
+    def check_page(self, url):
+        self.assertEqual(self.browser.current_url, self.live_server_url + url)
+
+
+    def check_title(self, text):
+        self.assertIn(text, self.browser.title)
+
+
+    def check_h1(self, text):
+        self.assertIn(text, self.browser.find_element_by_tag_name("h1").text)
+
+
+    def scroll_to(self, element):
+        self.browser.execute_script("arguments[0].scrollIntoView();", element)
+
+
+    def click(self, element):
+        self.scroll_to(element)
+        element.click()
