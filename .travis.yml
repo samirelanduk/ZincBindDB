@@ -5,11 +5,10 @@ python:
     - 3.5
 
 install:
-    - pip install --upgrade git+https://github.com/samirelanduk/atomium.git@0.7
     - pip install -r requirements.txt
 
 script:
-    - coverage run --source=zincbind,scripts `which django-admin.py` test --pythonpath=. --settings=zincbind.settings
+    - djangovar=headless coverage run --source=zincbind,scripts `which django-admin.py` test --pythonpath=. --settings=zincbind.settings
 
 after_success:
   - coveralls

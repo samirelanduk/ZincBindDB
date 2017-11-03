@@ -1,3 +1,5 @@
+import os
+import sys
 from datetime import datetime, timedelta
 from selenium import webdriver
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
@@ -82,11 +84,17 @@ class BrowserTest(FunctionalTest):
 
     def setUp(self):
         FunctionalTest.setUp(self)
-        self.browser = webdriver.Chrome()
+        if os.environ.get("djangovar") == "headless":
+            self.browser = webdriver.PhantomJS()
+        else:
+            self.browser = webdriver.Chrome()
 
 
     def tearDown(self):
         self.browser.quit()
+        try:
+            os.remove("ghostdriver.log")
+        except IOError: pass
 
 
     def get(self, url):
