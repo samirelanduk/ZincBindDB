@@ -139,3 +139,22 @@ class BasePageLayoutTests(BrowserTest):
         footer = self.browser.find_element_by_tag_name("footer")
         lists = footer.find_elements_by_class_name("footer-list")
         self.assertGreater(lists[1].location["y"], lists[0].location["y"])
+
+
+
+class HomePageTests(BrowserTest):
+
+    def test_home_page_layout(self):
+        self.get("/")
+        logo = self.browser.find_element_by_id("logo")
+        logo.click()
+        self.check_page("/")
+
+        description = self.browser.find_element_by_id("site-description")
+        self.assertIn("zincbind is", description.text.lower())
+        self.assertIn("4 zinc", description.text.lower())
+        self.assertIn("3 pdb", description.text.lower())
+
+        search = self.browser.find_element_by_id("site-search")
+        searchbox = search.find_element_by_tag_name("input")
+        self.assertEqual(searchbox.get_attribute("type"),"text")

@@ -11,3 +11,7 @@ $(document).ready(function() {
   	$("nav").slideToggle();
   });
 });
+
+function formatNumber(number) {
+  return number.toLocaleString("en");
+}
