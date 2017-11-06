@@ -8,6 +8,7 @@ class AddingScriptTests(FunctionalTest):
     @patch("scripts.add_pdbs.get_all_pdb_codes")
     @patch("builtins.print")
     def test_successful_add(self, mock_print, mock_add):
+        print("test_script")
         self.assertEqual(len(Pdb.objects.all()), 8)
         self.assertEqual(len(ZincSite.objects.all()), 4)
         self.assertEqual(len(Residue.objects.all()), 12)

@@ -4,6 +4,7 @@ from .base import BrowserTest
 class BasePageLayoutTests(BrowserTest):
 
     def test_basic_page_layout(self):
+        print("test_basic_layout")
         self.get("/")
 
         # There is a nav, a main section, and a footer
@@ -35,6 +36,7 @@ class BasePageLayoutTests(BrowserTest):
 
 
     def test_basic_page_css(self):
+        print("test_basic_css")
         self.get("/")
 
         # The header is correct
@@ -58,39 +60,7 @@ class BasePageLayoutTests(BrowserTest):
 
         # The footer is at the bottom
         footer = self.browser.find_element_by_tag_name("footer")
-        self.assertGreater(footer.location["y"], 500)
-
-        # The footer lists are side by side
-        lists = footer.find_elements_by_class_name("footer-list")
-        self.assertGreater(lists[1].location["x"], lists[0].location["x"])
-
-
-    def test_basic_page_css(self):
-        self.get("/")
-
-        # The header is correct
-        header = self.browser.find_element_by_tag_name("header")
-        self.assertGreater(header.size["height"], 50)
-
-        # The nav links are horizontally aranged
-        nav = self.browser.find_element_by_tag_name("nav")
-        mobile_menu = header.find_element_by_id("mobile-menu")
-        self.assertEqual(
-         mobile_menu.value_of_css_property("display"),
-         "none"
-        )
-        nav_links = nav.find_elements_by_tag_name("li")
-        for index, link in enumerate(nav_links):
-            self.assertEqual(link.location["y"], nav_links[0].location["y"])
-            if index:
-                self.assertGreater(
-                 link.location["x"], nav_links[index - 1].location["x"]
-                )
-
-        # The footer is at the bottom
-        footer = self.browser.find_element_by_tag_name("footer")
-        if not self.headless:
-            self.assertGreater(footer.location["y"], 500)
+        self.assertGreater(footer.location["y"], 400)
 
         # The footer lists are side by side
         lists = footer.find_elements_by_class_name("footer-list")
@@ -98,6 +68,7 @@ class BasePageLayoutTests(BrowserTest):
 
 
     def test_basic_page_mobile_css(self):
+        print("test_mobile_layout")
         self.browser.set_window_size(350, 600)
         self.get("/")
 
@@ -145,6 +116,7 @@ class BasePageLayoutTests(BrowserTest):
 class HomePageTests(BrowserTest):
 
     def test_home_page_layout(self):
+        print("test_home")
         self.get("/")
         logo = self.browser.find_element_by_id("logo")
         logo.click()
@@ -158,3 +130,20 @@ class HomePageTests(BrowserTest):
         search = self.browser.find_element_by_id("site-search")
         searchbox = search.find_element_by_tag_name("input")
         self.assertEqual(searchbox.get_attribute("type"),"text")
+
+
+
+class DataPageTests(BrowserTest):
+
+    def test_data_page_charts(self):
+        print("test_data")
+        # User goes to data page
+        self.get("/")
+        nav = self.browser.find_element_by_tag_name("nav")
+        data_link = nav.find_elements_by_tag_name("a")[-1]
+        self.click(data_link)
+        self.check_page("/data/")
+
+        # The page has the proper headings etc
+        self.check_title("Data")
+        self.check_h1("Data")

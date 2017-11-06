@@ -8,3 +8,7 @@ def home(request):
      "zinc_count": ZincSite.objects.count(),
      "pdb_count": Pdb.objects.exclude(title=None).count()
     })
+
+
+def data(request):
+    return render(request, "data.html")

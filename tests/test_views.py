@@ -24,3 +24,11 @@ class HomeViewTests(ZincBindTest):
         request = self.get_request("/")
         self.check_view_has_context(home, request, {"pdb_count": 50})
         mock_exclude.assert_called_with(title=None)
+
+
+
+class DataViewTests(ZincBindTest):
+
+    def test_data_view_uses_data_template(self):
+        request = self.get_request("/data/")
+        self.check_view_uses_template(data, request, "data.html")
