@@ -12,6 +12,10 @@ class Pdb(models.Model):
     resolution = models.FloatField(blank=True, null=True)
     checked = models.DateTimeField()
 
+    @property
+    def sites(self):
+        return set([residue.zincsite_set.first() for residue in self.residue_set.all()])
+
 
 
 class Residue(models.Model):

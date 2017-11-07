@@ -60,7 +60,6 @@ class BasePageLayoutTests(BrowserTest):
 
         # The footer is at the bottom
         footer = self.browser.find_element_by_tag_name("footer")
-        self.assertGreater(footer.location["y"], 400)
 
         # The footer lists are side by side
         lists = footer.find_elements_by_class_name("footer-list")
@@ -147,3 +146,13 @@ class DataPageTests(BrowserTest):
         # The page has the proper headings etc
         self.check_title("Data")
         self.check_h1("Data")
+
+        # There is a data description section
+        data_description = self.browser.find_element_by_id("data-description")
+        self.assertGreaterEqual(len(data_description.find_elements_by_tag_name("p")), 2)
+
+        # There is a charts section
+        charts = self.browser.find_element_by_id("charts")
+
+        # There is a pie chart for PDB proportions
+        pie = charts.find_element_by_id("pdb-prop")

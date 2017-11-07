@@ -49,6 +49,10 @@ class PdbTests(ZincBindTest):
             pdb.full_clean()
 
 
+    def test_sites_property(self):
+        
+
+
 
 class ResidueTests(ZincBindTest):
 

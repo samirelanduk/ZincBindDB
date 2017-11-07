@@ -1,6 +1,7 @@
 body {
   margin: 0px;
   font-family: 'Source Sans Pro';
+  line-height: 150%;
 }
 
 header {
@@ -57,6 +58,8 @@ main {
   margin: 20px;
   position: relative;
   font-size: 90%;
+  margin-left: 100px;
+  margin-right: 100px;
 }
 
 footer {
@@ -156,6 +159,13 @@ input {
 
   #mobile-menu-icon {
     display: inline;
+  }
+
+  main {
+    min-height: calc(75vh);
+    margin: 20px;
+    position: relative;
+    font-size: 90%;
   }
 
   footer .footer-list {

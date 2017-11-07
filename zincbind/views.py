@@ -11,4 +11,8 @@ def home(request):
 
 
 def data(request):
-    return render(request, "data.html")
+    valid = Pdb.objects.exclude(title=None)
+    return render(request, "data.html", {
+     "pdb_with_zinc": valid.count(),
+     "pdb_without_zinc": Pdb.objects.filter(title=None).count(),
+    })

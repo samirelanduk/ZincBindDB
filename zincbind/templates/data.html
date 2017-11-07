@@ -4,5 +4,56 @@
 
 {% block main %}
 <h1>ZincBind Data</h1>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<div id="data-description">
+  <p>The data are obtained from the <a href="https://www.wwpdb.org/" target="_blank">
+  Protein Data Bank</a>, and are generated automatically. For every PDB which
+  contains a ZN HET record, binding sites are obtained by obtaining every
+  non-hydrogen atom within 4 Angstroms of the zinc atom(s), and using the set of
+  residues they belong to as respective binding sites.</p>
+  <p>The Python PDB parser and molecular modeller
+  <a href="https://atomium.samireland.com/" target="_blank">atomium</a> is used
+  to process the PDB files, and the Python web framework
+  <a href="https://www.djangoproject.com/" target="_blank">Django</a> is used to
+  manage and store data.</p>
+</div>
+<div id="charts">
+  <div id="pdb-prop"></div>
+</div>
+
+<script>
+Highcharts.chart('pdb-prop', {
+    chart: {
+        type: 'pie'
+    },
+    title: {
+        text: 'PDBs with Zinc Sites'
+    },
+    tooltip: {
+        headerFormat: '',
+        pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
+    },
+    plotOptions: {
+        pie: {
+            dataLabels: {
+                enabled: true,
+                format: '<b>{point.name}</b>: {point.y}'
+            }
+        }
+    },
+    credits: false,
+    series: [{
+        name: 'PDB Breakdown',
+        colorByPoint: true,
+        data: [{
+            name: 'Have Zinc Site',
+            y: {{ pdb_with_zinc}}
+        }, {
+            name: 'No Zinc Sites',
+            y: {{ pdb_without_zinc}},
+        }]
+    }]
+});
+</script>
 
 {% endblock %}
