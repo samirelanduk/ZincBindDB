@@ -4,4 +4,9 @@
 
 {% block main %}
 <h1>Search Results: {{ term }}</h1>
+
+<div id="result-count">
+  Search returned {{ results.count }} result.
+</div>
+
 {% endblock %}

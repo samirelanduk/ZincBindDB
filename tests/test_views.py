@@ -65,3 +65,12 @@ class SearchViewTests(ZincBindTest):
     def test_search_view_sends_search_term(self):
         request = self.get_request("/search/", "post", {"term": "TERM"})
         self.check_view_has_context(search, request, {"term": "TERM"})
+
+
+    @patch("zincbind.views.omni_search")
+    def test_search_view_searches(self, mock_omni):
+        mock_omni.return_value = ["RESULT1", "RESULT2"]
+        request = self.get_request("/search/", "post", {"term": "TERM"})
+        self.check_view_has_context(
+         search, request, {"results": ["RESULT1", "RESULT2"]}
+        )

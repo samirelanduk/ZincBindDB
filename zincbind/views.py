@@ -2,6 +2,7 @@
 
 from django.shortcuts import render
 from .models import ZincSite, Pdb
+from .search import omni_search
 
 def home(request):
     return render(request, "home.html", {
@@ -21,5 +22,6 @@ def data(request):
 def search(request):
     if request.method == "POST":
         return render(request, "search.html", {
-         "term": request.POST["term"]
+         "term": request.POST["term"],
+         "results": omni_search(request.POST["term"])
         })

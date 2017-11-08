@@ -16,4 +16,8 @@ class MainSearchTests(BrowserTest):
         # They are on the search page
         self.check_page("/search/")
         self.check_title("Search Results")
-        self.check_h1("Search Results: 1aaada200")
+        self.check_h1("Search Results: 1aada200")
+
+        # There is a result count
+        result_count = self.browser.find_element_by_id("result-count")
+        self.assertIn("1 result", result_count.text)
