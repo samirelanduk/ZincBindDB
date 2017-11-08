@@ -21,3 +21,16 @@ class MainSearchTests(BrowserTest):
         # There is a result count
         result_count = self.browser.find_element_by_id("result-count")
         self.assertIn("1 result", result_count.text)
+
+        # The results are below
+        results = self.browser.find_element_by_tag_name("table")
+        th = results.find_element_by_tag_name("tr")
+        self.assertEqual(th.find_elements_by_tag_name("th")[0].text, "ZincSite ID")
+        self.assertEqual(th.find_elements_by_tag_name("th")[1].text, "PDB")
+        self.assertEqual(th.find_elements_by_tag_name("th")[2].text, "Deposited")
+        self.assertEqual(th.find_elements_by_tag_name("th")[3].text, "Residues")
+        row = results.find_elements_by_tag_name("tr")[1]
+        self.assertEqual(row.find_elements_by_tag_name("td")[0].text, "1AADA200")
+        self.assertEqual(row.find_elements_by_tag_name("td")[1].text, "1AAD")
+        self.assertEqual(row.find_elements_by_tag_name("td")[2].text, "4 January, 2012")
+        self.assertEqual(row.find_elements_by_tag_name("td")[3].text, "3")

@@ -305,3 +305,17 @@ class ZincSiteTests(ZincBindTest):
             site.full_clean()
         site = ZincSite(pk="1ZZZA500", x=1.5, y=-1.5, z=0.0)
         site.full_clean()
+
+
+    @patch("zincbind.models.ZincSite.residues")
+    def test_zinc_site_pdb_property(self, mock_residues):
+        site = ZincSite(pk="1ZZZA500", x=1.5, y=-1.5, z=5.6)
+        site.save()
+        pdb = Mock(name="pdb")
+        residue = Mock(name="residue")
+        residue.pdb = pdb
+        residue_set = Mock(name="residue_set")
+        residue_set.first = MagicMock()
+        residue_set.first.return_value = residue
+        site.residues = residue_set
+        self.assertIs(site.pdb, pdb)

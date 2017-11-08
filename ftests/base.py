@@ -63,7 +63,7 @@ class FunctionalTest(StaticLiveServerTestCase):
                  id=pdb_codes[3] + str(a + r * 100), x=a, y=a, z=a, charge=0, bfactor=1.5,
                  name=str(a), element="C", atom_id=a + r * 100, residue=residue,
                 )
-            site2.residues.add(residue)
+            site3.residues.add(residue)
 
         site4 = ZincSite.objects.create(id=pdb_codes[3] + "E500", x=-6.5, y=-8.5, z=-1.5)
         for r in range(11, 14):
@@ -77,7 +77,7 @@ class FunctionalTest(StaticLiveServerTestCase):
                  id=pdb_codes[6] + str(a + r * 100), x=a, y=a, z=a, charge=0, bfactor=1.5,
                  name=str(a), element="C", atom_id=a + r * 100, residue=residue,
                 )
-            site2.residues.add(residue)
+            site4.residues.add(residue)
 
 
 

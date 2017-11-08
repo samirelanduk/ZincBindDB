@@ -56,3 +56,7 @@ class ZincSite(models.Model):
     x = models.FloatField()
     y = models.FloatField()
     z = models.FloatField()
+
+    @property
+    def pdb(self):
+        return self.residues.first().pdb if self.residues.count() else None
