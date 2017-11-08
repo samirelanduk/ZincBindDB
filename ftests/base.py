@@ -65,7 +65,7 @@ class FunctionalTest(StaticLiveServerTestCase):
                 )
             site3.residues.add(residue)
 
-        site4 = ZincSite.objects.create(id=pdb_codes[3] + "E500", x=-6.5, y=-8.5, z=-1.5)
+        site4 = ZincSite.objects.create(id=pdb_codes[6] + "E500", x=-6.5, y=-8.5, z=-1.5)
         for r in range(11, 14):
             residue = Residue.objects.create(
              id=pdb_codes[6] + "E" + str(r), residue_id="E" + str(r),

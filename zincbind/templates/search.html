@@ -6,7 +6,7 @@
 <h1>Search Results: {{ term }}</h1>
 
 <div id="result-count">
-  Search returned {{ results.count }} result.
+  Search returned {{ results.count }} result{% if results.count != 1 %}s{% endif %}.
 </div>
 
 <table class="results-table">
