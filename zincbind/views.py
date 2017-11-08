@@ -16,3 +16,10 @@ def data(request):
      "pdb_with_zinc": valid.count(),
      "pdb_without_zinc": Pdb.objects.filter(title=None).count(),
     })
+
+
+def search(request):
+    if request.method == "POST":
+        return render(request, "search.html", {
+         "term": request.POST["term"]
+        })

@@ -10,9 +10,11 @@
     <script>document.write(formatNumber({{ zinc_count }}));</script>
     zinc binding sites accross
     <script>document.write(formatNumber({{ pdb_count }}));</script> PDB files.
-  </div><div id="site-search" class="box half-width">
+  </div><form id="site-search" class="box half-width" method="POST" action="/search/">
     <h2>Search ZincBind</h2>
-    <input type="text">
-  </div>
+    <input type="text" name="term">
+    {% csrf_token %}
+    <input type="submit" value="Search">
+  </form>
 </div>
 {% endblock %}

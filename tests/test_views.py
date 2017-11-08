@@ -52,3 +52,16 @@ class DataViewTests(ZincBindTest):
         request = self.get_request("/")
         self.check_view_has_context(data, request, {"pdb_without_zinc": 50})
         mock_filter.assert_called_with(title=None)
+
+
+
+class SearchViewTests(ZincBindTest):
+
+    def test_search_view_uses_search_template(self):
+        request = self.get_request("/search/", "post", {"term": "TERM"})
+        self.check_view_uses_template(search, request, "search.html")
+
+
+    def test_search_view_sends_search_term(self):
+        request = self.get_request("/search/", "post", {"term": "TERM"})
+        self.check_view_has_context(search, request, {"term": "TERM"})
