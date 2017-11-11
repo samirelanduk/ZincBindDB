@@ -13,7 +13,7 @@
   <tr><th>ZincSite ID</th><th>PDB</th><th>Deposited</th><th>Residues</th></tr>
   {% for result in results %}
   <tr>
-    <td>{{ result.id }}</td>
+    <td><a href="/{{ result.id }}/">{{ result.id }}</a></td>
     <td>{{ result.pdb.id }}</td>
     <td>{{ result.pdb.deposited|date:"j F, Y" }}</td>
     <td>{{ result.residues.count }}</td>

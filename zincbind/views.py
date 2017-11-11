@@ -25,3 +25,8 @@ def search(request):
          "term": request.POST["term"],
          "results": omni_search(request.POST["term"])
         })
+
+
+
+def site(request, site_id):
+    return render(request, "site.html")

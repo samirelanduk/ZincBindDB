@@ -4,7 +4,6 @@ from .base import BrowserTest
 class BasePageLayoutTests(BrowserTest):
 
     def test_basic_page_layout(self):
-        print("test_basic_layout")
         self.get("/")
 
         # There is a nav, a main section, and a footer
@@ -36,7 +35,6 @@ class BasePageLayoutTests(BrowserTest):
 
 
     def test_basic_page_css(self):
-        print("test_basic_css")
         self.get("/")
 
         # The header is correct
@@ -67,7 +65,6 @@ class BasePageLayoutTests(BrowserTest):
 
 
     def test_basic_page_mobile_css(self):
-        print("test_mobile_layout")
         self.browser.set_window_size(350, 600)
         self.get("/")
 
@@ -115,7 +112,6 @@ class BasePageLayoutTests(BrowserTest):
 class HomePageTests(BrowserTest):
 
     def test_home_page_layout(self):
-        print("test_home")
         self.get("/")
         logo = self.browser.find_element_by_id("logo")
         logo.click()
@@ -135,7 +131,6 @@ class HomePageTests(BrowserTest):
 class DataPageTests(BrowserTest):
 
     def test_data_page_charts(self):
-        print("test_data")
         # User goes to data page
         self.get("/")
         nav = self.browser.find_element_by_tag_name("nav")

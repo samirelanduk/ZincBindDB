@@ -9,7 +9,6 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def setUp(self):
         # Create 8 Pdbs
-        print("Creating PDBs...")
         pdb_codes = [
          "{}AA{}".format(n, chr(c + 65)) for n in range(1, 3) for c in range(0, 4)
         ]

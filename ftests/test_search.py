@@ -35,6 +35,11 @@ class MainSearchTests(BrowserTest):
         self.assertEqual(row.find_elements_by_tag_name("td")[2].text, "4 January, 2012")
         self.assertEqual(row.find_elements_by_tag_name("td")[3].text, "3")
 
+        # They link to the right page
+        link = row.find_elements_by_tag_name("td")[0]
+        link.find_element_by_tag_name("a").click()
+        self.check_page("/1AADA200/")
+
 
     def test_can_search_pdbs(self):
         self.get("/")

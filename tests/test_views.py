@@ -74,3 +74,11 @@ class SearchViewTests(ZincBindTest):
         self.check_view_has_context(
          search, request, {"results": ["RESULT1", "RESULT2"]}
         )
+
+
+
+class SiteViewTests(ZincBindTest):
+
+    def test_site_view_uses_site_template(self):
+        request = self.get_request("/somesite/")
+        self.check_view_uses_template(site, request, "site.html", "ID")

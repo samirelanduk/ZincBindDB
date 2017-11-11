@@ -13,3 +13,7 @@ class UrlRedirectTests(ZincBindTest):
 
     def test_search_url_works(self):
         self.check_url_returns_view("/search/", views.search)
+
+
+    def test_site_url_works(self):
+        self.check_url_returns_view("/1XXXA001/", views.site)
