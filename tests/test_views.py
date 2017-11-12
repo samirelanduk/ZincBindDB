@@ -79,6 +79,25 @@ class SearchViewTests(ZincBindTest):
 
 class SiteViewTests(ZincBindTest):
 
+    def setUp(self):
+        ZincBindTest.setUp(self)
+        self.get_patcher = patch("zincbind.views.ZincSite.objects.get")
+        self.mock_get = self.get_patcher.start()
+
+
+    def tearDown(self):
+        self.get_patcher.stop()
+
+
     def test_site_view_uses_site_template(self):
         request = self.get_request("/somesite/")
         self.check_view_uses_template(site, request, "site.html", "ID")
+
+
+    def test_site_view_sends_site(self):
+        self.mock_get.return_value = "ZINCSITE"
+        request = self.get_request("/somesite/")
+        self.check_view_has_context(
+         site, request, {"site": "ZINCSITE"}, "siteid"
+        )
+        self.mock_get.assert_called_with(pk="siteid")

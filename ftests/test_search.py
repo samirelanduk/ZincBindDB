@@ -11,7 +11,7 @@ class MainSearchTests(BrowserTest):
         term = search.find_element_by_tag_name("input")
         term.send_keys("1aada200")
         submit = search.find_elements_by_tag_name("input")[-1]
-        submit.click()
+        self.click(submit)
 
         # They are on the search page
         self.check_page("/search/")
@@ -37,7 +37,7 @@ class MainSearchTests(BrowserTest):
 
         # They link to the right page
         link = row.find_elements_by_tag_name("td")[0]
-        link.find_element_by_tag_name("a").click()
+        self.click(link.find_element_by_tag_name("a"))
         self.check_page("/1AADA200/")
 
 
@@ -49,7 +49,7 @@ class MainSearchTests(BrowserTest):
         term = search.find_element_by_tag_name("input")
         term.send_keys("1aad")
         submit = search.find_elements_by_tag_name("input")[-1]
-        submit.click()
+        self.click(submit)
 
         # They are on the search page
         self.check_page("/search/")

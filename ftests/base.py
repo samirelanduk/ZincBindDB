@@ -1,5 +1,6 @@
 import os
 import sys
+from time import sleep
 from datetime import datetime, timedelta
 from selenium import webdriver
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
@@ -27,7 +28,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         for r in range(11, 14):
             residue = Residue.objects.create(
              id=pdb_codes[1] + "A" + str(r), residue_id="A" + str(r),
-             name="VAL" if r % 2 else "CYS", number=r,
+             name="VAL" if r % 2 else "CYS", number=r, chain="A",
              pdb=Pdb.objects.get(pk=pdb_codes[1])
             )
             for a in range(1, 5):
@@ -41,7 +42,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         for r in range(11, 14):
             residue = Residue.objects.create(
              id=pdb_codes[3] + "A" + str(r), residue_id="A" + str(r),
-             name="VAL" if r % 2 else "CYS", number=r,
+             name="VAL" if r % 2 else "CYS", number=r, chain="A",
              pdb=Pdb.objects.get(pk=pdb_codes[3])
             )
             for a in range(1, 5):
@@ -54,7 +55,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         for r in range(11, 14):
             residue = Residue.objects.create(
              id=pdb_codes[3] + "B" + str(r), residue_id="B" + str(r),
-             name="VAL" if r % 2 else "CYS", number=r,
+             name="VAL" if r % 2 else "CYS", number=r, chain="B",
              pdb=Pdb.objects.get(pk=pdb_codes[3])
             )
             for a in range(1, 5):
@@ -68,7 +69,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         for r in range(11, 14):
             residue = Residue.objects.create(
              id=pdb_codes[6] + "E" + str(r), residue_id="E" + str(r),
-             name="VAL" if r % 2 else "CYS", number=r,
+             name="VAL" if r % 2 else "CYS", number=r, chain="E",
              pdb=Pdb.objects.get(pk=pdb_codes[3])
             )
             for a in range(1, 5):
@@ -88,7 +89,10 @@ class BrowserTest(FunctionalTest):
         if self.headless:
             self.browser = webdriver.PhantomJS()
         else:
-            self.browser = webdriver.Chrome()
+            try:
+                self.browser = webdriver.Chrome()
+            except:
+                self.browser = webdriver.Firefox()
         self.browser.set_window_size(800, 700)
 
 
@@ -122,3 +126,4 @@ class BrowserTest(FunctionalTest):
     def click(self, element):
         self.scroll_to(element)
         element.click()
+        sleep(0.5)

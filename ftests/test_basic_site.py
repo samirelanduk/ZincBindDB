@@ -39,7 +39,6 @@ class BasePageLayoutTests(BrowserTest):
 
         # The header is correct
         header = self.browser.find_element_by_tag_name("header")
-        self.assertGreater(header.size["height"], 50)
 
         # The nav links are horizontally aranged
         mobile_menu = header.find_element_by_id("mobile-menu")
@@ -79,7 +78,7 @@ class BasePageLayoutTests(BrowserTest):
         mobile_menu_icon = mobile_menu.find_element_by_id("mobile-menu-icon")
         self.assertGreater(
          mobile_menu_icon.location["x"],
-         300
+         200
         )
 
         # Clicking the icon makes the nav links appear and disappear
@@ -114,7 +113,7 @@ class HomePageTests(BrowserTest):
     def test_home_page_layout(self):
         self.get("/")
         logo = self.browser.find_element_by_id("logo")
-        logo.click()
+        self.click(logo)
         self.check_page("/")
 
         description = self.browser.find_element_by_id("site-description")

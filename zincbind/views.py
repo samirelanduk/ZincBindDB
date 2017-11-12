@@ -29,4 +29,5 @@ def search(request):
 
 
 def site(request, site_id):
-    return render(request, "site.html")
+    site = ZincSite.objects.get(pk=site_id)
+    return render(request, "site.html", {"site": site})
