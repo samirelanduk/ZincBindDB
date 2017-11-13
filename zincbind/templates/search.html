@@ -2,8 +2,8 @@
 
 {% block title %}Search Results{% endblock %}
 
+{% block h1 %}<h1>Search Results: {{ term }}</h1>{% endblock %}
 {% block main %}
-<h1>Search Results: {{ term }}</h1>
 
 <div id="result-count">
   Search returned {{ result_count }} result{% if results.count != 1 %}s{% endif %}

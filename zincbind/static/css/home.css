@@ -1,0 +1,58 @@
+
+.row {
+  background-color: #f1ecf0;
+  padding: 50px;
+  padding-top: 50px;
+}
+
+.row:nth-child(2) {
+    background-color: #ffffff;
+}
+
+.image {
+    background-image: url('/static/images/zincsite.png');
+    background-size: 90% auto;
+    background-repeat: no-repeat;
+    background-position: center;
+    box-shadow: 0 0 8px 8px white inset;
+    min-height: 300px;
+}
+
+h1 {
+    font-size: 375%;
+    line-height: normal;
+    text-align: center;
+    background-color: inherit;
+    font-weight: normal;
+    margin-bottom: 40px;
+}
+
+h2 {
+    font-size: 275%;
+    text-align: center;
+    line-height: normal;
+    font-weight: normal;
+}
+
+#site-search {
+    vertical-align: middle;
+    align-items: center;
+    display: flex;
+}
+
+#site-search form {
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #FFFFFF;
+}
+
+#site-search form h2{
+    text-align: center;
+}
+
+.site-description {
+    font-size: 130%;
+    line-height: 200%;
+    text-align: center;
+}

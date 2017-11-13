@@ -1,19 +1,42 @@
 {% extends "base.html" %}
 
 {% block title %}Home{% endblock %}
+{% block css %}
+ <link rel="stylesheet" type="text/css" href="/static/css/home.css">
+{% endblock %}
 
 {% block main %}
+<div class="row" id="home-first">
+    <div class="half-width">
+        <h1>The Database of Zinc Binding Sites</h1>
+        <div class="site-description">
+            ZincBind is a database of zinc binding sites, automatically generated from
+            the Protein Data Bank. There are currently
+            <script>document.write(formatNumber({{ zinc_count }}));</script>
+            zinc binding sites accross
+            <script>document.write(formatNumber({{ pdb_count }}));</script> PDB files.
+        </div>
+    </div><div id="site-search" class="half-width">
+        <form method="GET" action="/search" class="box">
+            <h2>Search ZincBind</h2>
+            <input type="text" name="term"
+             placeholder="E.g. '1TON', '1B0NA1001' etc." autocomplete="off">
+        </form>
+    </div>
+</div>
+
 <div class="row">
-  <div id="site-description" class="box half-width">
-    ZincBind is a database of zinc binding sites, automatically generated from
-    the Protein Data Bank. There are currently
-    <script>document.write(formatNumber({{ zinc_count }}));</script>
-    zinc binding sites accross
-    <script>document.write(formatNumber({{ pdb_count }}));</script> PDB files.
-  </div><form id="site-search" class="box half-width" method="GET" action="/search">
-    <h2>Search ZincBind</h2>
-    <input type="text" name="term">
-    <input type="submit" value="Search">
-  </form>
+    <div class="half-width image">
+
+    </div><div class="half-width">
+        <h2>Detailed Structural Information</h2>
+        <div class="site-description">
+            For each zinc binding site, ZincBind provides information about atom
+            geometry, residue contacts, hydrophobic environment, and more. PDB
+            information such as resolution and date of deposition is also
+            available.
+        </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

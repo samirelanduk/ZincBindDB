@@ -8,7 +8,7 @@ $(window).on("resize", function() {
 
 $(document).ready(function() {
   $('#mobile-menu-icon').on('click', function() {
-  	$("nav").slideToggle();
+  	$("nav").slideToggle("fast");
   });
 });
 

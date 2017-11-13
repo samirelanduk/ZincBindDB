@@ -55,11 +55,8 @@ nav li {
 
 main {
   min-height: calc(75vh);
-  margin: 20px;
   position: relative;
   font-size: 90%;
-  margin-left: 100px;
-  margin-right: 100px;
 }
 
 footer {
@@ -98,6 +95,19 @@ footer a {
   text-align: center;
 }
 
+img {
+    display: block;
+    width: 90%;
+    height: auto;
+}
+
+h1 {
+    margin: 0px;
+    padding: 10px;
+    padding-left: 5%;
+    background-color: #FFEEFF;
+}
+
 .row {
   display: flex;
 }
@@ -125,8 +135,13 @@ input {
   width: 100%;
   padding: 10px;
   box-sizing: border-box;
-  border-radius: 30px;
+  border-radius: 10px;
   font-size: 120%;
+}
+
+input[type='submit'] {
+    width: auto;
+    cursor: pointer;
 }
 
 
@@ -163,7 +178,6 @@ input {
 
   main {
     min-height: calc(75vh);
-    margin: 20px;
     position: relative;
     font-size: 90%;
   }
@@ -171,6 +185,11 @@ input {
   footer .footer-list {
     display: block;
     width: 100%;
+  }
+
+  h1 {
+      text-align: center;
+      font-size: 150%;
   }
 
   .row {
