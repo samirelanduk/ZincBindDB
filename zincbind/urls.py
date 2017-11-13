@@ -5,7 +5,7 @@ import zincbind.views as views
 
 urlpatterns = [
  url(r"^data/$", views.data),
- url(r"^search/$", views.search),
+ url(r"^search", views.search),
  url(r"^(.+?)/$", views.site),
  url(r"^$", views.home)
 ]

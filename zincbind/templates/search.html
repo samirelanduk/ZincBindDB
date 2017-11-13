@@ -6,7 +6,8 @@
 <h1>Search Results: {{ term }}</h1>
 
 <div id="result-count">
-  Search returned {{ results.count }} result{% if results.count != 1 %}s{% endif %}.
+  Search returned {{ result_count }} result{% if results.count != 1 %}s{% endif %}
+  (Page {{ page }} of {{ page_count }}).
 </div>
 
 <table class="results-table">
@@ -20,5 +21,12 @@
   </tr>
   {% endfor %}
 </table>
+
+{% if previous or next %}
+<div class="page-links">
+  {% if previous %}<a href="/search?term={{ term }}&page={{ previous }}">Previous</a>{% endif %}
+  {% if next %}<a href="/search?term={{ term }}&page={{ next }}">Next</a>{% endif %}
+</div>
+{% endif %}
 
 {% endblock %}

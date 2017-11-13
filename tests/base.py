@@ -16,10 +16,10 @@ class ZincBindTest(TestCase):
 
 
     def get_request(self, path, method="get", data=None):
-        request = self.factory.get(path)
-        if method=="post":
-            data = data if data else {}
+        data = data if data else {}
+        if  method == "post":
             request = self.factory.post(path, data=data)
+        request = self.factory.get(path, data=data)
         return request
 
 
@@ -47,3 +47,9 @@ class ZincBindTest(TestCase):
                 self.assertEqual(sent_context[key], context[key])
         finally:
             render_patcher.stop()
+
+
+    def check_view_redirects(self, view, request, url, *args):
+        response = view(request, *args)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, url)
