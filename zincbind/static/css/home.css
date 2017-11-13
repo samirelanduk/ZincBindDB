@@ -56,3 +56,17 @@ h2 {
     line-height: 200%;
     text-align: center;
 }
+
+@media only screen and (max-width: 769px) {
+  /* iPad and down */
+  h1 {
+      font-size: 300%;
+  }
+
+  h2 {
+      font-size: 200%;
+  }
+
+  .site-description {
+      font-size: 125%;
+  }

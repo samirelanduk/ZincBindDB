@@ -108,6 +108,10 @@ h1 {
     background-color: #FFEEFF;
 }
 
+h2 {
+    padding-left: 5%;
+}
+
 .row {
   display: flex;
 }
