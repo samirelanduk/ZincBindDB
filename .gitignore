@@ -3,6 +3,7 @@ __pycache__
 .DS_Store
 .coverage
 *.log
+secrets.py
 
 *.sqlite3*
 *.json

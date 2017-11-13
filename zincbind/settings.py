@@ -2,11 +2,13 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-SECRET_KEY = "nwb9(%k2_gljo=x-q=o=qz*qy&nqs%$#73s=pqynj!fhlbmtpl"
+from .secrets import SECRET_KEY
 
 DEBUG = True
 
 ROOT_URLCONF = "zincbind.urls"
+
+ALLOWED_HOSTS = []
 
 DATABASES = {"default": {
  "ENGINE": "django.db.backends.sqlite3",
@@ -22,6 +24,7 @@ INSTALLED_APPS = [
 TIME_ZONE = "UTC"
 
 STATIC_URL = "/static/"
+STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, "../static"))
 
 TEMPLATES = [{
  "BACKEND": "django.template.backends.django.DjangoTemplates",

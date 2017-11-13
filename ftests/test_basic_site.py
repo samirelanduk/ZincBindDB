@@ -116,7 +116,7 @@ class HomePageTests(BrowserTest):
         self.click(logo)
         self.check_page("/")
 
-        description = self.browser.find_element_by_id("site-description")
+        description = self.browser.find_element_by_class_name("site-description")
         self.assertIn("zincbind is", description.text.lower())
         self.assertIn("4 zinc", description.text.lower())
         self.assertIn("3 pdb", description.text.lower())

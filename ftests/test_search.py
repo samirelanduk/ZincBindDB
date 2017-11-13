@@ -1,5 +1,6 @@
 from time import sleep
 from mixer.backend.django import mixer
+from selenium.webdriver.common.keys import Keys
 from zincbind.models import ZincSite
 from .base import BrowserTest
 
@@ -12,8 +13,8 @@ class MainSearchTests(BrowserTest):
         # The user searches for '1AADA200'
         term = search.find_element_by_tag_name("input")
         term.send_keys("1aada200")
-        submit = search.find_elements_by_tag_name("input")[-1]
-        self.click(submit)
+        term.send_keys(Keys.ENTER)
+        sleep(0.4)
 
         # They are on the search page
         self.check_page("/search?term=1aada200")
@@ -54,8 +55,8 @@ class MainSearchTests(BrowserTest):
         # The user searches for '1AAD'
         term = search.find_element_by_tag_name("input")
         term.send_keys("1aad")
-        submit = search.find_elements_by_tag_name("input")[-1]
-        self.click(submit)
+        term.send_keys(Keys.ENTER)
+        sleep(0.4)
 
         # They are on the search page
         self.check_page("/search?term=1aad")
@@ -93,8 +94,8 @@ class MainSearchTests(BrowserTest):
         # The user searches for '1AAD'
         term = search.find_element_by_tag_name("input")
         term.send_keys("1aad")
-        submit = search.find_elements_by_tag_name("input")[-1]
-        self.click(submit)
+        term.send_keys(Keys.ENTER)
+        sleep(0.4)
 
         # They are on the search page
         self.check_page("/search?term=1aad")
