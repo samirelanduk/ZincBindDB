@@ -1,0 +1,25 @@
+#result-count {
+    text-align: center;
+    font-size: 150%;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.page-links {
+    width: 100%;
+    padding: 10px;
+    font-size: 150%;
+}
+
+.page-links a {
+    display: inline-block;
+    width: 50%;
+    text-align: center;
+    box-sizing: border-box;
+    text-decoration: none;
+    margin-bottom: 30px;
+}
+
+.page-links a:visited {
+    color: blue;
+}

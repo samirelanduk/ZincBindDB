@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
 {% block title %}Search Results{% endblock %}
+{% block css %}
+ <link rel="stylesheet" type="text/css" href="/static/css/search.css">
+{% endblock %}
 
 {% block h1 %}<h1>Search Results: {{ term }}</h1>{% endblock %}
 {% block main %}
@@ -24,8 +27,7 @@
 
 {% if previous or next %}
 <div class="page-links">
-  {% if previous %}<a href="/search?term={{ term }}&page={{ previous }}">Previous</a>{% endif %}
-  {% if next %}<a href="/search?term={{ term }}&page={{ next }}">Next</a>{% endif %}
+  {% if previous %}<a href="/search?term={{ term }}&page={{ previous }}">&#8592; Previous</a>{% endif %}{% if next %}<a href="/search?term={{ term }}&page={{ next }}">Next  &#8594;</a>{% endif %}
 </div>
 {% endif %}
 
