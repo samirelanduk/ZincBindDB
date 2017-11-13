@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Changelog{% endblock %}
+{% block css %}
+ <link rel="stylesheet" type="text/css" href="/static/css/changelog.css">
+{% endblock %}
+
+{% block h1 %}<h1>Changelog</h1>{% endblock %}
+
+{% block main %}
+<div class="release">
+  <h2><a href="https://github.com/samirelanduk/ZincBind/tree/v0.1"
+     target="_blank">0.1.0</a></h2>
+  <div class="release-date">13 November, 2017</div>
+  <ul>
+    <li>Built initial database of zinc binding sites</li>
+    <li>Added home page, data page, and basic site structure</li>
+    <li>Added basic searching of Zinc IDs</li>
+  </ul>
+</div>
+
+{% endblock %}

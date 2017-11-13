@@ -2,6 +2,8 @@
 
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404
 from .models import ZincSite, Pdb
 from .search import omni_search
 
@@ -45,5 +47,12 @@ def search(request):
 
 
 def site(request, site_id):
-    site = ZincSite.objects.get(pk=site_id)
-    return render(request, "site.html", {"site": site})
+    try:
+        site = ZincSite.objects.get(pk=site_id)
+        return render(request, "site.html", {"site": site})
+    except ObjectDoesNotExist:
+        raise Http404
+
+
+def changelog(request):
+    return render(request, "changelog.html")

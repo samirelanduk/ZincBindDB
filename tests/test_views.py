@@ -1,4 +1,6 @@
 from unittest.mock import patch, Mock
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404
 from .base import ZincBindTest
 from zincbind.views import *
 
@@ -173,3 +175,18 @@ class SiteViewTests(ZincBindTest):
          site, request, {"site": "ZINCSITE"}, "siteid"
         )
         self.mock_get.assert_called_with(pk="siteid")
+
+
+    def test_404_on_unknown_site(self):
+        self.mock_get.side_effect = ObjectDoesNotExist()
+        request = self.get_request("/sites/1XXXA500/")
+        with self.assertRaises(Http404):
+            site(request, "1XXXA500")
+
+
+
+class ChangelogViewTests(ZincBindTest):
+
+    def test_changelog_view_uses_changelog_template(self):
+        request = self.get_request("/changelog/")
+        self.check_view_uses_template(changelog, request, "changelog.html")

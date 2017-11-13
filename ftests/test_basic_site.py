@@ -150,3 +150,39 @@ class DataPageTests(BrowserTest):
 
         # There is a pie chart for PDB proportions
         pie = charts.find_element_by_id("pdb-prop")
+
+
+
+class ChangelogTests(BrowserTest):
+
+    def test_changelog_structure(self):
+        # The user goes to the main page
+        self.get("/")
+
+        # The footer has a section for useful links, with a changelog link
+        footer = self.browser.find_element_by_tag_name("footer")
+        useful_links = footer.find_elements_by_class_name("footer-list")[0]
+        useful_links = useful_links.find_elements_by_tag_name("a")
+        changelog_link = [a for a in useful_links if "changelog" in a.text.lower()][0]
+
+        # They click the changelog link and go to the changelog page
+        self.click(changelog_link)
+        self.check_page("/changelog/")
+        self.check_h1("Changelog")
+        self.check_title("Changelog")
+
+        # The changlog is there
+        heading = self.browser.find_element_by_tag_name("h1")
+        self.assertEqual(heading.text, "Changelog")
+        releases = self.browser.find_elements_by_class_name("release")
+        self.assertTrue(releases)
+        for release in releases:
+            release_title = release.find_element_by_tag_name("h2")
+            self.assertEqual(release_title.text.count("."), 2)
+            release_date = release.find_element_by_class_name("release-date")
+            self.assertGreater(len(release.find_elements_by_tag_name("li")), 0)
+
+        # None of the h2 links are the same
+        h2s = self.browser.find_elements_by_tag_name("h2")
+        h2_links = [h2.find_element_by_tag_name("a").get_attribute("href") for h2 in h2s]
+        self.assertEqual(len(h2_links), len(set(h2_links)))
