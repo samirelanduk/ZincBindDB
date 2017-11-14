@@ -8,13 +8,13 @@ class Pdb(models.Model):
 
     id = models.CharField(primary_key=True, max_length=64)
     title = models.TextField(blank=True, null=True)
+    classification = models.TextField(blank=True, null=True)
     deposited = models.DateField(blank=True, null=True)
     resolution = models.FloatField(blank=True, null=True)
+    organism = models.TextField(blank=True, null=True)
+    expression = models.TextField(blank=True, null=True)
+    uniprot = models.TextField(blank=True, null=True)
     checked = models.DateTimeField()
-
-    @property
-    def sites(self):
-        return set([residue.zincsite_set.first() for residue in self.residue_set.all()])
 
 
 
@@ -28,7 +28,18 @@ class Residue(models.Model):
     name = models.CharField(max_length=32)
     chain = models.CharField(max_length=16)
     number = models.IntegerField()
+
+
+
+class ZincSite(models.Model):
+    """Represents a Zinc binding site."""
+
+    id = models.TextField(primary_key=True)
+    x = models.FloatField()
+    y = models.FloatField()
+    z = models.FloatField()
     pdb = models.ForeignKey(Pdb)
+    residues = models.ManyToManyField(Residue)
 
 
 
@@ -44,19 +55,7 @@ class Atom(models.Model):
     element = models.CharField(max_length=8)
     charge = models.FloatField()
     bfactor = models.FloatField()
+    alpha = models.BooleanField()
+    beta = models.BooleanField()
+    liganding = models.BooleanField()
     residue = models.ForeignKey(Residue)
-
-
-
-class ZincSite(models.Model):
-    """Represents a Zinc binding site."""
-
-    id = models.TextField(primary_key=True)
-    residues = models.ManyToManyField(Residue)
-    x = models.FloatField()
-    y = models.FloatField()
-    z = models.FloatField()
-
-    @property
-    def pdb(self):
-        return self.residues.first().pdb if self.residues.count() else None
