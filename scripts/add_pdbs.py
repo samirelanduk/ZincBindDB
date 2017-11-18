@@ -32,8 +32,10 @@ def main():
                         site = zinc.site()
                         create_zinc_site(pdb, zinc, site.residues())
                         print("\t\tAdded {}".format(site))
+                        break
                 else:
                     print("\tDiscounting {} - skeleton PDB".format(code))
+                    create_empty_pdb(code)
             else:
                 print("\tNo Zinc")
                 create_empty_pdb(code)
