@@ -7,6 +7,51 @@ class AddingScriptTests(FunctionalTest):
 
     @patch("scripts.add_pdbs.get_all_pdb_codes")
     @patch("builtins.print")
+    def test_can_check_empty_pdbs(self, mock_print, mock_add):
+        self.assertEqual(len(Pdb.objects.all()), 8)
+        self.assertEqual(len(ZincSite.objects.all()), 4)
+        self.assertEqual(len(Residue.objects.all()), 12)
+        self.assertEqual(len(Atom.objects.all()), 48)
+        mock_add.return_value = [
+         "1AAA", "1AAB", "1AAC", "1AAD", "2AAA", "2AAB", "2AAC", "2AAD",
+         "1LOL", "2SAM"
+        ]
+        main()
+        mock_print.assert_any_call("There are 10 current PDB codes.")
+        mock_print.assert_any_call("There are 2 which have never been checked.")
+        for code in mock_add.return_value:
+            mock_print.assert_any_call("\tChecking {}...".format(code))
+        self.assertEqual(len(Pdb.objects.all()), 10)
+        self.assertEqual(len(ZincSite.objects.all()), 4)
+        self.assertEqual(len(Residue.objects.all()), 12)
+        self.assertEqual(len(Atom.objects.all()), 48)
+
+
+    @patch("scripts.add_pdbs.get_all_pdb_codes")
+    @patch("builtins.print")
+    def test_can_ignore_skeleton_pdbs(self, mock_print, mock_add):
+        self.assertEqual(len(Pdb.objects.all()), 8)
+        self.assertEqual(len(ZincSite.objects.all()), 4)
+        self.assertEqual(len(Residue.objects.all()), 12)
+        self.assertEqual(len(Atom.objects.all()), 48)
+        mock_add.return_value = [
+         "1AAA", "1AAB", "1AAC", "1AAD", "2AAA", "2AAB", "2AAC", "2AAD",
+         "1LOL", "2SAM", "1A1Q"
+        ]
+        main()
+        mock_print.assert_any_call("There are 11 current PDB codes.")
+        mock_print.assert_any_call("There are 3 which have never been checked.")
+        for code in mock_add.return_value:
+            mock_print.assert_any_call("\tChecking {}...".format(code))
+        mock_print.assert_any_call("\tDiscounting 1A1Q - skeleton PDB")
+        self.assertEqual(len(Pdb.objects.all()), 10)
+        self.assertEqual(len(ZincSite.objects.all()), 4)
+        self.assertEqual(len(Residue.objects.all()), 12)
+        self.assertEqual(len(Atom.objects.all()), 48)
+
+
+    '''@patch("scripts.add_pdbs.get_all_pdb_codes")
+    @patch("builtins.print")
     def test_successful_add(self, mock_print, mock_add):
         self.assertEqual(len(Pdb.objects.all()), 8)
         self.assertEqual(len(ZincSite.objects.all()), 4)
@@ -25,4 +70,4 @@ class AddingScriptTests(FunctionalTest):
         self.assertEqual(len(Pdb.objects.all()), 11)
         self.assertEqual(len(ZincSite.objects.all()), 5)
         self.assertEqual(len(Residue.objects.all()), 15)
-        self.assertEqual(len(Atom.objects.all()), 78)
+        self.assertEqual(len(Atom.objects.all()), 78)'''

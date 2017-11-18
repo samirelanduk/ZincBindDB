@@ -64,3 +64,16 @@ def get_pdb(pdb_code):
         raise AtomiumError(
          "There was a problem parsing {} with atomium".format(pdb_code)
         )
+
+
+def model_is_skeleton(model):
+    """Returns ``True`` if the model given only contains backbone atoms.
+
+    :rtype: ``bool``"""
+
+    for chain in model.chains():
+        atom_names = set([atom.name() for atom in chain.atoms()])
+        for name in atom_names:
+            if name not in ["C", "N", "CA", "O"]:
+                return False
+    return True

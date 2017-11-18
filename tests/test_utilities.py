@@ -124,3 +124,30 @@ class PdbLoadingTests(ZincBindTest):
             get_pdb("1ABC")
         mock_pdb.side_effect = ["PDB"] * 3
         get_pdb("1ABC")
+
+
+
+class SkeletonModelTests(ZincBindTest):
+
+    def setUp(self):
+        ZincBindTest.setUp(self)
+        self.model = Mock()
+        self.atoms = Mock(), Mock(), Mock(), Mock(), Mock()
+        self.atoms[0].name.return_value = "N"
+        self.atoms[1].name.return_value = "CA"
+        self.atoms[2].name.return_value = "C"
+        self.atoms[3].name.return_value = "O"
+        self.atoms[4].name.return_value = "CB"
+        chaina, chainb = Mock(), Mock()
+        chaina.atoms.return_value = set(self.atoms[:3])
+        chainb.atoms.return_value = set(self.atoms[3:])
+        self.model.chains.return_value = set([chaina, chainb])
+
+
+    def test_can_pass_model(self):
+        self.assertFalse(model_is_skeleton(self.model))
+
+
+    def test_can_fail_model(self):
+        self.atoms[4].name.return_value = "CA"
+        self.assertTrue(model_is_skeleton(self.model))

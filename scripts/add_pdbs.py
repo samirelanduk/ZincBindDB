@@ -27,10 +27,13 @@ def main():
                 print("\tFound Zinc")
                 pdb = get_pdb(code)
                 model = pdb.model()
-                for zinc in model.molecules(name="ZN"):
-                    site = zinc.site()
-                    create_zinc_site(pdb, zinc, site.residues())
-                    print("\t\tAdded {}".format(site))
+                if not model_is_skeleton(model):
+                    for zinc in model.molecules(name="ZN"):
+                        site = zinc.site()
+                        create_zinc_site(pdb, zinc, site.residues())
+                        print("\t\tAdded {}".format(site))
+                else:
+                    print("\tDiscounting {} - skeleton PDB".format(code))
             else:
                 print("\tNo Zinc")
                 create_empty_pdb(code)
