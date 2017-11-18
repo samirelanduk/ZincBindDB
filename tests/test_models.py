@@ -11,7 +11,8 @@ class PdbTests(ZincBindTest):
         pdb = Pdb(
          pk="1XXY", title="The PDB Title", deposited="1990-09-28",
          resolution=4.5, organism="HOMO SAPIENS", expression="M MUS",
-         classification="LYASE", uniprot="P10023", checked="2017-01-01"
+         classification="LYASE", technique="XRAY",
+         rfactor=4.5, checked="2017-01-01"
         )
         self.assertEqual(pdb.zincsite_set.count(), 0)
         pdb.full_clean()
@@ -21,7 +22,8 @@ class PdbTests(ZincBindTest):
         pdb = Pdb(
          pk="1XXY", deposited="1990-09-28",
          resolution=4.5, organism="HOMO SAPIENS", expression="M MUS",
-         uniprot="P10023", checked="2017-01-01"
+         technique="XRAY",
+         rfactor=4.5, checked="2017-01-01"
         )
         pdb.full_clean()
 
@@ -30,7 +32,8 @@ class PdbTests(ZincBindTest):
         pdb = Pdb(
          pk="1XXY", deposited="1990-09-28",
          resolution=4.5, organism="HOMO SAPIENS", expression="M MUS",
-         uniprot="P10023", checked="2017-01-01"
+         technique="XRAY",
+         rfactor=4.5, checked="2017-01-01"
         )
         pdb.full_clean()
 
@@ -39,7 +42,8 @@ class PdbTests(ZincBindTest):
         pdb = Pdb(
          pk="1XXY", title="The PDB Title", deposited=None,
          resolution=4.5, organism="HOMO SAPIENS", expression="M MUS",
-         classification="LYASE", uniprot="P10023", checked="2017-01-01"
+         classification="LYASE", technique="XRAY",
+         rfactor=4.5, checked="2017-01-01"
         )
         pdb.full_clean()
 
@@ -48,7 +52,8 @@ class PdbTests(ZincBindTest):
         pdb = Pdb(
          pk="1XXY", title="The PDB Title", deposited="1990-09-28",
          resolution=None, organism="HOMO SAPIENS", expression="M MUS",
-         classification="LYASE", uniprot="P10023", checked="2017-01-01"
+         classification="LYASE", technique="XRAY",
+         rfactor=4.5, checked="2017-01-01"
         )
         pdb.full_clean()
 
@@ -57,7 +62,8 @@ class PdbTests(ZincBindTest):
         pdb = Pdb(
          pk="1XXY", title="The PDB Title", deposited="1990-09-28",
          resolution=4.5, expression="M MUS",
-         classification="LYASE", uniprot="P10023", checked="2017-01-01"
+         classification="LYASE", technique="XRAY",
+         rfactor=4.5, checked="2017-01-01"
         )
         pdb.full_clean()
 
@@ -66,16 +72,28 @@ class PdbTests(ZincBindTest):
         pdb = Pdb(
          pk="1XXY", title="The PDB Title", deposited="1990-09-28",
          resolution=4.5, organism="HOMO SAPIENS",
-         classification="LYASE", uniprot="P10023", checked="2017-01-01"
+         classification="LYASE", technique="XRAY",
+         rfactor=4.5, checked="2017-01-01"
         )
         pdb.full_clean()
 
 
-    def test_uniprot_is_not_required(self):
+    def test_technique_is_not_required(self):
         pdb = Pdb(
          pk="1XXY", title="The PDB Title", deposited="1990-09-28",
-         resolution=None, organism="HOMO SAPIENS", expression="M MUS",
-         classification="LYASE", checked="2017-01-01"
+         resolution=4.5, organism="HOMO SAPIENS",
+         classification="LYASE", expression="M MUS",
+         rfactor=4.5, checked="2017-01-01"
+        )
+        pdb.full_clean()
+
+
+    def test_rfactor_is_not_required(self):
+        pdb = Pdb(
+         pk="1XXY", title="The PDB Title", deposited="1990-09-28",
+         resolution=4.5, organism="HOMO SAPIENS",
+         classification="LYASE", technique="XRAY", expression="M MUS",
+         checked="2017-01-01"
         )
         pdb.full_clean()
 
@@ -84,7 +102,8 @@ class PdbTests(ZincBindTest):
         pdb = Pdb(
          pk="1XXY", title="The PDB Title", deposited="1990-09-28",
          resolution=4.5, organism="HOMO SAPIENS", expression="M MUS",
-         classification="LYASE", uniprot="P10023", checked=None
+         classification="LYASE", technique="XRAY",
+         rfactor=4.5, checked=None
         )
         with self.assertRaises(ValidationError):
             pdb.full_clean()
@@ -134,7 +153,7 @@ class ZincSiteTests(ZincBindTest):
             site.full_clean()
 
 
-    
+
 class ResidueTests(ZincBindTest):
 
     def setUp(self):
@@ -387,7 +406,3 @@ class AtomTests(ZincBindTest):
         )
         with self.assertRaises(ValidationError):
             atom.full_clean()
-
-
-
-

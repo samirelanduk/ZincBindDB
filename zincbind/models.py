@@ -13,7 +13,8 @@ class Pdb(models.Model):
     resolution = models.FloatField(blank=True, null=True)
     organism = models.TextField(blank=True, null=True)
     expression = models.TextField(blank=True, null=True)
-    uniprot = models.TextField(blank=True, null=True)
+    technique = models.TextField(blank=True, null=True)
+    rfactor = models.FloatField(blank=True, null=True)
     checked = models.DateTimeField()
 
 
