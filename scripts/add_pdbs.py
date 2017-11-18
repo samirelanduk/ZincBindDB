@@ -30,9 +30,11 @@ def main():
                 if not model_is_skeleton(model):
                     for zinc in model.molecules(name="ZN"):
                         site = zinc.site()
-                        create_zinc_site(pdb, zinc, site.residues())
-                        print("\t\tAdded {}".format(site))
-                        break
+                        if site.residues():
+                            create_zinc_site(pdb, zinc, site.residues())
+                            print("\t\tAdded {}".format(site))
+                        else:
+                            print("\t\tNot adding {}".format(site))
                 else:
                     print("\tDiscounting {} - skeleton PDB".format(code))
                     create_empty_pdb(code)
