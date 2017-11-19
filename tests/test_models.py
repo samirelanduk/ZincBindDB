@@ -196,17 +196,11 @@ class ResidueTests(ZincBindTest):
             residue.full_clean()
 
 
-    def test_chain_is_required(self):
+    def test_chain_is_not_required(self):
         residue = Residue(
          pk="1XYZA10", residue_id="A10", name="VAL", chain=None, number=10
         )
-        with self.assertRaises(ValidationError):
-            residue.full_clean()
-        residue = Residue(
-         pk="1XYZA10", residue_id="A10", name="VAL", chain="", number=10
-        )
-        with self.assertRaises(ValidationError):
-            residue.full_clean()
+        residue.full_clean()
 
 
     def test_number_is_required(self):

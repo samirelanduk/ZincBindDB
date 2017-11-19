@@ -2,6 +2,7 @@
 
 import sys
 import os
+from atomium.structures import Residue
 import django
 sys.path.append(os.path.join("..", "zincbind"))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "zincbind.settings")
@@ -29,8 +30,8 @@ def main():
                 model = pdb.model()
                 if not model_is_skeleton(model):
                     for zinc in model.molecules(name="ZN"):
-                        site = zinc.site()
-                        if site.residues():
+                        site = zinc.site(include_water=True)
+                        if site.residues() and any(isinstance(res, Residue) for res in site.residues()):
                             create_zinc_site(pdb, zinc, site.residues())
                             print("\t\tAdded {}".format(site))
                         else:

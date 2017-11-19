@@ -151,6 +151,43 @@ class ResidueFactoryTests(FactoryTest):
     @patch("zincbind.models.Residue.objects.get")
     @patch("zincbind.models.Residue.objects.create")
     @patch("zincbind.models.Atom.objects.create")
+    def test_can_create_water_residue(self, mock_atom, mock_res, mock_get):
+        self.res1.residue_id.side_effect = AttributeError
+        self.res1.molecule_id.return_value = "B10"
+        self.res1.chain.side_effect = AttributeError
+        mock_get.side_effect = ObjectDoesNotExist
+        residue_record = Mock(name="rec")
+        mock_res.return_value = residue_record
+        residue = create_residue(self.res1, "1ABC", "zincatom")
+        mock_get.assert_called_with(pk="1ABCB10")
+        mock_res.assert_called_with(
+         pk="1ABCB10", residue_id="B10", name="VAL",
+         chain=None, number=10000
+        )
+        mock_atom.assert_any_call(
+         pk="1ABC1", atom_id=1, name="N2", x=15, y=16, z=17, element="N",
+         charge=-1, bfactor=101, alpha=False, beta=False, liganding=True,
+         residue=residue_record
+        )
+        mock_atom.assert_any_call(
+         pk="1ABC2", atom_id=2, name="CA", x=25, y=26, z=27, element="C",
+         charge=-2, bfactor=202, alpha=True, beta=False, liganding=False,
+         residue=residue_record
+        )
+        mock_atom.assert_any_call(
+         pk="1ABC3", atom_id=3, name="CB", x=35, y=36, z=37, element="C",
+         charge=-1, bfactor=20, alpha=False, beta=True, liganding=False,
+         residue=residue_record
+        )
+        self.atom1.distance_to.assert_called_with("zincatom")
+        self.atom2.distance_to.assert_called_with("zincatom")
+        self.atom3.distance_to.assert_called_with("zincatom")
+        self.assertIs(residue, residue_record)
+
+
+    @patch("zincbind.models.Residue.objects.get")
+    @patch("zincbind.models.Residue.objects.create")
+    @patch("zincbind.models.Atom.objects.create")
     def test_can_create_existing_residue(self, mock_atom, mock_res, mock_get):
         residue_record = Mock()
         mock_get.return_value = residue_record

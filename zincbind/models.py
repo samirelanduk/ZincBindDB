@@ -27,7 +27,7 @@ class Residue(models.Model):
     id = models.TextField(primary_key=True)
     residue_id = models.CharField(max_length=32)
     name = models.CharField(max_length=32)
-    chain = models.CharField(max_length=16)
+    chain = models.CharField(max_length=16, blank=True, null=True)
     number = models.IntegerField()
 
 

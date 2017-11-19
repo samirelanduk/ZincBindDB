@@ -36,14 +36,20 @@ def create_residue(residue, pdb_code, zinc_atom):
     """Creates a new Residue record and any associated Atom records, and returns
     it. If it already exists it will just be returned."""
 
-    residue_pk = pdb_code + residue.residue_id()
+    try:
+        residue_id = residue.residue_id()
+        chain = residue.chain().chain_id()
+    except AttributeError:
+        residue_id = residue.molecule_id()
+        chain = None
+    residue_pk = pdb_code + residue_id
     try:
         return Residue.objects.get(pk=residue_pk)
     except ObjectDoesNotExist:
         residue_record = Residue.objects.create(
-         pk=residue_pk, residue_id=residue.residue_id(), name=residue.name(),
-         number=residue.chain().residues().index(residue) + 1,
-         chain=residue.chain().chain_id()
+         pk=residue_pk, residue_id=residue_id, name=residue.name(),
+         number=residue.chain().residues().index(residue) + 1 if chain else 10000,
+         chain=chain
         )
         for atom in residue.atoms():
             Atom.objects.create(
@@ -51,7 +57,7 @@ def create_residue(residue, pdb_code, zinc_atom):
              x = atom.x(), y=atom.y(), z=atom.z(), element=atom.element(),
              name=atom.name(), charge=atom.charge(), bfactor=atom.bfactor(),
              alpha=(atom.name() == "CA"), beta=(atom.name() == "CB"),
-             liganding=(atom.distance_to(zinc_atom) <= 4),
+             liganding=(atom.distance_to(zinc_atom) <= 4 and atom.name() != "H"),
              residue=residue_record
             )
         return residue_record
