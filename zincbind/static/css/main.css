@@ -251,7 +251,13 @@ table {
 
   .half-width {
     flex-basis: 100%;
-      margin-bottom: 30px;
+    margin-bottom: 30px;
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+
+  .left, .right {
+    max-width: 800px;
   }
 
   .box {

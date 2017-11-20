@@ -70,3 +70,11 @@ h2 {
   .site-description {
       font-size: 125%;
   }
+
+  #site-search form {
+    width: 80%;
+    max-width: none;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #FFFFFF;
+}
