@@ -24,9 +24,10 @@ def main():
     for code in pdb_codes:
         try:
             print("\tChecking {}...".format(code))
-            if zinc_in_pdb(code):
+            filestring = get_pdb_filestring(code)
+            if zinc_in_pdb(filestring):
                 print("\tFound Zinc")
-                pdb = get_pdb(code)
+                pdb = get_pdb(filestring)
                 model = pdb.model()
                 if not model_is_skeleton(model):
                     for zinc in model.molecules(name="ZN"):

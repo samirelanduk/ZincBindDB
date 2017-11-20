@@ -41,24 +41,22 @@ def get_pdb_filestring(pdb_code):
         raise RcsbError("Could not get PDB {} from RCSB".format(pdb_code))
 
 
-def zinc_in_pdb(pdb_code):
+def zinc_in_pdb(pdb_filestring):
     """Takes the text of a .pdb file and determines whether or not it contains a
     Zinc molecule, using a regular expression.
 
     :rtype: ``bool``"""
 
-    filestring = get_pdb_filestring(pdb_code)
-    return bool(re.search(r"HET\s+ZN\s+", filestring))
+    return bool(re.search(r"HET\s+ZN\s+", pdb_filestring))
 
 
-def get_pdb(pdb_code):
-    """Gets an atomium ``Pdb`` object from a PDB code.
+def get_pdb(pdb_filestring):
+    """Gets an atomium ``Pdb`` object from a PDB filestring.
 
     :rtype: ``Pdb``"""
 
-    filestring = get_pdb_filestring(pdb_code)
     try:
-        d = atomium.files.pdbstring2pdbdict.pdb_string_to_pdb_dict(filestring)
+        d = atomium.files.pdbstring2pdbdict.pdb_string_to_pdb_dict(pdb_filestring)
         return atomium.files.pdbdict2pdb.pdb_dict_to_pdb(d)
     except:
         raise AtomiumError(
