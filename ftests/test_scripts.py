@@ -120,3 +120,29 @@ class AddingScriptTests(FunctionalTest):
         self.assertEqual(len(ZincSite.objects.all()), 6)
         self.assertEqual(len(Residue.objects.all()), 21)
         self.assertEqual(len(Atom.objects.all()), 125)
+
+
+    @patch("scripts.add_pdbs.get_all_pdb_codes")
+    @patch("builtins.print")
+    def test_rcsb_problems(self, mock_print, mock_add):
+        self.assertEqual(len(Pdb.objects.all()), 8)
+        self.assertEqual(len(ZincSite.objects.all()), 4)
+        self.assertEqual(len(Residue.objects.all()), 12)
+        self.assertEqual(len(Atom.objects.all()), 48)
+        mock_add.return_value = [
+         "1AAA", "1AAB", "1AAC", "1AAD", "2AAA", "2AAB", "2AAC", "2AAD",
+         "1LOL", "2SAM", "1A1Q", "1TON", "1W25", "12CA", "4V6X"
+        ]
+        main()
+        mock_print.assert_any_call("There are 15 current PDB codes.")
+        mock_print.assert_any_call("There are 7 which have never been checked.")
+        for code in mock_add.return_value:
+            mock_print.assert_any_call("\tChecking {}...".format(code))
+        mock_print.assert_any_call("\t\tAdded <'A247' Site (3 residues)>")
+        mock_print.assert_any_call("\t\tAdded <'A262' Site (6 residues)>")
+        mock_print.assert_any_call("\t\tNot adding <'A499' Site (0 residues)>")
+        mock_print.assert_any_call("\tCould not obtain 4V6X from RCSB")
+        self.assertEqual(len(Pdb.objects.all()), 13)
+        self.assertEqual(len(ZincSite.objects.all()), 6)
+        self.assertEqual(len(Residue.objects.all()), 21)
+        self.assertEqual(len(Atom.objects.all()), 125)

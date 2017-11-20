@@ -43,7 +43,7 @@ def main():
                 print("\tNo Zinc")
                 create_empty_pdb(code)
         except RcsbError:
-            print("Problem with {} RSCB".format(code))
+            print("\tCould not obtain {} from RCSB".format(code))
 
         print("")
 
