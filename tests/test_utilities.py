@@ -1,4 +1,4 @@
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch, MagicMock
 from .base import ZincBindTest
 from zincbind.utilities import *
 from zincbind.exceptions import RcsbError, AtomiumError
@@ -53,75 +53,92 @@ class CheckedPdbRemovalTests(ZincBindTest):
 
 class PdbTextLoadingTests(ZincBindTest):
 
+    @patch("builtins.open")
+    def test_can_get_local_file(self, mock_open):
+        with patch.dict("os.environ", {"PDBPATH": "/path/to/pdbs"}):
+            open_return = MagicMock()
+            mock_file = Mock()
+            open_return.__enter__.return_value = mock_file
+            mock_file.read.return_value = "returnstring"
+            mock_open.return_value = open_return
+            filestring = get_pdb_filestring("1ABC")
+            mock_open.assert_called_with("/path/to/pdbs/pdb1abc.ent")
+            self.assertEqual(filestring, "returnstring")
+
+
+    @patch("builtins.open")
+    @patch("atomium.files.utilities.fetch_string")
+    def test_can_fall_back_on_rcsb(self, mock_string, mock_open):
+        with patch.dict("os.environ", {"PDBPATH": "/path/to/pdbs"}):
+            mock_open.side_effect = FileNotFoundError
+            mock_string.return_value = "FILESTRING"
+            filestring = get_pdb_filestring("1ABC")
+            mock_string.assert_called_with("1ABC")
+            self.assertEqual(filestring, "FILESTRING")
+
+
     @patch("atomium.files.utilities.fetch_string")
     def test_can_get_pdb_text_from_web(self, mock_string):
-        mock_string.return_value = "FILESTRING"
-        filestring = get_pdb_filestring("1ABC")
-        mock_string.assert_called_with("1ABC")
-        self.assertEqual(filestring, "FILESTRING")
-
-
+        with patch.dict("os.environ", {"PDBPATHX": "/path/to/pdbs"}):
+            del os.environ["PDBPATH"]
+            mock_string.return_value = "FILESTRING"
+            filestring = get_pdb_filestring("1ABC")
+            mock_string.assert_called_with("1ABC")
+            self.assertEqual(filestring, "FILESTRING")
+            
+            
     @patch("atomium.files.utilities.fetch_string")
     def test_getting_pdb_from_web_can_trhow_error(self, mock_string):
-        mock_string.return_value = None
-        with self.assertRaises(RcsbError):
-            get_pdb_filestring("1ABC")
+        with patch.dict("os.environ", {"PDBPATHX": "/path/to/pdbs"}):
+            del os.environ["PDBPATH"]
+            mock_string.return_value = None
+            with self.assertRaises(RcsbError):
+                get_pdb_filestring("1ABC")
 
 
 
 class ZincInFileCheckingTests(ZincBindTest):
 
-    @patch("zincbind.utilities.get_pdb_filestring")
-    def test_can_find_zinc_in_file(self, mock_string):
-        mock_string.return_value = "\n".join([
+    def test_can_find_zinc_in_file(self):
+        self.assertTrue(zinc_in_pdb("\n".join([
          "SEQRES  19 A  235  PRO    ",
          "HET     ZN  A 247       1    ",
          "HETNAM      ZN ZINC ION    "
-        ])
-        self.assertTrue(zinc_in_pdb("1ABC"))
-        mock_string.assert_called_with("1ABC")
+        ])))
 
 
-    @patch("zincbind.utilities.get_pdb_filestring")
-    def test_can_reject_zinc_in_file(self, mock_string):
-        mock_string.return_value = "\n".join([
+    def test_can_reject_zinc_in_file(self):
+        self.assertFalse(zinc_in_pdb("\n".join([
          "SEQRES  19 A  235  PRO    ",
          "HET     MOL  A 247       1    ",
          "HETNAM      ZN ZINC ION    "
-        ])
-        self.assertFalse(zinc_in_pdb("1ABC"))
-        mock_string.assert_called_with("1ABC")
+        ])))
 
 
 
 class PdbLoadingTests(ZincBindTest):
 
-    @patch("zincbind.utilities.get_pdb_filestring")
     @patch("atomium.files.pdbstring2pdbdict.pdb_string_to_pdb_dict")
     @patch("atomium.files.pdbdict2pdb.pdb_dict_to_pdb")
-    def test_can_get_pdb(self, mock_pdb, mock_dict, mock_string):
-        mock_string.return_value = "FILESTRING"
+    def test_can_get_pdb(self, mock_pdb, mock_dict):
         mock_dict.return_value = {"pdb": "dict"}
         mock_pdb.return_value = "PDB"
-        pdb = get_pdb("1ABC")
-        mock_string.assert_called_with("1ABC")
+        pdb = get_pdb("FILESTRING")
         mock_dict.assert_called_with("FILESTRING")
         mock_pdb.assert_called_with({"pdb": "dict"})
         self.assertEqual(pdb, "PDB")
 
 
-    @patch("zincbind.utilities.get_pdb_filestring")
     @patch("atomium.files.pdbstring2pdbdict.pdb_string_to_pdb_dict")
     @patch("atomium.files.pdbdict2pdb.pdb_dict_to_pdb")
-    def test_can_throw_atomium_error(self, mock_pdb, mock_dict, mock_string):
-        mock_string.return_value = "FILESTRING"
+    def test_can_throw_atomium_error(self, mock_pdb, mock_dict):
         mock_dict.side_effect = Exception
         mock_pdb.side_effect = Exception
         with self.assertRaises(AtomiumError):
-            get_pdb("1ABC")
+            get_pdb("FILESTRING")
         mock_dict.side_effect = [{"pdb": "dict"}] * 3
         with self.assertRaises(AtomiumError):
-            get_pdb("1ABC")
+            get_pdb("FILESTRING")
         mock_pdb.side_effect = ["PDB"] * 3
         get_pdb("1ABC")
 

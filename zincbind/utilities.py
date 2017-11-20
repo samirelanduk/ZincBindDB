@@ -1,5 +1,6 @@
 import requests
 import re
+import os
 import atomium
 from .exceptions import RcsbError, AtomiumError
 from .models import Pdb
@@ -34,6 +35,13 @@ def get_pdb_filestring(pdb_code):
     """Gets the text of a PDB file from a PDB code - currently by just grabbing
     it from the RCSB web services."""
 
+    if "PDBPATH" in os.environ:
+        try:
+            with open(os.path.sep.join([
+             os.environ["PDBPATH"], "pdb{}.ent".format(pdb_code.lower())
+            ])) as f:
+                return f.read()
+        except FileNotFoundError: pass
     filestring = atomium.files.utilities.fetch_string(pdb_code)
     if filestring:
         return filestring
@@ -60,7 +68,7 @@ def get_pdb(pdb_filestring):
         return atomium.files.pdbdict2pdb.pdb_dict_to_pdb(d)
     except:
         raise AtomiumError(
-         "There was a problem parsing {} with atomium".format(pdb_code)
+         "There was a problem parsing filestring with atomium"
         )
 
 
