@@ -123,6 +123,18 @@ h2 {
   margin: 10px;
 }
 
+.left, .right {
+  max-width: 525px;
+}
+
+.left {
+  margin-left: auto;
+}
+
+.right {
+  margin-right: auto;
+}
+
 .box {
   border: 1px solid rgba(200, 200, 200, 0.8);
   padding: 20px;

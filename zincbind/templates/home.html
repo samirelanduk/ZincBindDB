@@ -7,7 +7,7 @@
 
 {% block main %}
 <div class="row" id="home-first">
-    <div class="half-width">
+    <div class="half-width left">
         <h1>The Database of Zinc Binding Sites</h1>
         <div class="site-description">
             ZincBind is a database of zinc binding sites, automatically generated from
@@ -16,7 +16,7 @@
             zinc binding sites accross
             <script>document.write(formatNumber({{ pdb_count }}));</script> PDB files.
         </div>
-    </div><div id="site-search" class="half-width">
+    </div><div id="site-search" class="half-width right">
         <form method="GET" action="/search" class="box">
             <h2>Search ZincBind</h2>
             <input type="text" name="term"
@@ -26,9 +26,9 @@
 </div>
 
 <div class="row">
-    <div class="half-width image">
+    <div class="half-width left image">
 
-    </div><div class="half-width">
+    </div><div class="half-width right">
         <h2>Detailed Structural Information</h2>
         <div class="site-description">
             For each zinc binding site, ZincBind provides information about atom
