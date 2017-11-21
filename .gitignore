@@ -9,3 +9,4 @@ log.txt
 *.sqlite3*
 *.json
 *.pdb
+data/*
