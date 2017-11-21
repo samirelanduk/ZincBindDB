@@ -1,93 +1,67 @@
 from time import sleep
 from mixer.backend.django import mixer
 from selenium.webdriver.common.keys import Keys
-from zincbind.models import ZincSite
+from zincbind.models import ZincSite, Pdb
 from .base import BrowserTest
 
 class MainSearchTests(BrowserTest):
 
-    def test_can_search_by_id(self):
+    def check_term_returns_results(self, term, results):
         self.get("/")
         search = self.browser.find_element_by_id("site-search")
 
-        # The user searches for '1AADA200'
-        term = search.find_element_by_tag_name("input")
-        term.send_keys("1aada200")
-        term.send_keys(Keys.ENTER)
+        # The user searches for the term
+        term_input = search.find_element_by_tag_name("input")
+        term_input.send_keys(term)
+        term_input.send_keys(Keys.ENTER)
         sleep(0.4)
 
         # They are on the search page
-        self.check_page("/search?term=1aada200")
+        self.check_page("/search?term=" + term)
         self.check_title("Search Results")
-        self.check_h1("Search Results: 1aada200")
+        self.check_h1("Search Results: " + term)
 
         # There is a result count
         result_count = self.browser.find_element_by_id("result-count")
-        self.assertIn("1 result", result_count.text)
+        self.assertIn("{} result".format(len(results)), result_count.text)
         self.assertIn("Page 1 of 1", result_count.text)
 
         # There are no pagination links
         self.assertEqual(len(self.browser.find_elements_by_class_name("page-links")), 0)
 
         # The results are below
-        results = self.browser.find_element_by_tag_name("table")
-        th = results.find_element_by_tag_name("tr")
+        results_table = self.browser.find_element_by_tag_name("table")
+        th = results_table.find_element_by_tag_name("tr")
         self.assertEqual(th.find_elements_by_tag_name("th")[0].text, "ZincSite ID")
         self.assertEqual(th.find_elements_by_tag_name("th")[1].text, "PDB")
         self.assertEqual(th.find_elements_by_tag_name("th")[2].text, "Deposited")
         self.assertEqual(th.find_elements_by_tag_name("th")[3].text, "Residues")
-        row = results.find_elements_by_tag_name("tr")[1]
-        self.assertEqual(row.find_elements_by_tag_name("td")[0].text, "1AADA200")
-        self.assertEqual(row.find_elements_by_tag_name("td")[1].text, "1AAD")
-        self.assertEqual(row.find_elements_by_tag_name("td")[2].text, "4 January, 2012")
-        self.assertEqual(row.find_elements_by_tag_name("td")[3].text, "3")
+        for row, result in zip(results_table.find_elements_by_tag_name("tr")[1:], results):
+            self.assertEqual(row.find_element_by_tag_name("td").text, result)
 
         # They link to the right page
         link = row.find_elements_by_tag_name("td")[0]
         self.click(link.find_element_by_tag_name("a"))
-        self.check_page("/1AADA200/")
+        self.check_page("/{}/".format(results[-1]))
+
+
+    def test_can_search_by_id(self):
+        self.check_term_returns_results("1aada200", ["1AADA200"])
 
 
     def test_can_search_pdbs(self):
-        self.get("/")
-        search = self.browser.find_element_by_id("site-search")
+        self.check_term_returns_results("1aad", ["1AADA200", "1AADB200"])
 
-        # The user searches for '1AAD'
-        term = search.find_element_by_tag_name("input")
-        term.send_keys("1aad")
-        term.send_keys(Keys.ENTER)
-        sleep(0.4)
 
-        # They are on the search page
-        self.check_page("/search?term=1aad")
-        self.check_title("Search Results")
-        self.check_h1("Search Results: 1aad")
-
-        # There is a result count
-        result_count = self.browser.find_element_by_id("result-count")
-        self.assertIn("2 results", result_count.text)
-        self.assertIn("Page 1 of 1", result_count.text)
-
-        # The results are below
-        results = self.browser.find_element_by_tag_name("table")
-        row1 = results.find_elements_by_tag_name("tr")[1]
-        self.assertEqual(row1.find_elements_by_tag_name("td")[0].text, "1AADA200")
-        self.assertEqual(row1.find_elements_by_tag_name("td")[1].text, "1AAD")
-        self.assertEqual(row1.find_elements_by_tag_name("td")[2].text, "4 January, 2012")
-        self.assertEqual(row1.find_elements_by_tag_name("td")[3].text, "3")
-        row2 = results.find_elements_by_tag_name("tr")[2]
-        self.assertEqual(row2.find_elements_by_tag_name("td")[0].text, "1AADB200")
-        self.assertEqual(row2.find_elements_by_tag_name("td")[1].text, "1AAD")
-        self.assertEqual(row2.find_elements_by_tag_name("td")[2].text, "4 January, 2012")
-        self.assertEqual(row2.find_elements_by_tag_name("td")[3].text, "3")
-
-        # There are no pagination links
-        self.assertEqual(len(self.browser.find_elements_by_class_name("page-links")), 0)
+    def test_can_search_titles(self):
+        pass
 
 
     def test_paginated_results(self):
         for i in range(110):
-            ZincSite.objects.create(id="1AAD{}".format(i), x=1.5, y=2.5, z=2.5)
+            ZincSite.objects.create(
+             id="1AAD{}".format(i), x=1.5, y=2.5, z=2.5, pdb=Pdb.objects.get(id="1AAD")
+            )
         self.get("/")
         search = self.browser.find_element_by_id("site-search")
 
