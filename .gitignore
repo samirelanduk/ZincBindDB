@@ -4,6 +4,7 @@ __pycache__
 .coverage
 *.log
 secrets.py
+log.txt
 
 *.sqlite3*
 *.json

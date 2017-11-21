@@ -161,7 +161,7 @@ input[type='submit'] {
 }
 
 table, th, td {
-   border: 1px solid black;
+   border: 1px solid #080808;
 }
 
 th {

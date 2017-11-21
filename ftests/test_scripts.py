@@ -161,7 +161,7 @@ class AddingScriptTests(FunctionalTest):
          "1TON"
         ]
         mock_res.add = MagicMock(name="adder")
-        mock_res.add.side_effect = Exception
+        mock_res.add.side_effect = KeyboardInterrupt
         try:
             main()
         except: pass

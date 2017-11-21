@@ -13,25 +13,13 @@ class SiteTests(BrowserTest):
         pdb_title = pdb_section.find_element_by_tag_name("h2")
         self.assertIn("PDB", pdb_title.text)
         table = pdb_section.find_element_by_tag_name("table")
-        rows = table.find_elements_by_tag_name("tr")
-        self.assertEqual(
-         rows[0].find_elements_by_tag_name("td")[0].text, "PDB Code"
-        )
-        self.assertEqual(
-         rows[1].find_elements_by_tag_name("td")[0].text, "Deposition Date"
-        )
-        self.assertEqual(
-         rows[2].find_elements_by_tag_name("td")[0].text, "Title"
-        )
-        self.assertEqual(
-         rows[0].find_elements_by_tag_name("td")[1].text, "1AAD"
-        )
-        self.assertEqual(
-         rows[1].find_elements_by_tag_name("td")[1].text, "4 January, 2012"
-        )
-        self.assertIn(
-         "PDB 4", rows[2].find_elements_by_tag_name("td")[1].text,
-        )
+        self.check_table_values(table, [
+         ["PDB Code", "1AAD"], ["Deposition Date", "4 January, 2012"],
+         ["Title", "PDB 4"], ["Technique", "NMR"],
+         ["Resolution", "4.7"], ["Rfactor", "9.4"],
+         ["Classification", "LYASE"], ["Source Organism", "Homo sapiens"],
+         ["Expression System", "E. coli"]
+        ])
 
         # There is a residues section
         residues_section = self.browser.find_element_by_id("site-residues")

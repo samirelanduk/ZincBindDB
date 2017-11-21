@@ -32,8 +32,8 @@ def remove_checked_pdbs(pdbs):
 
 
 def get_pdb_filestring(pdb_code):
-    """Gets the text of a PDB file from a PDB code - currently by just grabbing
-    it from the RCSB web services."""
+    """Gets the text of a PDB file from a PDB code - first by trying to get the
+    file locally, then by fetching from RCSB."""
 
     if "PDBPATH" in os.environ:
         try:

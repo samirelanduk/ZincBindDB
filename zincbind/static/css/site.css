@@ -7,3 +7,24 @@
     margin-top: 50px;
     margin-bottom: 50px;
 }
+
+td:first-child {
+	font-weight: bold;
+}
+
+td:last-child {
+	text-align: left;
+}
+
+h2 {
+	margin-left: calc(2.5% + 10px);
+	padding-left: 0px;
+}
+
+
+@media only screen and (max-width: 769px) {
+  /* iPad and down */
+  h2 {
+	margin-left: calc(5% + 20px)
+  }
+}

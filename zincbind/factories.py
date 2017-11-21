@@ -1,7 +1,7 @@
 """Contains factory functions for creating objects in the database."""
 
 from datetime import datetime
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 from .models import Pdb, Residue, Atom, ZincSite
 from .exceptions import DuplicateSiteError
@@ -63,7 +63,6 @@ def create_residue(residue, pdb_code, zinc_atom):
         return residue_record
 
 
-@transaction.atomic
 def create_zinc_site(pdb, zinc, residues):
     """Creates a new ZincSite from atomium Pdb, Molecule, and Residues objects.
     Any components that don't exist will be created first."""

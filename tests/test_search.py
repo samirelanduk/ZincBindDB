@@ -12,4 +12,4 @@ class OmniSearchTests(ZincBindTest):
     	mock_filter.return_value = result_set
     	results = omni_search("term")
     	mock_filter.assert_called_with(id__contains="TERM")
-    	result_set.order_by.assert_called_with("id")
+    	result_set.order_by.assert_called_with("-pdb__deposited")

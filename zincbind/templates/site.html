@@ -12,11 +12,36 @@
 
 <div id="site-pdb">
   <h2>PDB</h2>
-  <table>
-    <tr><td>PDB Code</td><td>{{ site.pdb.id }}</td></tr>
-    <tr><td>Deposition Date</td><td>{{ site.pdb.deposited|date:"j F, Y" }}</td></tr>
-    <tr><td>Title</td><td>{{ site.pdb.title }}</td></tr>
-  </table>
+  <div class="row">
+    <div class="half-width">
+      <table>
+        <tr><td>PDB Code</td><td>{{ site.pdb.id }}</td></tr>
+        <tr><td>Deposition Date</td><td>{{ site.pdb.deposited|date:"j F, Y" }}</td></tr>
+        <tr><td>Title</td><td>{{ site.pdb.title }}</td></tr>
+        <tr><td>Technique</td><td>{{ site.pdb.technique }}</td></tr>
+        <tr><td>Resolution</td><td>{{ site.pdb.resolution }}</td></tr>
+        <tr><td>Rfactor</td><td>{{ site.pdb.rfactor }}</td></tr>
+        <tr><td>Classification</td><td>{{ site.pdb.classification }}</td></tr>
+        <tr><td>Source Organism</td><td>
+          <em><script>document.write(formatSpecies("{{ site.pdb.organism }}"));</script></em>
+        </td></tr>
+        <tr><td>Expression System</td><td>
+          <em><script>document.write(formatSpecies("{{ site.pdb.expression }}"));</script></em>
+        </td></tr>
+      </table>
+    </div><div class="half-width">
+      <table>
+        <tr>
+          <th>Other Sites in this PDB</th>
+        </tr>
+      </table>
+      <table>
+        <tr>
+          <th>Other Sites from this Organism</th>
+        </tr>
+      </table>
+    </div>
+  </div>
 </div>
 
 <div id="site-residues">

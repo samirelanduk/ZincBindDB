@@ -143,3 +143,13 @@ class BrowserTest(FunctionalTest):
         self.scroll_to(element)
         element.click()
         sleep(0.5)
+
+
+    def check_table_values(self, table, row_values):
+        rows = table.find_elements_by_tag_name("tr")
+        self.assertEqual(len(rows), len(row_values))
+        for table_row, value_row in zip(rows, row_values):
+            cells = table_row.find_elements_by_tag_name("td")
+            self.assertEqual(len(cells), len(value_row))
+            for cell, value in zip(cells, value_row):
+                self.assertEqual(cell.text, value)
