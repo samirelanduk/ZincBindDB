@@ -80,17 +80,21 @@ class PdbTextLoadingTests(ZincBindTest):
     @patch("atomium.files.utilities.fetch_string")
     def test_can_get_pdb_text_from_web(self, mock_string):
         with patch.dict("os.environ", {"PDBPATHX": "/path/to/pdbs"}):
-            del os.environ["PDBPATH"]
+            try:
+                del os.environ["PDBPATH"]
+            except: pass
             mock_string.return_value = "FILESTRING"
             filestring = get_pdb_filestring("1ABC")
             mock_string.assert_called_with("1ABC")
             self.assertEqual(filestring, "FILESTRING")
-            
-            
+
+
     @patch("atomium.files.utilities.fetch_string")
-    def test_getting_pdb_from_web_can_trhow_error(self, mock_string):
+    def test_getting_pdb_from_web_can_throw_error(self, mock_string):
         with patch.dict("os.environ", {"PDBPATHX": "/path/to/pdbs"}):
-            del os.environ["PDBPATH"]
+            try:
+                del os.environ["PDBPATH"]
+            except: pass
             mock_string.return_value = None
             with self.assertRaises(RcsbError):
                 get_pdb_filestring("1ABC")

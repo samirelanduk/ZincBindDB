@@ -109,7 +109,7 @@ class BrowserTest(FunctionalTest):
                 self.browser = webdriver.Chrome()
             except:
                 self.browser = webdriver.Firefox()
-        self.browser.set_window_size(800, 700)
+        #self.browser.set_window_size(800, 700)
 
 
     def tearDown(self):

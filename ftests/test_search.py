@@ -17,7 +17,7 @@ class MainSearchTests(BrowserTest):
         sleep(0.4)
 
         # They are on the search page
-        self.check_page("/search?term=" + term)
+        self.check_page("/search?term=" + term.replace(" ", "+"))
         self.check_title("Search Results")
         self.check_h1("Search Results: " + term)
 
@@ -54,7 +54,25 @@ class MainSearchTests(BrowserTest):
 
 
     def test_can_search_titles(self):
-        pass
+        self.check_term_returns_results("PDB 4", ["1AADA200", "1AADB200"])
+
+
+    def test_can_search_organisms(self):
+        self.check_term_returns_results("Mus musculus", ["2AACE500", "1AABA100"])
+
+
+    def test_can_search_expression(self):
+        self.check_term_returns_results(
+         "e. coli", ["2AACE500", "1AADA200", "1AADB200", "1AABA100"]
+        )
+
+
+    def test_can_search_technique(self):
+        self.check_term_returns_results("NMR", ["2AACE500", "1AADA200", "1AADB200"])
+
+
+    def test_can_search_classification(self):
+        self.check_term_returns_results("immunoglobulin", ["2AACE500"])
 
 
     def test_paginated_results(self):
@@ -116,4 +134,3 @@ class MainSearchTests(BrowserTest):
             result_count = self.browser.find_element_by_id("result-count")
             self.assertIn("112 results", result_count.text)
             self.assertIn("Page {} of 5".format(index), result_count.text)
-
