@@ -9,6 +9,17 @@
 {% block h1 %}<h1>Zinc Site: {{ site.id }}</h1>{% endblock %}
 {% block main %}
 
+<div id="site">
+    <div class="row">
+        <div class="half-width left">
+            <div id="ngl-container">
+              <iframe scrolling="no" src="/ngl/{{site.id}}/"></iframe>
+            </div>
+        </div><div class="half-width right">
+          .
+        </div>
+    </div>
+</div>
 
 <div id="site-pdb">
   <h2>PDB</h2>

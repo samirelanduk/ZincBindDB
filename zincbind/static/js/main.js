@@ -2,8 +2,8 @@ $(window).on("resize", function() {
   if ($("#mobile-menu-icon").is(":hidden")) {
     $("nav").show();
   } else {
-		$("nav").hide();
-	}
+    $("nav").hide();
+  }
 });
 
 $(document).ready(function() {

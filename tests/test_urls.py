@@ -25,3 +25,7 @@ class UrlRedirectTests(ZincBindTest):
 
     def test_changelog_url_works(self):
         self.check_url_returns_view("/changelog/", views.changelog)
+
+
+    def test_ngl_url_works(self):
+        self.check_url_returns_view("/ngl/1XXXA001/", views.ngl_site)

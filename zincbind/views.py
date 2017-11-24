@@ -54,5 +54,13 @@ def site(request, site_id):
         raise Http404
 
 
+def ngl_site(request, site_id):
+    try:
+        site = ZincSite.objects.get(pk=site_id)
+        return render(request, "ngl-site.html", {"site": site})
+    except ObjectDoesNotExist:
+        raise Http404
+
+
 def changelog(request):
     return render(request, "changelog.html")
