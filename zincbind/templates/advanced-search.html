@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Advanced Search{% endblock %}
+{% block css %}
+ <link rel="stylesheet" type="text/css" href="/static/css/search.css">
+{% endblock %}
+
+{% block h1 %}<h1>Advanced Search</h1>{% endblock %}
+{% block main %}
+
+<form method="GET" action="/search">
+    <div class="search-row">
+        <select>
+          <option value="title">PDB Title</option>
+        </select>
+        <span class="search-con"> contains </span>
+        <input name="title">
+    </div>
+
+    <input type="submit" value="Search">
+</form>
+{% endblock %}

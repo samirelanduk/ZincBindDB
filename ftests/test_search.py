@@ -1,6 +1,7 @@
 from time import sleep
 from mixer.backend.django import mixer
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import Select
 from zincbind.models import ZincSite, Pdb
 from .base import BrowserTest
 
@@ -182,3 +183,56 @@ class MainSearchTests(BrowserTest):
             result_count = self.browser.find_element_by_id("result-count")
             self.assertIn("112 results", result_count.text)
             self.assertIn("Page {} of 5".format(index), result_count.text)
+
+
+
+class AdvancedSearchTests(BrowserTest):
+
+    def test_can_search_by_title(self):
+        # User goes to the search page
+        self.get("/")
+        nav = self.browser.find_element_by_tag_name("nav")
+        self.click(nav.find_elements_by_tag_name("a")[0])
+        self.check_page("/search/")
+        self.check_title("Advanced Search")
+        self.check_h1("Advanced Search")
+
+        # There is a form with a single search row
+        form = self.browser.find_element_by_tag_name("form")
+        search_rows = form.find_elements_by_class_name("search-row")
+        self.assertEqual(len(search_rows), 1)
+        row = search_rows[0]
+
+        # They search for sites with 'B 7' in title
+        drowndown = row.find_element_by_tag_name("select")
+        drowndown = Select(drowndown)
+        drowndown.select_by_visible_text("PDB Title")
+        text = row.find_element_by_tag_name("input")
+        text.send_keys("B 7")
+        submit = form.find_elements_by_tag_name("input")[-1]
+        self.click(submit)
+
+        # They are on the search results page
+        self.check_page("/search?title=B+7")
+        self.check_title("Search Results")
+        self.check_h1("Search Results")
+
+        # There is a result count
+        result_count = self.browser.find_element_by_id("result-count")
+        self.assertIn("1 result", result_count.text)
+        self.assertIn("Page 1 of 1", result_count.text)
+
+        # There are no pagination links
+        self.assertEqual(len(self.browser.find_elements_by_class_name("page-links")), 0)
+
+        # The results are below
+        results_table = self.browser.find_element_by_tag_name("table")
+        th = results_table.find_element_by_tag_name("tr")
+        self.assertEqual(th.find_elements_by_tag_name("th")[0].text, "ZincSite ID")
+        self.assertEqual(th.find_elements_by_tag_name("th")[1].text, "PDB")
+        self.assertEqual(th.find_elements_by_tag_name("th")[2].text, "Deposited")
+        self.assertEqual(th.find_elements_by_tag_name("th")[3].text, "Resolution")
+        self.assertEqual(th.find_elements_by_tag_name("th")[4].text, "Organism")
+        results = ["2AACE500"]
+        for row, result in zip(results_table.find_elements_by_tag_name("tr")[1:], results):
+            self.assertEqual(row.find_element_by_tag_name("td").text, result)

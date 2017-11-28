@@ -5,7 +5,7 @@
  <link rel="stylesheet" type="text/css" href="/static/css/search.css">
 {% endblock %}
 
-{% block h1 %}<h1>Search Results: {{ term }}</h1>{% endblock %}
+{% block h1 %}<h1>Search Results{% if term != None %}: {{ term }}{% endif %}</h1>{% endblock %}
 {% block main %}
 
 <div id="result-count">

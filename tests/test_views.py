@@ -59,105 +59,139 @@ class DataViewTests(ZincBindTest):
 
 class SearchViewTests(ZincBindTest):
 
-    def test_search_view_uses_search_template(self):
-        request = self.get_request("/search/", "get", {"term": "TERM"})
-        self.check_view_uses_template(search, request, "search.html")
-
-
-    def test_search_view_redirects_if_no_term(self):
+    @patch("zincbind.views.advanced_search")
+    def test_no_params_uses_advanced_search(self, mock_view):
+        mock_view.return_value = "RESPONSE"
         request = self.get_request("/search/", "get")
-        self.check_view_redirects(search, request, "/")
+        response = search(request)
+        mock_view.assert_called_with(request)
+        self.assertEqual(response, "RESPONSE")
 
 
-    def test_search_view_sends_search_term(self):
+    @patch("zincbind.views.process_search")
+    def test_params_uses_process_search(self, mock_view):
+        mock_view.return_value = "RESPONSE"
+        request = self.get_request("/search/", "get", {"term": "*"})
+        response = search(request)
+        mock_view.assert_called_with(request)
+        self.assertEqual(response, "RESPONSE")
+
+
+
+class ProcessSearchTests(ZincBindTest):
+
+    def test_process_search_view_uses_search_template(self):
         request = self.get_request("/search/", "get", {"term": "TERM"})
-        self.check_view_has_context(search, request, {"term": "TERM"})
+        self.check_view_uses_template(process_search, request, "search.html")
+
+
+    def test_process_search_view_sends_search_term(self):
+        request = self.get_request("/search/", "get", {"term": "TERM"})
+        self.check_view_has_context(process_search, request, {"term": "TERM"})
 
 
     @patch("zincbind.views.omni_search")
-    def test_search_view_sends_search_results(self, mock_omni):
+    def test_process_search_view_sends_search_results(self, mock_omni):
         mock_omni.return_value = ["RESULT1", "RESULT2"]
         request = self.get_request("/search/", "get", {"term": "TERM"})
-        self.check_view_has_context(search, request, {
+        self.check_view_has_context(process_search, request, {
          "results": ["RESULT1", "RESULT2"], "result_count": 2
         })
 
 
     @patch("zincbind.views.omni_search")
-    def test_search_view_sends_search_results_first_25(self, mock_omni):
+    def test_process_search_view_sends_search_results_first_25(self, mock_omni):
         mock_omni.return_value = list(range(130))
         request = self.get_request("/search/", "get", {"term": "TERM"})
-        self.check_view_has_context(search, request, {
+        self.check_view_has_context(process_search, request, {
          "results": list(range(25)), "result_count": 130
         })
 
 
     @patch("zincbind.views.omni_search")
-    def test_search_view_searches_sends_pagination_details_one_page(self, mock_omni):
+    def test_process_search_view_searches_sends_pagination_details_one_page(self, mock_omni):
         mock_omni.return_value = ["RESULT1", "RESULT2"]
         request = self.get_request("/search/", "get", {"term": "TERM"})
-        self.check_view_has_context(search, request, {
+        self.check_view_has_context(process_search, request, {
          "page_count": 1, "page": 1, "previous": False, "next": False
         })
 
 
     @patch("zincbind.views.omni_search")
-    def test_search_view_searches_sends_pagination_details_multi_page(self, mock_omni):
+    def test_process_search_view_searches_sends_pagination_details_multi_page(self, mock_omni):
         mock_omni.return_value = list(range(130))
         request = self.get_request("/search/", "get", {"term": "TERM"})
-        self.check_view_has_context(search, request, {
+        self.check_view_has_context(process_search, request, {
          "page_count": 6, "page": 1, "previous": False, "next": 2
         })
 
 
     @patch("zincbind.views.omni_search")
-    def test_search_view_handles_second_25(self, mock_omni):
+    def test_process_search_view_handles_second_25(self, mock_omni):
         mock_omni.return_value = list(range(130))
         request = self.get_request("/search/", "get", {"term": "TERM", "page": 2})
-        self.check_view_has_context(search, request, {
+        self.check_view_has_context(process_search, request, {
          "results": list(range(25, 50)), "result_count": 130,
          "page_count": 6, "page": 2, "previous": 1, "next": 3
         })
 
 
     @patch("zincbind.views.omni_search")
-    def test_search_view_handles_last_results(self, mock_omni):
+    def test_process_search_view_handles_last_results(self, mock_omni):
         mock_omni.return_value = list(range(130))
         request = self.get_request("/search/", "get", {"term": "TERM", "page": 6})
-        self.check_view_has_context(search, request, {
+        self.check_view_has_context(process_search, request, {
          "results": list(range(125, 130)), "result_count": 130,
          "page_count": 6, "page": 6, "previous": 5, "next": False
         })
 
 
     @patch("zincbind.views.omni_search")
-    def test_search_view_handles_invalid_page(self, mock_omni):
+    def test_process_search_view_handles_invalid_page(self, mock_omni):
         mock_omni.return_value = list(range(130))
         request = self.get_request("/search/", "get", {"term": "TERM", "page": "ghgh"})
-        self.check_view_has_context(search, request, {
+        self.check_view_has_context(process_search, request, {
          "results": list(range(25)), "result_count": 130,
          "page_count": 6, "page": 1, "previous": False, "next": 2
         })
         request = self.get_request("/search/", "get", {"term": "TERM", "page": -1})
-        self.check_view_has_context(search, request, {
+        self.check_view_has_context(process_search, request, {
          "results": list(range(25)), "result_count": 130,
          "page_count": 6, "page": 1, "previous": False, "next": 2
         })
         request = self.get_request("/search/", "get", {"term": "TERM", "page": 30})
-        self.check_view_has_context(search, request, {
+        self.check_view_has_context(process_search, request, {
          "results": list(range(25)), "result_count": 130,
          "page_count": 6, "page": 1, "previous": False, "next": 2
         })
 
 
     @patch("zincbind.views.omni_search")
-    def test_search_view_can_get_all_results(self, mock_omni):
+    def test_process_search_view_can_get_all_results(self, mock_omni):
         mock_omni.return_value = ["RESULT1", "RESULT2"]
         request = self.get_request("/search/", "get", {"term": "*"})
-        self.check_view_has_context(search, request, {
+        self.check_view_has_context(process_search, request, {
          "results": ["RESULT1", "RESULT2"], "result_count": 2
         })
         mock_omni.assert_called_with("")
+
+
+    @patch("zincbind.views.specific_search")
+    def test_can_use_specific_search_if_no_term(self, mock_specific):
+        mock_specific.return_value = ["RESULT1", "RESULT2"]
+        request = self.get_request("/search/", "get", {"x": "*"})
+        self.check_view_has_context(process_search, request, {
+         "results": ["RESULT1", "RESULT2"], "result_count": 2
+        })
+        mock_specific.assert_called_with(x=["*"])
+
+
+
+class AdvancedSearchTests(ZincBindTest):
+
+    def test_advanced_search_uses_advanced_search_template(self):
+        request = self.get_request("/search/")
+        self.check_view_uses_template(advanced_search, request, "advanced-search.html")
 
 
 

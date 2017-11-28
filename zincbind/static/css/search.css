@@ -31,7 +31,66 @@
     color: blue;
 }
 
-td {
+td, th {
     font-size: 80%;
     padding: 5px;
+}
+
+.search-row {
+    width: 70%;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+form {
+    margin-top: 20px;
+}
+
+select {
+    font-size: 200%;
+    margin-right: 10px;
+}
+
+.search-con {
+    font-size: 150%;
+    font-style: italic;
+}
+
+.search-row input {
+    display: inline;
+    margin-left: 10px;
+    flex-grow: 5
+}
+
+input[type='submit'] {
+    margin-top: 15px;
+    display: block;
+    width: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media only screen and (max-width: 769px) {
+  /* iPad and down */
+
+  .search-row {
+      width: 90%;
+  }
+
+  select {
+      font-size: 150%;
+      margin-right: 5px;
+  }
+
+  .search-con {
+      font-size: 100%;
+      font-style: italic;
+  }
+
+  .search-row input {
+      margin-left: 5px;
+  }
 }

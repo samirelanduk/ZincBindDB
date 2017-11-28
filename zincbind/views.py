@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from .models import ZincSite, Pdb
-from .search import omni_search
+from .search import omni_search, specific_search
 
 def home(request):
     return render(request, "home.html", {
@@ -23,29 +23,40 @@ def data(request):
 
 
 def search(request):
+    if not request.GET:
+        return advanced_search(request)
+    else:
+        return process_search(request)
+
+
+def advanced_search(request):
+    return render(request, "advanced-search.html")
+
+
+def process_search(request):
     if "term" in request.GET:
         sites = omni_search(
          "" if request.GET["term"] == "*" else request.GET["term"]
         )
-        results = Paginator(sites, 25)
-        page_number = request.GET.get("page", 1)
-        try:
-            page_number = int(page_number)
-        except: page_number = 1
-        if not 0 < page_number <= results.num_pages:
-            page_number = 1
-        page = results.page(page_number)
-        return render(request, "search.html", {
-         "term": request.GET["term"],
-         "page_count": results.num_pages,
-         "result_count": results.count,
-         "results": page.object_list,
-         "page": page.number,
-         "previous": page.previous_page_number() if page.has_previous() else False,
-         "next": page.next_page_number() if page.has_next() else False,
-        })
-    return redirect("/")
-
+    else:
+        sites = specific_search(**request.GET)
+    results = Paginator(sites, 25)
+    page_number = request.GET.get("page", 1)
+    try:
+        page_number = int(page_number)
+    except: page_number = 1
+    if not 0 < page_number <= results.num_pages:
+        page_number = 1
+    page = results.page(page_number)
+    return render(request, "search.html", {
+     "term": request.GET.get("term"),
+     "page_count": results.num_pages,
+     "result_count": results.count,
+     "results": page.object_list,
+     "page": page.number,
+     "previous": page.previous_page_number() if page.has_previous() else False,
+     "next": page.next_page_number() if page.has_next() else False,
+    })
 
 
 def site(request, site_id):
