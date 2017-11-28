@@ -153,6 +153,16 @@ class ZincSiteTests(ZincBindTest):
             site.full_clean()
 
 
+    def test_site_chain_property(self):
+        site = ZincSite(pk="1ZZZA500", x=1.5, y=-1.5, z=10.0, pdb=self.pdb)
+        self.assertEqual(site.chain, "A")
+
+
+    def test_site_number_id_property(self):
+        site = ZincSite(pk="1ZZZA500", x=1.5, y=-1.5, z=10.0, pdb=self.pdb)
+        self.assertEqual(site.number_id, "500")
+
+
 
 class ResidueTests(ZincBindTest):
 
@@ -213,6 +223,28 @@ class ResidueTests(ZincBindTest):
          pk="1XYZA10", residue_id="A10", name="VAL", chain="A", number=0
         )
         residue.full_clean()
+
+
+    def test_residue_number_id_property(self):
+        residue = Residue(
+         pk="1XYZA10", residue_id="A10", name="VAL", chain="A", number=10
+        )
+        self.assertEqual(residue.number_id, "10")
+
+
+    def test_residue_full_name_property(self):
+        residue = Residue(
+         pk="1XYZA10", residue_id="A10", name="VAL", chain="A", number=10
+        )
+        self.assertEqual(residue.full_name, "Valine")
+        residue = Residue(
+         pk="1XYZA10", residue_id="A10", name="HOH", chain="A", number=10
+        )
+        self.assertEqual(residue.full_name, "Water")
+        residue = Residue(
+         pk="1XYZA10", residue_id="A10", name="XXX", chain="A", number=10
+        )
+        self.assertEqual(residue.full_name, "XXX")
 
 
 

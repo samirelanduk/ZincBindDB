@@ -1,12 +1,12 @@
-/*.row:first-child {
+/*.row {
     background-color: lightblue;
 }
 
-.row:first-child .left {
+ .left {
     background-color: lightgreen;
 }
 
-.row:first-child .right {
+.right {
     background-color: lightyellow;
 }*/
 
@@ -28,6 +28,22 @@ iframe {
     margin: 10px;
     border: 1px solid silver;
     border-radius: 10px;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.site-info, .site-info tr, .site-info td {
+    border: none;
+}
+
+.site-info td:first-child {
+    font-weight: bold;
+    text-align: right;
+}
+
+.site-info td:last-child {
+    text-align: left;
 }
 
 #site-pdb {

@@ -8,10 +8,30 @@ class SiteTests(BrowserTest):
         self.check_title("1AADA200")
         self.check_h1("Zinc Site: 1AADA200")
 
+        # There is a site section
+        site_section = self.browser.find_element_by_id("site")
+
+        # There are two panels
+        panels = site_section.find_elements_by_class_name("half-width")
+        self.assertEqual(len(panels), 2)
+
+        # The first panel is an iframe
+        iframe = panels[0].find_element_by_tag_name("iframe")
+        self.assertEqual(
+         iframe.get_attribute("src"), self.live_server_url + "/ngl/1AADA200/"
+        )
+
+        # The second panel has a table of data
+        site_table = panels[1].find_element_by_tag_name("table")
+        cells = [[cell.text for cell in row.find_elements_by_tag_name("td")]
+         for row in site_table.find_elements_by_tag_name("tr")]
+        self.assertEqual(cells[0][0], "Residues")
+        self.assertEqual(cells[0][1], "Valine (A11), Cysteine (A12), Valine (A13)")
+        self.assertEqual(cells[1][0], "PyMol Selector")
+        self.assertEqual(cells[1][1], "sele 1AADA200, (chain A and resi 11) + (chain A and resi 12) + (chain A and resi 13) + (chain A and resi 200)")
+
         # There is a PDB section
         pdb_section = self.browser.find_element_by_id("site-pdb")
-        pdb_title = pdb_section.find_element_by_tag_name("h2")
-        self.assertIn("PDB", pdb_title.text)
         table = pdb_section.find_element_by_tag_name("table")
         self.check_table_values(table, [
          ["PDB Code", "1AAD"], ["Deposition Date", "4 January, 2012"],
@@ -20,35 +40,3 @@ class SiteTests(BrowserTest):
          ["Classification", "LYASE"], ["Source Organism", "Homo sapiens"],
          ["Expression System", "E. coli"]
         ])
-
-        # There is a residues section
-        residues_section = self.browser.find_element_by_id("site-residues")
-        residues_title = residues_section.find_element_by_tag_name("h2")
-        self.assertIn("Residues", residues_section.text)
-
-        # There are residue divs
-        residue_divs = self.browser.find_elements_by_class_name("residue")
-        self.assertEqual(len(residue_divs), 3)
-
-        # The residue divs are correct
-        for index, residue_div in enumerate(residue_divs):
-            table = residue_div.find_element_by_tag_name("table")
-            rows = table.find_elements_by_tag_name("tr")
-            self.assertEqual(
-             rows[0].find_elements_by_tag_name("td")[0].text, "Chain"
-            )
-            self.assertEqual(
-             rows[1].find_elements_by_tag_name("td")[0].text, "ID"
-            )
-            self.assertEqual(
-             rows[2].find_elements_by_tag_name("td")[0].text, "Name"
-            )
-            self.assertEqual(
-             rows[0].find_elements_by_tag_name("td")[1].text, "A"
-            )
-            self.assertEqual(
-             rows[1].find_elements_by_tag_name("td")[1].text, "A1" + str(index + 1)
-            )
-            self.assertEqual(
-             rows[2].find_elements_by_tag_name("td")[1].text, "CYS" if index % 2 else "VAL"
-            )

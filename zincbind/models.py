@@ -30,6 +30,24 @@ class Residue(models.Model):
     chain = models.CharField(max_length=16, blank=True, null=True)
     number = models.IntegerField()
 
+    @property
+    def number_id(self):
+        return self.residue_id[1:]
+
+
+    @property
+    def full_name(self):
+        return {
+         "ALA": "Alanine", "ARG": "Arginine", "ASN": "Asparganine",
+         "ASP": "Aspartic Acid", "CYS": "Cysteine", "GLU": "Glutamic Acid",
+         "GLN": "Glutamine", "GLY": "Glycine", "HIS": "Histidine",
+         "ILE": "Isoleucine", "LEU": "Leucine", "LYS": "Lysine",
+         "MET": "Methionine", "PHE": "Phenylalanine", "PRO": "Proline",
+         "SER": "Serine", "THR": "Threonine", "TRP": "Tryptophan",
+         "TYR": "Tyrosine", "VAL": "Valine", "HOH": "Water"
+        }.get(self.name, self.name)
+
+
 
 
 class ZincSite(models.Model):
@@ -41,6 +59,15 @@ class ZincSite(models.Model):
     z = models.FloatField()
     pdb = models.ForeignKey(Pdb)
     residues = models.ManyToManyField(Residue)
+
+    @property
+    def chain(self):
+        return self.id[4]
+
+
+    @property
+    def number_id(self):
+        return self.id[5:]
 
 
 
