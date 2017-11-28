@@ -35,7 +35,8 @@ class MainSearchTests(BrowserTest):
         self.assertEqual(th.find_elements_by_tag_name("th")[0].text, "ZincSite ID")
         self.assertEqual(th.find_elements_by_tag_name("th")[1].text, "PDB")
         self.assertEqual(th.find_elements_by_tag_name("th")[2].text, "Deposited")
-        self.assertEqual(th.find_elements_by_tag_name("th")[3].text, "Residues")
+        self.assertEqual(th.find_elements_by_tag_name("th")[3].text, "Resolution")
+        self.assertEqual(th.find_elements_by_tag_name("th")[4].text, "Organism")
         for row, result in zip(results_table.find_elements_by_tag_name("tr")[1:], results):
             self.assertEqual(row.find_element_by_tag_name("td").text, result)
 
