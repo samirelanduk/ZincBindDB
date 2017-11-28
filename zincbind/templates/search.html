@@ -9,29 +9,30 @@
 {% block main %}
 
 <div id="result-count">
-  Search returned {{ result_count }} result{% if results.count != 1 %}s{% endif %}
-  (Page {{ page }} of {{ page_count }}).
+  Search returned {{ result_count }} result{% if results.count != 1 %}s{% endif %}{% if result_count %} (Page {{ page }} of {{ page_count }}){% endif %}.
 </div>
 
-<table class="results-table">
-  <tr><th>ZincSite ID</th><th>PDB</th><th>Deposited</th><th>Residues</th></tr>
-  {% for result in results %}
-  <tr>
-    <td><a href="/{{ result.id }}/">{{ result.id }}</a></td>
-    <td>{{ result.pdb.id }}</td>
-    <td>{{ result.pdb.deposited|date:"j F, Y" }}</td>
-    <td>{{ result.residues.count }}</td>
-  </tr>
-  {% endfor %}
-  {% if previous or next %}
-  <tr style="width:100%;" class="page-links"><td colspan="4">
-      <div>{% if previous %}<a href="/search?term={{ term }}&page={{ previous }}">&#8592; Previous</a>{% endif %}
-      </div><div>
-      {% if next %}<a href="/search?term={{ term }}&page={{ next }}">Next  &#8594;</a>{% endif %}</div>
+{% if result_count %}
+    <table class="results-table">
+      <tr><th>ZincSite ID</th><th>PDB</th><th>Deposited</th><th>Residues</th></tr>
+      {% for result in results %}
+      <tr>
+        <td><a href="/{{ result.id }}/">{{ result.id }}</a></td>
+        <td>{{ result.pdb.id }}</td>
+        <td>{{ result.pdb.deposited|date:"j F, Y" }}</td>
+        <td>{{ result.residues.count }}</td>
+      </tr>
+      {% endfor %}
+      {% if previous or next %}
+      <tr style="width:100%;" class="page-links"><td colspan="4">
+          <div>{% if previous %}<a href="/search?term={{ term }}&page={{ previous }}">&#8592; Previous</a>{% endif %}
+          </div><div>
+          {% if next %}<a href="/search?term={{ term }}&page={{ next }}">Next  &#8594;</a>{% endif %}</div>
 
-  </td></tr>
-  {% endif %}
-</table>
+      </td></tr>
+      {% endif %}
+    </table>
+{% endif %}
 
 
 

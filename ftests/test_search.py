@@ -45,6 +45,31 @@ class MainSearchTests(BrowserTest):
         self.check_page("/{}/".format(results[-1]))
 
 
+    def test_zero_results(self):
+        self.get("/")
+        search = self.browser.find_element_by_id("site-search")
+
+        # The user searches for the term
+        term_input = search.find_element_by_tag_name("input")
+        term_input.send_keys("spiggldywiggle")
+        term_input.send_keys(Keys.ENTER)
+        sleep(0.4)
+
+        # They are on the search page
+        self.check_page("/search?term=spiggldywiggle")
+        self.check_title("Search Results")
+        self.check_h1("Search Results: spiggldywiggle")
+
+        # There is a result count
+        result_count = self.browser.find_element_by_id("result-count")
+        self.assertIn("0 results", result_count.text)
+        self.assertNotIn("Page", result_count.text)
+
+        # There is no table
+        tables = self.browser.find_elements_by_tag_name("table")
+        self.assertEqual(len(tables), 0)
+
+
     def test_can_search_by_id(self):
         self.check_term_returns_results("1aada200", ["1AADA200"])
 
@@ -99,7 +124,7 @@ class MainSearchTests(BrowserTest):
         self.assertIn("112 results", result_count.text)
         self.assertIn("Page 1 of 5", result_count.text)
         results = self.browser.find_element_by_tag_name("table")
-        self.assertEqual(len(results.find_elements_by_tag_name("tr")), 26)
+        self.assertEqual(len(results.find_elements_by_tag_name("tr")), 27)
 
         # There is a page link to the next page
         links = self.browser.find_element_by_class_name("page-links")
@@ -115,7 +140,7 @@ class MainSearchTests(BrowserTest):
         self.assertIn("112 results", result_count.text)
         self.assertIn("Page 2 of 5", result_count.text)
         results = self.browser.find_element_by_tag_name("table")
-        self.assertEqual(len(results.find_elements_by_tag_name("tr")), 26)
+        self.assertEqual(len(results.find_elements_by_tag_name("tr")), 27)
 
         # There are page links
         links = self.browser.find_element_by_class_name("page-links")
