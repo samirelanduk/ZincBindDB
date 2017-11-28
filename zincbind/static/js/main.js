@@ -27,3 +27,12 @@ function formatSpecies(species) {
 	}
 	return words.join(" ")
 }
+
+function checkEmpty() {
+    var value = $("#term").val();
+    if (value === "") {
+        $(".error-message").text("Please enter a search term")
+        return false;
+    };
+    return true;
+}

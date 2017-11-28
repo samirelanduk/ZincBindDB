@@ -189,6 +189,12 @@ table {
     margin-bottom: 20px;
 }
 
+.error-message {
+    text-align: center;
+    color: #c0392b;
+    font-weight: bold;
+}
+
 
 @media only screen and (max-width: 769px) {
   /* iPad and down */

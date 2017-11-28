@@ -17,9 +17,10 @@
             <script>document.write(formatNumber({{ pdb_count }}));</script> PDB files.
         </div>
     </div><div id="site-search" class="half-width right">
-        <form method="GET" action="/search" class="box">
+        <form method="GET" action="/search" class="box" onsubmit="return checkEmpty();">
             <h2>Search ZincBind</h2>
-            <input type="text" name="term"
+            <div class="error-message"></div>
+            <input type="text" name="term" id="term"
              placeholder="e.g. '1TON', 'antibody' etc." autocomplete="off">
         </form>
     </div>

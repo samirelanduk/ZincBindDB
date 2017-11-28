@@ -46,6 +46,24 @@ class MainSearchTests(BrowserTest):
         self.check_page("/{}/".format(results[-1]))
 
 
+    def test_needs_term(self):
+        self.get("/")
+        search = self.browser.find_element_by_id("site-search")
+
+        # The user searches for the term
+        term_input = search.find_element_by_tag_name("input")
+        term_input.send_keys(Keys.ENTER)
+        sleep(0.4)
+
+        # They are still on the home page
+        self.check_page("/")
+
+        # There is an error message
+        search = self.browser.find_element_by_id("site-search")
+        error = search.find_element_by_class_name("error-message")
+        self.assertIn("enter a", error.text)
+
+
     def test_zero_results(self):
         self.get("/")
         search = self.browser.find_element_by_id("site-search")
@@ -99,6 +117,10 @@ class MainSearchTests(BrowserTest):
 
     def test_can_search_classification(self):
         self.check_term_returns_results("immunoglobulin", ["2AACE500"])
+
+
+    def test_all_results(self):
+        self.check_term_returns_results("*", ["2AACE500", "1AADA200", "1AADB200", "1AABA100"])
 
 
     def test_paginated_results(self):

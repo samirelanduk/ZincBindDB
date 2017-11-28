@@ -150,6 +150,16 @@ class SearchViewTests(ZincBindTest):
         })
 
 
+    @patch("zincbind.views.omni_search")
+    def test_search_view_can_get_all_results(self, mock_omni):
+        mock_omni.return_value = ["RESULT1", "RESULT2"]
+        request = self.get_request("/search/", "get", {"term": "*"})
+        self.check_view_has_context(search, request, {
+         "results": ["RESULT1", "RESULT2"], "result_count": 2
+        })
+        mock_omni.assert_called_with("")
+
+
 
 class SiteViewTests(ZincBindTest):
 

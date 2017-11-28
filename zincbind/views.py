@@ -24,7 +24,9 @@ def data(request):
 
 def search(request):
     if "term" in request.GET:
-        sites = omni_search(request.GET["term"])
+        sites = omni_search(
+         "" if request.GET["term"] == "*" else request.GET["term"]
+        )
         results = Paginator(sites, 25)
         page_number = request.GET.get("page", 1)
         try:
