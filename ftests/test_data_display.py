@@ -29,6 +29,8 @@ class SiteTests(BrowserTest):
         self.assertEqual(cells[0][1], "Valine (A11), Cysteine (A12), Valine (A13)")
         self.assertEqual(cells[1][0], "PyMol Selector")
         self.assertEqual(cells[1][1], "sele 1AADA200, (chain A and resi 11) + (chain A and resi 12) + (chain A and resi 13) + (chain A and resi 200)")
+        self.assertEqual(cells[2][0], "VMD Selector")
+        self.assertEqual(cells[2][1], "(chain A and resid 11) or (chain A and resid 12) or (chain A and resid 13) or (chain A and resid 200)")
 
         # There is a PDB section
         pdb_section = self.browser.find_element_by_id("site-pdb")
