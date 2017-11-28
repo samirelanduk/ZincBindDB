@@ -23,12 +23,16 @@
     <td>{{ result.residues.count }}</td>
   </tr>
   {% endfor %}
+  {% if previous or next %}
+  <tr style="width:100%;" class="page-links"><td colspan="4">
+      <div>{% if previous %}<a href="/search?term={{ term }}&page={{ previous }}">&#8592; Previous</a>{% endif %}
+      </div><div>
+      {% if next %}<a href="/search?term={{ term }}&page={{ next }}">Next  &#8594;</a>{% endif %}</div>
+
+  </td></tr>
+  {% endif %}
 </table>
 
-{% if previous or next %}
-<div class="page-links">
-  {% if previous %}<a href="/search?term={{ term }}&page={{ previous }}">&#8592; Previous</a>{% endif %}{% if next %}<a href="/search?term={{ term }}&page={{ next }}">Next  &#8594;</a>{% endif %}
-</div>
-{% endif %}
+
 
 {% endblock %}

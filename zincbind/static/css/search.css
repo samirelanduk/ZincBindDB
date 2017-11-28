@@ -5,21 +5,33 @@
     margin-bottom: 30px;
 }
 
-.page-links {
-    width: 100%;
-    padding: 10px;
-    font-size: 150%;
+.page-links div {
+    width: 50%;
+    display: inline-block;
+}
+
+.page-links td {
+    padding-top: 15px;
+}
+
+.page-links td, .page-links {
+    border: none;
+}
+
+.page-links:hover {
+    background-color: inherit;
 }
 
 .page-links a {
-    display: inline-block;
-    width: 50%;
-    text-align: center;
-    box-sizing: border-box;
     text-decoration: none;
-    margin-bottom: 30px;
+    font-size: 120%;
 }
 
 .page-links a:visited {
     color: blue;
+}
+
+td {
+    font-size: 80%;
+    padding: 5px;
 }
