@@ -32,7 +32,7 @@ def create_pdb(pdb):
         )
 
 
-def create_residue(residue, pdb_code, zinc_atom):
+def create_residue(residue, zinc_atom, site):
     """Creates a new Residue record and any associated Atom records, and returns
     it. If it already exists it will just be returned."""
 
@@ -42,18 +42,18 @@ def create_residue(residue, pdb_code, zinc_atom):
     except AttributeError:
         residue_id = residue.molecule_id()
         chain = None
-    residue_pk = pdb_code + residue_id
+    residue_pk = site.pk + residue_id
     try:
         return Residue.objects.get(pk=residue_pk)
     except ObjectDoesNotExist:
         residue_record = Residue.objects.create(
          pk=residue_pk, residue_id=residue_id, name=residue.name(),
          number=residue.chain().residues().index(residue) + 1 if chain else 10000,
-         chain=chain
+         chain=chain, site=site
         )
         for atom in residue.atoms():
             Atom.objects.create(
-             pk=pdb_code + str(atom.atom_id()), atom_id=atom.atom_id(),
+             pk=residue_pk + str(atom.atom_id()), atom_id=atom.atom_id(),
              x = atom.x(), y=atom.y(), z=atom.z(), element=atom.element(),
              name=atom.name(), charge=atom.charge(), bfactor=atom.bfactor(),
              alpha=(atom.name() == "CA"), beta=(atom.name() == "CB"),
@@ -68,7 +68,6 @@ def create_zinc_site(pdb, zinc, residues):
     Any components that don't exist will be created first."""
 
     pdb_record = create_pdb(pdb)
-    residue_records = [create_residue(res, pdb_record.id, zinc.atom()) for res in residues]
     try:
         atom = zinc.atom()
         site = ZincSite.objects.create(
@@ -77,6 +76,6 @@ def create_zinc_site(pdb, zinc, residues):
          pdb=pdb_record
         )
     except IntegrityError: raise DuplicateSiteError
-    for residue in residue_records:
-        site.residues.add(residue)
+    residue_records = [create_residue(res, zinc.atom(), site) for res in residues]
+    
     return site

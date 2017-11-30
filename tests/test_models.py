@@ -119,7 +119,7 @@ class ZincSiteTests(ZincBindTest):
 
     def test_can_create_zinc_site(self):
         site = ZincSite(pk="1ZZZA500", x=1.5, y=-1.5, z=10.0, pdb=self.pdb)
-        self.assertEqual(site.residues.count(), 0)
+        self.assertEqual(site.residue_set.count(), 0)
         site.full_clean()
 
 
@@ -173,21 +173,23 @@ class ResidueTests(ZincBindTest):
 
     def test_can_create_residue(self):
         residue = Residue(
-         pk="1XYZA10", residue_id="A10", name="VAL", chain="A", number=10
+         pk="1XYZA10", residue_id="A10", name="VAL", chain="A", number=10,
+         site=self.site
         )
         self.assertEqual(residue.atom_set.count(), 0)
-        self.assertEqual(residue.zincsite_set.count(), 0)
         residue.full_clean()
 
 
     def test_residueid_is_required(self):
         residue = Residue(
-         pk="1XYZA10", residue_id=None, name="VAL", chain="A", number=10
+         pk="1XYZA10", residue_id=None, name="VAL", chain="A", number=10,
+         site=self.site
         )
         with self.assertRaises(ValidationError):
             residue.full_clean()
         residue = Residue(
-         pk="1XYZA10", residue_id="", name="VAL", chain="A", number=10
+         pk="1XYZA10", residue_id="", name="VAL", chain="A", number=10,
+         site=self.site
         )
         with self.assertRaises(ValidationError):
             residue.full_clean()
@@ -195,12 +197,14 @@ class ResidueTests(ZincBindTest):
 
     def test_name_is_required(self):
         residue = Residue(
-         pk="1XYZA10", residue_id="A10", name=None, chain="A", number=10
+         pk="1XYZA10", residue_id="A10", name=None, chain="A", number=10,
+         site=self.site
         )
         with self.assertRaises(ValidationError):
             residue.full_clean()
         residue = Residue(
-         pk="1XYZA10", residue_id="A10", name="", chain="A", number=10
+         pk="1XYZA10", residue_id="A10", name="", chain="A", number=10,
+         site=self.site
         )
         with self.assertRaises(ValidationError):
             residue.full_clean()
@@ -208,41 +212,57 @@ class ResidueTests(ZincBindTest):
 
     def test_chain_is_not_required(self):
         residue = Residue(
-         pk="1XYZA10", residue_id="A10", name="VAL", chain=None, number=10
+         pk="1XYZA10", residue_id="A10", name="VAL", chain=None, number=10,
+         site=self.site
         )
         residue.full_clean()
 
 
     def test_number_is_required(self):
         residue = Residue(
-         pk="1XYZA10", residue_id="A10", name="VAL", chain="A", number=None
+         pk="1XYZA10", residue_id="A10", name="VAL", chain="A", number=None,
+         site=self.site
         )
         with self.assertRaises(ValidationError):
             residue.full_clean()
         residue = Residue(
-         pk="1XYZA10", residue_id="A10", name="VAL", chain="A", number=0
+         pk="1XYZA10", residue_id="A10", name="VAL", chain="A", number=0,
+         site=self.site
         )
         residue.full_clean()
 
 
+    def test_site_is_required(self):
+        residue = Residue(
+         pk="1XYZA10", residue_id="A10", name="VAL", chain="A", number=10,
+         site=None
+        )
+        with self.assertRaises(ValidationError):
+            residue.full_clean()
+
+
     def test_residue_number_id_property(self):
         residue = Residue(
-         pk="1XYZA10", residue_id="A10", name="VAL", chain="A", number=10
+         pk="1XYZA10", residue_id="A10", name="VAL", chain="A", number=10,
+         site=self.site
         )
         self.assertEqual(residue.number_id, "10")
 
 
     def test_residue_full_name_property(self):
         residue = Residue(
-         pk="1XYZA10", residue_id="A10", name="VAL", chain="A", number=10
+         pk="1XYZA10", residue_id="A10", name="VAL", chain="A", number=10,
+         site=self.site
         )
         self.assertEqual(residue.full_name, "Valine")
         residue = Residue(
-         pk="1XYZA10", residue_id="A10", name="HOH", chain="A", number=10
+         pk="1XYZA10", residue_id="A10", name="HOH", chain="A", number=10,
+         site=self.site
         )
         self.assertEqual(residue.full_name, "Water")
         residue = Residue(
-         pk="1XYZA10", residue_id="A10", name="XXX", chain="A", number=10
+         pk="1XYZA10", residue_id="A10", name="XXX", chain="A", number=10,
+         site=self.site
         )
         self.assertEqual(residue.full_name, "XXX")
 

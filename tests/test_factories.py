@@ -68,6 +68,8 @@ class FactoryTest(ZincBindTest):
         self.zinc = Mock()
         self.zinc.molecule_id.return_value = "B505"
         self.zinc.atom.return_value = self.atom1
+        self.site = Mock()
+        self.site.pk = "1ABCA100"
 
 
 
@@ -121,24 +123,24 @@ class ResidueFactoryTests(FactoryTest):
         mock_get.side_effect = ObjectDoesNotExist
         residue_record = Mock(name="rec")
         mock_res.return_value = residue_record
-        residue = create_residue(self.res1, "1ABC", "zincatom")
-        mock_get.assert_called_with(pk="1ABCB10")
+        residue = create_residue(self.res1, "zincatom", self.site)
+        mock_get.assert_called_with(pk="1ABCA100B10")
         mock_res.assert_called_with(
-         pk="1ABCB10", residue_id="B10", name="VAL",
-         chain="C", number=21
+         pk="1ABCA100B10", residue_id="B10", name="VAL",
+         chain="C", number=21, site=self.site
         )
         mock_atom.assert_any_call(
-         pk="1ABC1", atom_id=1, name="N2", x=15, y=16, z=17, element="N",
+         pk="1ABCA100B101", atom_id=1, name="N2", x=15, y=16, z=17, element="N",
          charge=-1, bfactor=101, alpha=False, beta=False, liganding=True,
          residue=residue_record
         )
         mock_atom.assert_any_call(
-         pk="1ABC2", atom_id=2, name="CA", x=25, y=26, z=27, element="C",
+         pk="1ABCA100B102", atom_id=2, name="CA", x=25, y=26, z=27, element="C",
          charge=-2, bfactor=202, alpha=True, beta=False, liganding=False,
          residue=residue_record
         )
         mock_atom.assert_any_call(
-         pk="1ABC3", atom_id=3, name="CB", x=35, y=36, z=37, element="C",
+         pk="1ABCA100B103", atom_id=3, name="CB", x=35, y=36, z=37, element="C",
          charge=-1, bfactor=20, alpha=False, beta=True, liganding=False,
          residue=residue_record
         )
@@ -158,24 +160,24 @@ class ResidueFactoryTests(FactoryTest):
         mock_get.side_effect = ObjectDoesNotExist
         residue_record = Mock(name="rec")
         mock_res.return_value = residue_record
-        residue = create_residue(self.res1, "1ABC", "zincatom")
-        mock_get.assert_called_with(pk="1ABCB10")
+        residue = create_residue(self.res1, "zincatom", self.site)
+        mock_get.assert_called_with(pk="1ABCA100B10")
         mock_res.assert_called_with(
-         pk="1ABCB10", residue_id="B10", name="VAL",
-         chain=None, number=10000
+         pk="1ABCA100B10", residue_id="B10", name="VAL",
+         chain=None, number=10000, site=self.site
         )
         mock_atom.assert_any_call(
-         pk="1ABC1", atom_id=1, name="N2", x=15, y=16, z=17, element="N",
+         pk="1ABCA100B101", atom_id=1, name="N2", x=15, y=16, z=17, element="N",
          charge=-1, bfactor=101, alpha=False, beta=False, liganding=True,
          residue=residue_record
         )
         mock_atom.assert_any_call(
-         pk="1ABC2", atom_id=2, name="CA", x=25, y=26, z=27, element="C",
+         pk="1ABCA100B102", atom_id=2, name="CA", x=25, y=26, z=27, element="C",
          charge=-2, bfactor=202, alpha=True, beta=False, liganding=False,
          residue=residue_record
         )
         mock_atom.assert_any_call(
-         pk="1ABC3", atom_id=3, name="CB", x=35, y=36, z=37, element="C",
+         pk="1ABCA100B103", atom_id=3, name="CB", x=35, y=36, z=37, element="C",
          charge=-1, bfactor=20, alpha=False, beta=True, liganding=False,
          residue=residue_record
         )
@@ -191,8 +193,8 @@ class ResidueFactoryTests(FactoryTest):
     def test_can_create_existing_residue(self, mock_atom, mock_res, mock_get):
         residue_record = Mock()
         mock_get.return_value = residue_record
-        residue = create_residue(self.res1, "1XXX", Mock())
-        mock_get.assert_called_with(pk="1XXXB10")
+        residue = create_residue(self.res1, Mock(), self.site)
+        mock_get.assert_called_with(pk="1ABCA100B10")
         self.assertFalse(mock_res.called)
         self.assertFalse(mock_atom.called)
         self.assertIs(residue, residue_record)
@@ -208,19 +210,14 @@ class ZincSiteFactoryTests(FactoryTest):
         mock_pdb.return_value = self.pdb_record
         residue_record1, residue_record2 = Mock(), Mock()
         mock_res.side_effect = [residue_record1, residue_record2]
-        residue_set = Mock()
-        residue_set.add = MagicMock()
         site_record = Mock()
         mock_zinc.return_value = site_record
-        site_record.residues = residue_set
         site = create_zinc_site(self.pdb, self.zinc, [self.res1, self.res2])
         mock_pdb.assert_called_with(self.pdb)
-        mock_res.assert_any_call(self.res1, "1ABC", self.atom1)
-        mock_res.assert_any_call(self.res2, "1ABC", self.atom1)
+        mock_res.assert_any_call(self.res1, self.atom1, site)
+        mock_res.assert_any_call(self.res2, self.atom1, site)
         mock_zinc.assert_called_with(pk="1ABCB505", x=15, y=16, z=17, pdb=self.pdb_record)
         self.assertIs(site, site_record)
-        residue_set.add.assert_any_call(residue_record1)
-        residue_set.add.assert_any_call(residue_record2)
 
 
     @patch("zincbind.factories.create_pdb")

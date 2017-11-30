@@ -19,17 +19,17 @@
           <table class="site-info">
               <tr>
                   <td>Residues</td>
-                  <td>{% for residue in site.residues.all %}
+                  <td>{% for residue in site.residue_set.all %}
                         {{ residue.full_name }} ({{ residue.residue_id }}){% if not forloop.last %}, {% endif %}
                       {% endfor %}</td>
               </tr>
               <tr>
                   <td>PyMol Selector</td>
-                  <td><code>sele {{ site.id }}, {% for residue in site.residues.all %}(chain {{ residue.chain }} and resi {{ residue.number_id }}) + {% endfor %} (chain {{ site.chain }} and resi {{ site.number_id }})</code></td>
+                  <td><code>sele {{ site.id }}, {% for residue in site.residue_set.all %}(chain {{ residue.chain }} and resi {{ residue.number_id }}) + {% endfor %} (chain {{ site.chain }} and resi {{ site.number_id }})</code></td>
               </tr>
               <tr>
                   <td>VMD Selector</td>
-                  <td><code>{% for residue in site.residues.all %}(chain {{ residue.chain }} and resid {{ residue.number_id }}) or {% endfor %} (chain {{ site.chain }} and resid {{ site.number_id }})</code></td>
+                  <td><code>{% for residue in site.residue_set.all %}(chain {{ residue.chain }} and resid {{ residue.number_id }}) or {% endfor %} (chain {{ site.chain }} and resid {{ site.number_id }})</code></td>
               </tr>
           </table>
         </div>

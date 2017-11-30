@@ -38,9 +38,10 @@
           aspectRatio: 8
       };
       var residueCommand = "";
-      {% for residue in site.residues.all %}
-          residueCommand += "((sidechain or .CA) and :" + "{{ residue.id }}"[4] + " and " + "{{ residue.id }}) or ".slice(5);
+      {% for residue in site.residue_set.all %}
+          residueCommand += "((sidechain or .CA) and :" + "{{ residue.id }}"[4] + " and " + "{{ residue.residue_id }}) or ".slice(1);
       {% endfor %}
+      console.log(residueCommand)
       residueCommand = residueCommand.slice(0, -4)
       residueCommand = {
           sele: residueCommand,

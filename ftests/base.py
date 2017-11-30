@@ -35,7 +35,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         for r in range(11, 14):
             residue = Residue.objects.create(
              id=pdb_codes[1] + "A" + str(r), residue_id="A" + str(r),
-             name="VAL" if r % 2 else "CYS", number=r, chain="A"
+             name="VAL" if r % 2 else "CYS", number=r, chain="A", site=site1
             )
             for a in range(1, 5):
                 Atom.objects.create(
@@ -43,7 +43,6 @@ class FunctionalTest(StaticLiveServerTestCase):
                  name=str(a), element="C", atom_id=a + r * 10, residue=residue,
                  alpha=(a == 1), beta=(a == 2), liganding=(a > 2)
                 )
-            site1.residues.add(residue)
 
         site2 = ZincSite.objects.create(
          id=pdb_codes[3] + "A200", x=1.5, y=2.5, z=2.5,
@@ -52,7 +51,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         for r in range(11, 14):
             residue = Residue.objects.create(
              id=pdb_codes[3] + "A" + str(r), residue_id="A" + str(r),
-             name="VAL" if r % 2 else "CYS", number=r, chain="A"
+             name="VAL" if r % 2 else "CYS", number=r, chain="A", site=site2
             )
             for a in range(1, 5):
                 Atom.objects.create(
@@ -60,7 +59,6 @@ class FunctionalTest(StaticLiveServerTestCase):
                  name=str(a), element="C", atom_id=a + r * 10, residue=residue,
                  alpha=(a == 1), beta=(a == 2), liganding=(a > 2)
                 )
-            site2.residues.add(residue)
         site3 = ZincSite.objects.create(
          id=pdb_codes[3] + "B200", x=1.5, y=2.5, z=2.5,
          pdb=Pdb.objects.get(pk=pdb_codes[3])
@@ -68,7 +66,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         for r in range(11, 14):
             residue = Residue.objects.create(
              id=pdb_codes[3] + "B" + str(r), residue_id="B" + str(r),
-             name="VAL" if r % 2 else "CYS", number=r, chain="B"
+             name="VAL" if r % 2 else "CYS", number=r, chain="B", site=site3
             )
             for a in range(1, 5):
                 Atom.objects.create(
@@ -76,7 +74,6 @@ class FunctionalTest(StaticLiveServerTestCase):
                  name=str(a), element="C", atom_id=a + r * 100, residue=residue,
                  alpha=(a == 1), beta=(a == 2), liganding=(a > 2)
                 )
-            site3.residues.add(residue)
 
         site4 = ZincSite.objects.create(
          id=pdb_codes[6] + "E500", x=1.5, y=2.5, z=2.5,
@@ -85,7 +82,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         for r in range(11, 14):
             residue = Residue.objects.create(
              id=pdb_codes[6] + "E" + str(r), residue_id="E" + str(r),
-             name="VAL" if r % 2 else "CYS", number=r, chain="E"
+             name="VAL" if r % 2 else "CYS", number=r, chain="E", site=site4
             )
             for a in range(1, 5):
                 Atom.objects.create(
@@ -93,7 +90,6 @@ class FunctionalTest(StaticLiveServerTestCase):
                  name=str(a), element="C", atom_id=a + r * 100, residue=residue,
                  alpha=(a == 1), beta=(a == 2), liganding=(a > 2)
                 )
-            site4.residues.add(residue)
 
 
 
@@ -116,6 +112,7 @@ class BrowserTest(FunctionalTest):
         self.browser.quit()
         try:
             os.remove("ghostdriver.log")
+            os.remove("geckodriver.log")
         except IOError: pass
 
 

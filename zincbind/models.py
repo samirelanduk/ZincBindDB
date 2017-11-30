@@ -19,6 +19,26 @@ class Pdb(models.Model):
 
 
 
+class ZincSite(models.Model):
+    """Represents a Zinc binding site."""
+
+    id = models.TextField(primary_key=True)
+    x = models.FloatField()
+    y = models.FloatField()
+    z = models.FloatField()
+    pdb = models.ForeignKey(Pdb)
+
+    @property
+    def chain(self):
+        return self.id[4]
+
+
+    @property
+    def number_id(self):
+        return self.id[5:]
+
+
+
 class Residue(models.Model):
     """Represents a residue in the PDB sense - that is it can be an amino acid
     residue in a macromolecular chain, or it can be a small molecule such as
@@ -29,6 +49,7 @@ class Residue(models.Model):
     name = models.CharField(max_length=32)
     chain = models.CharField(max_length=16, blank=True, null=True)
     number = models.IntegerField()
+    site = models.ForeignKey(ZincSite)
 
     @property
     def number_id(self):
@@ -46,28 +67,6 @@ class Residue(models.Model):
          "SER": "Serine", "THR": "Threonine", "TRP": "Tryptophan",
          "TYR": "Tyrosine", "VAL": "Valine", "HOH": "Water"
         }.get(self.name, self.name)
-
-
-
-
-class ZincSite(models.Model):
-    """Represents a Zinc binding site."""
-
-    id = models.TextField(primary_key=True)
-    x = models.FloatField()
-    y = models.FloatField()
-    z = models.FloatField()
-    pdb = models.ForeignKey(Pdb)
-    residues = models.ManyToManyField(Residue)
-
-    @property
-    def chain(self):
-        return self.id[4]
-
-
-    @property
-    def number_id(self):
-        return self.id[5:]
 
 
 

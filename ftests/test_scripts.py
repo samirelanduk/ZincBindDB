@@ -150,8 +150,8 @@ class AddingScriptTests(FunctionalTest):
 
     @patch("scripts.add_pdbs.get_all_pdb_codes")
     @patch("builtins.print")
-    @patch("zincbind.factories.ZincSite.residues")
-    def test_transactions_work(self, mock_res, mock_print, mock_get):
+    @patch("zincbind.factories.Atom.objects.create")
+    def test_transactions_work(self, mock_create, mock_print, mock_get):
         self.assertEqual(len(Pdb.objects.all()), 8)
         self.assertEqual(len(ZincSite.objects.all()), 4)
         self.assertEqual(len(Residue.objects.all()), 12)
@@ -160,8 +160,7 @@ class AddingScriptTests(FunctionalTest):
          "1AAA", "1AAB", "1AAC", "1AAD", "2AAA", "2AAB", "2AAC", "2AAD",
          "1TON"
         ]
-        mock_res.add = MagicMock(name="adder")
-        mock_res.add.side_effect = KeyboardInterrupt
+        mock_create.side_effect = KeyboardInterrupt
         try:
             main()
         except: pass
