@@ -26,7 +26,15 @@ class SiteTests(BrowserTest):
         cells = [[cell.text for cell in row.find_elements_by_tag_name("td")]
          for row in site_table.find_elements_by_tag_name("tr")]
         self.assertEqual(cells[0][0], "Residues")
-        self.assertEqual(cells[0][1], "Valine (A11), Cysteine (A12), Valine (A13)")
+        self.assertIn("Valine (A11)", cells[0][1])
+        self.assertIn("CA distance: 2.18 Å", cells[0][1])
+        self.assertIn("CB distance: 0.87 Å", cells[0][1])
+        self.assertIn("Cysteine (A12)", cells[0][1])
+        self.assertIn("CA distance: 2.18 Å", cells[0][1])
+        self.assertIn("CB distance: 0.87 Å", cells[0][1])
+        self.assertIn("Valine (A13)", cells[0][1])
+        self.assertIn("CA distance: 2.18 Å", cells[0][1])
+        self.assertIn("CB distance: 0.87 Å", cells[0][1])
         self.assertEqual(cells[1][0], "PyMol Selector")
         self.assertEqual(cells[1][1], "sele 1AADA200, (chain A and resi 11) + (chain A and resi 12) + (chain A and resi 13) + (chain A and resi 200)")
         self.assertEqual(cells[2][0], "VMD Selector")
