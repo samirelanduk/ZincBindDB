@@ -1,6 +1,6 @@
 from datetime import datetime
 from mixer.backend.django import mixer
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from unittest.mock import patch, Mock, MagicMock
 from .base import ZincBindTest
 from zincbind.models import Pdb, Residue, Atom, ZincSite
@@ -267,12 +267,72 @@ class ResidueTests(ZincBindTest):
         self.assertEqual(residue.full_name, "XXX")
 
 
+    @patch("zincbind.models.Residue.atom_set")
+    def test_residue_ca_property(self, mock_set):
+        atomset = Mock()
+        atomset.get = MagicMock()
+        atomset.get.return_value = "atom"
+        residue = Residue(
+         pk="1XYZA10", residue_id="A10", name="VAL", chain="A", number=10,
+         site=self.site
+        )
+        residue.atom_set = atomset
+        ca = residue.ca
+        atomset.get.assert_called_with(alpha=True)
+        self.assertEqual(ca, "atom")
+
+
+    @patch("zincbind.models.Residue.atom_set")
+    def test_residue_ca_property(self, mock_set):
+        atomset = Mock()
+        atomset.get = MagicMock()
+        atomset.get.side_effect = ObjectDoesNotExist
+        residue = Residue(
+         pk="1XYZA10", residue_id="A10", name="VAL", chain="A", number=10,
+         site=self.site
+        )
+        residue.atom_set = atomset
+        self.assertIsNone(residue.ca)
+
+
+    @patch("zincbind.models.Residue.atom_set")
+    def test_residue_cb_property(self, mock_set):
+        atomset = Mock()
+        atomset.get = MagicMock()
+        atomset.get.return_value = "atom"
+        residue = Residue(
+         pk="1XYZA10", residue_id="A10", name="VAL", chain="A", number=10,
+         site=self.site
+        )
+        residue.atom_set = atomset
+        cb = residue.cb
+        atomset.get.assert_called_with(beta=True)
+        self.assertEqual(cb, "atom")
+
+
+    @patch("zincbind.models.Residue.atom_set")
+    def test_residue_cb_property(self, mock_set):
+        atomset = Mock()
+        atomset.get = MagicMock()
+        atomset.get.side_effect = ObjectDoesNotExist
+        residue = Residue(
+         pk="1XYZA10", residue_id="A10", name="VAL", chain="A", number=10,
+         site=self.site
+        )
+        residue.atom_set = atomset
+        self.assertIsNone(residue.cb)
+
+
 
 class AtomTests(ZincBindTest):
 
     def setUp(self):
         ZincBindTest.setUp(self)
         self.residue = mixer.blend(Residue)
+        self.residue.site = mixer.blend(ZincSite)
+        self.residue.site.x = 1
+        self.residue.site.y = 2
+        self.residue.site.z = 3
 
 
     def test_can_create_atom(self):
@@ -452,3 +512,12 @@ class AtomTests(ZincBindTest):
         )
         with self.assertRaises(ValidationError):
             atom.full_clean()
+
+
+    def test_zinc_distance_property(self):
+        atom = Atom(
+         pk="1XYZ555", atom_id=555, name="CA", x=1.5, y=-1.5, z=0.0,
+         element="C", charge=-1, bfactor=13.4, alpha=True, beta=False,
+         liganding=True, residue=self.residue
+        )
+        self.assertAlmostEqual(atom.zinc_distance, 4.636809, delta=0.00005)

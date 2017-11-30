@@ -12,10 +12,6 @@ $(document).ready(function() {
   });
 });
 
-function formatNumber(number) {
-  return number.toLocaleString("en");
-}
-
 function formatSpecies(species) {
 	var words = species.toLowerCase().split(" ");
 	words[0] = words[0][0].toUpperCase() + words[0].slice(1);

@@ -1,5 +1,7 @@
 """ZincBind models."""
 
+from math import sqrt
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
 class Pdb(models.Model):
@@ -69,6 +71,20 @@ class Residue(models.Model):
         }.get(self.name, self.name)
 
 
+    @property
+    def ca(self):
+        try:
+            return self.atom_set.get(alpha=True)
+        except ObjectDoesNotExist: return None
+
+
+    @property
+    def cb(self):
+        try:
+            return self.atom_set.get(beta=True)
+        except ObjectDoesNotExist: return None
+
+
 
 class Atom(models.Model):
     """Represents an Atom from a PDB."""
@@ -86,3 +102,12 @@ class Atom(models.Model):
     beta = models.BooleanField()
     liganding = models.BooleanField()
     residue = models.ForeignKey(Residue)
+
+    @property
+    def zinc_distance(self):
+        site = self.residue.site
+        return sqrt(
+         ((self.x - site.x) ** 2) + 
+         ((self.y - site.y) ** 2) + 
+         ((self.z - site.z) ** 2)
+        )

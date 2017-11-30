@@ -58,6 +58,7 @@ iframe {
 
 td:first-child {
 	font-weight: bold;
+  font-size:105%;
 }
 
 td:last-child {
@@ -69,6 +70,17 @@ h2 {
 	padding-left: 0px;
 }
 
+.residue {
+  display: inline-block;
+  width: 49%;
+  font-size: 90%;
+}
+
+.residue ul {
+  margin: 0px;
+  padding-left: 25px;
+  list-style-type: square;
+}
 
 @media only screen and (max-width: 769px) {
   /* iPad and down */

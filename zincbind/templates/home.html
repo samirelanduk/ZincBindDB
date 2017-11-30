@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block title %}Home{% endblock %}
 {% block css %}
@@ -11,10 +12,8 @@
         <h1>The Database of Zinc Binding Sites</h1>
         <div class="site-description">
             ZincBind is a database of zinc binding sites, automatically generated from
-            the Protein Data Bank. There are currently
-            <script>document.write(formatNumber({{ zinc_count }}));</script>
-            zinc binding sites accross
-            <script>document.write(formatNumber({{ pdb_count }}));</script> PDB files.
+            the Protein Data Bank. There are currently {{ zinc_count|intcomma }}
+            zinc binding sites accross {{ pdb_count|intcomma }} PDB files.
         </div>
     </div><div id="site-search" class="half-width right">
         <form method="GET" action="/search" class="box" onsubmit="return checkEmpty();">
