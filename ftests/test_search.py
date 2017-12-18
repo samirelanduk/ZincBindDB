@@ -370,3 +370,30 @@ class AdvancedSearchTests(BrowserTest):
         # The correct parameters were sent
         self.check_page("/search?organism=mus+m&code=1aa")
 
+
+    def test_advanced_search_needs_input(self):
+        # User goes to the search page
+        self.get("/")
+        nav = self.browser.find_element_by_tag_name("nav")
+        self.click(nav.find_elements_by_tag_name("a")[0])
+        self.check_page("/search/")
+        self.check_title("Advanced Search")
+        self.check_h1("Advanced Search")
+
+        # There is a form with a single search row
+        form = self.browser.find_element_by_tag_name("form")
+        search_rows = form.find_elements_by_class_name("search-row")
+        self.assertEqual(len(search_rows), 1)
+
+        # They submit without sending anything
+        submit = form.find_elements_by_tag_name("input")[-1]
+        self.click(submit)
+
+        # They are still on the search page
+        self.check_page("/search/")
+
+        # There is an error message
+        form = self.browser.find_element_by_tag_name("form")
+        error = form.find_element_by_class_name("error-message")
+        self.assertIn("enter", error.text)
+

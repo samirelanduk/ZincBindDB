@@ -66,9 +66,17 @@ function removeRow(button) {
 
 function validateSearch() {
   var rows = $(".search-row");
+  var dataCount = 0;
   rows.each(function(index, row) {
     if ($(row).find("input").val() == "") {
       $(row).find("input").removeAttr("name");
+    } else {
+      dataCount++;
     }
   });
+  if (dataCount == 0) {
+      $(".error-message").text("Please enter a search term")
+      return false;
+  };
+  return true;
 }

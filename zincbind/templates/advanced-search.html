@@ -9,6 +9,7 @@
 {% block main %}
 
 <form method="GET" action="/search">
+	<div class="error-message"></div>
     <div class="search-row">
         <select onchange="updateSearchTerm(this);">
           <option value="title">PDB Title</option>
@@ -21,6 +22,6 @@
 
     <button type="button" onclick="addSearchRow(this);">Add term</button>
 
-    <input type="submit" onclick="validateSearch();" value="Search">
+    <input type="submit" onclick="return validateSearch();" value="Search">
 </form>
 {% endblock %}
