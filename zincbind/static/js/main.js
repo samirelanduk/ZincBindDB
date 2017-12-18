@@ -62,3 +62,13 @@ function removeRow(button) {
   }
   $(button).parent().remove();
 }
+
+
+function validateSearch() {
+  var rows = $(".search-row");
+  rows.each(function(index, row) {
+    if ($(row).find("input").val() == "") {
+      $(row).find("input").removeAttr("name");
+    }
+  });
+}
