@@ -113,7 +113,7 @@ class ProcessSearchTests(ZincBindTest):
         mock_omni.return_value = ["RESULT1", "RESULT2"]
         request = self.get_request("/search/", "get", {"term": "TERM"})
         self.check_view_has_context(process_search, request, {
-         "page_count": 1, "page": 1, "previous": False, "next": False
+         "page_count": 1, "page": 1, "previous": False, "next": False, "url": "/search?term=TERM"
         })
 
 
@@ -122,7 +122,7 @@ class ProcessSearchTests(ZincBindTest):
         mock_omni.return_value = list(range(130))
         request = self.get_request("/search/", "get", {"term": "TERM"})
         self.check_view_has_context(process_search, request, {
-         "page_count": 6, "page": 1, "previous": False, "next": 2
+         "page_count": 6, "page": 1, "previous": False, "next": 2, "url": "/search?term=TERM"
         })
 
 
@@ -132,7 +132,7 @@ class ProcessSearchTests(ZincBindTest):
         request = self.get_request("/search/", "get", {"term": "TERM", "page": 2})
         self.check_view_has_context(process_search, request, {
          "results": list(range(25, 50)), "result_count": 130,
-         "page_count": 6, "page": 2, "previous": 1, "next": 3
+         "page_count": 6, "page": 2, "previous": 1, "next": 3, "url": "/search?term=TERM"
         })
 
 
@@ -142,7 +142,7 @@ class ProcessSearchTests(ZincBindTest):
         request = self.get_request("/search/", "get", {"term": "TERM", "page": 6})
         self.check_view_has_context(process_search, request, {
          "results": list(range(125, 130)), "result_count": 130,
-         "page_count": 6, "page": 6, "previous": 5, "next": False
+         "page_count": 6, "page": 6, "previous": 5, "next": False, "url": "/search?term=TERM"
         })
 
 
@@ -152,17 +152,17 @@ class ProcessSearchTests(ZincBindTest):
         request = self.get_request("/search/", "get", {"term": "TERM", "page": "ghgh"})
         self.check_view_has_context(process_search, request, {
          "results": list(range(25)), "result_count": 130,
-         "page_count": 6, "page": 1, "previous": False, "next": 2
+         "page_count": 6, "page": 1, "previous": False, "next": 2, "url": "/search?term=TERM"
         })
         request = self.get_request("/search/", "get", {"term": "TERM", "page": -1})
         self.check_view_has_context(process_search, request, {
          "results": list(range(25)), "result_count": 130,
-         "page_count": 6, "page": 1, "previous": False, "next": 2
+         "page_count": 6, "page": 1, "previous": False, "next": 2, "url": "/search?term=TERM"
         })
         request = self.get_request("/search/", "get", {"term": "TERM", "page": 30})
         self.check_view_has_context(process_search, request, {
          "results": list(range(25)), "result_count": 130,
-         "page_count": 6, "page": 1, "previous": False, "next": 2
+         "page_count": 6, "page": 1, "previous": False, "next": 2, "url": "/search?term=TERM"
         })
 
 
@@ -171,7 +171,7 @@ class ProcessSearchTests(ZincBindTest):
         mock_omni.return_value = ["RESULT1", "RESULT2"]
         request = self.get_request("/search/", "get", {"term": "*"})
         self.check_view_has_context(process_search, request, {
-         "results": ["RESULT1", "RESULT2"], "result_count": 2
+         "results": ["RESULT1", "RESULT2"], "result_count": 2, "url": "/search?term=*"
         })
         mock_omni.assert_called_with("")
 
@@ -179,11 +179,11 @@ class ProcessSearchTests(ZincBindTest):
     @patch("zincbind.views.specific_search")
     def test_can_use_specific_search_if_no_term(self, mock_specific):
         mock_specific.return_value = ["RESULT1", "RESULT2"]
-        request = self.get_request("/search/", "get", {"x": "*"})
+        request = self.get_request("/search/", "get", {"x": "*", "y": "x z"})
         self.check_view_has_context(process_search, request, {
-         "results": ["RESULT1", "RESULT2"], "result_count": 2
+         "results": ["RESULT1", "RESULT2"], "result_count": 2, "url": "/search?x=*&y=x+z"
         })
-        mock_specific.assert_called_with(x=["*"])
+        mock_specific.assert_called_with(x=["*"], y=["x z"])
 
 
 

@@ -48,6 +48,13 @@ def process_search(request):
     if not 0 < page_number <= results.num_pages:
         page_number = 1
     page = results.page(page_number)
+    url = "/search?"
+    if "term" in request.GET:
+        url += "term=" + request.GET["term"]
+    else:
+        url +=  "&".join(["{}={}".format(
+         term, request.GET[term].replace(" " , "+")
+        ) for term in request.GET if term != "page"])
     return render(request, "search.html", {
      "term": request.GET.get("term"),
      "page_count": results.num_pages,
@@ -56,6 +63,7 @@ def process_search(request):
      "page": page.number,
      "previous": page.previous_page_number() if page.has_previous() else False,
      "next": page.next_page_number() if page.has_next() else False,
+     "url": url
     })
 
 

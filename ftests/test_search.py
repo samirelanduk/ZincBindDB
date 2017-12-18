@@ -397,3 +397,91 @@ class AdvancedSearchTests(BrowserTest):
         error = form.find_element_by_class_name("error-message")
         self.assertIn("enter", error.text)
 
+
+    def test_advanced_pagination(self):
+        for i in range(110):
+            ZincSite.objects.create(
+             id="1AAB{}".format(i), x=1.5, y=2.5, z=2.5, pdb=Pdb.objects.get(id="1AAB")
+            )
+
+         # User goes to the search page
+        self.get("/")
+        nav = self.browser.find_element_by_tag_name("nav")
+        self.click(nav.find_elements_by_tag_name("a")[0])
+        self.check_page("/search/")
+        self.check_title("Advanced Search")
+        self.check_h1("Advanced Search")
+
+        # There is a form with a single search row
+        form = self.browser.find_element_by_tag_name("form")
+        search_rows = form.find_elements_by_class_name("search-row")
+        self.assertEqual(len(search_rows), 1)
+
+        # There is a button for adding more rows
+        button = form.find_elements_by_tag_name("button")[-1]
+        button.click()
+        search_rows = form.find_elements_by_class_name("search-row")
+        self.assertEqual(len(search_rows), 2)
+        button.click()
+        search_rows = form.find_elements_by_class_name("search-row")
+        self.assertEqual(len(search_rows), 3)
+
+        # User searches for sites with organism mus m and code 1aa
+        drowndown = search_rows[0].find_element_by_tag_name("select")
+        drowndown = Select(drowndown)
+        drowndown.select_by_visible_text("PDB Organism")
+        text = search_rows[0].find_element_by_tag_name("input")
+        text.send_keys("mus m")
+        drowndown = search_rows[1].find_element_by_tag_name("select")
+        drowndown = Select(drowndown)
+        drowndown.select_by_visible_text("PDB Code")
+        text = search_rows[1].find_element_by_tag_name("input")
+        text.send_keys("1aa")
+        submit = form.find_elements_by_tag_name("input")[-1]
+        self.click(submit)
+
+        # They are on the search results page
+        self.check_page("/search?organism=mus+m&code=1aa")
+        self.check_title("Search Results")
+        self.check_h1("Search Results")
+
+         # There are 25 results
+        result_count = self.browser.find_element_by_id("result-count")
+        self.assertIn("111 results", result_count.text)
+        self.assertIn("Page 1 of 5", result_count.text)
+        results = self.browser.find_element_by_tag_name("table")
+        self.assertEqual(len(results.find_elements_by_tag_name("tr")), 27)
+
+        # There is a page link to the next page
+        links = self.browser.find_element_by_class_name("page-links")
+        self.assertEqual(len(links.find_elements_by_tag_name("a")), 1)
+        link = links.find_element_by_tag_name("a")
+        self.click(link)
+        self.check_page("/search?organism=mus+m&code=1aa&page=2")
+        self.check_title("Search Results")
+        self.check_h1("Search Results")
+
+        # There are still 25 results
+        result_count = self.browser.find_element_by_id("result-count")
+        self.assertIn("111 results", result_count.text)
+        self.assertIn("Page 2 of 5", result_count.text)
+        results = self.browser.find_element_by_tag_name("table")
+        self.assertEqual(len(results.find_elements_by_tag_name("tr")), 27)
+
+        # There are page links
+        links = self.browser.find_element_by_class_name("page-links")
+        self.assertEqual(len(links.find_elements_by_tag_name("a")), 2)
+        link = links.find_element_by_tag_name("a")
+        self.click(link)
+        self.check_page("/search?organism=mus+m&code=1aa&page=1")
+        self.check_title("Search Results")
+        self.check_h1("Search Results")
+
+        # They go to the last page
+        for index in range(2, 6):
+            links = self.browser.find_element_by_class_name("page-links")
+            link = links.find_elements_by_tag_name("a")[-1]
+            self.click(link)
+            result_count = self.browser.find_element_by_id("result-count")
+            self.assertIn("111 results", result_count.text)
+            self.assertIn("Page {} of 5".format(index), result_count.text)
