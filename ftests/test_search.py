@@ -188,7 +188,7 @@ class MainSearchTests(BrowserTest):
 
 class AdvancedSearchTests(BrowserTest):
 
-    def check_advanced_search(self, dropdown, name, term, results):
+    def check_advanced_search(self, dropdown_value, name, term, results):
         # User goes to the search page
         self.get("/")
         nav = self.browser.find_element_by_tag_name("nav")
@@ -206,7 +206,7 @@ class AdvancedSearchTests(BrowserTest):
         # They search for sites
         drowndown = row.find_element_by_tag_name("select")
         drowndown = Select(drowndown)
-        drowndown.select_by_visible_text(dropdown)
+        drowndown.select_by_visible_text(dropdown_value)
         text = row.find_element_by_tag_name("input")
         text.send_keys(term)
         submit = form.find_elements_by_tag_name("input")[-1]
@@ -247,3 +247,81 @@ class AdvancedSearchTests(BrowserTest):
 
     def test_can_search_by_pdb_code(self):
         self.check_advanced_search("PDB Code", "code", "1aA", ["1AADA200", "1AADB200", "1AABA100"])
+
+
+    def test_can_search_by_multiple_criteria(self):
+        # User goes to the search page
+        self.get("/")
+        nav = self.browser.find_element_by_tag_name("nav")
+        self.click(nav.find_elements_by_tag_name("a")[0])
+        self.check_page("/search/")
+        self.check_title("Advanced Search")
+        self.check_h1("Advanced Search")
+
+        # There is a form with a single search row
+        form = self.browser.find_element_by_tag_name("form")
+        search_rows = form.find_elements_by_class_name("search-row")
+        self.assertEqual(len(search_rows), 1)
+
+        # There is a button for adding more rows
+        button = form.find_elements_by_tag_name("button")[-1]
+        button.click()
+        search_rows = form.find_elements_by_class_name("search-row")
+        self.assertEqual(len(search_rows), 2)
+        button.click()
+        search_rows = form.find_elements_by_class_name("search-row")
+        self.assertEqual(len(search_rows), 3)
+
+        # The rows can be removed down to the last
+        self.click(search_rows[-1].find_element_by_tag_name("button"))
+        search_rows = form.find_elements_by_class_name("search-row")
+        self.assertEqual(len(search_rows), 2)
+        search_rows[-1].find_element_by_tag_name("button").click()
+        search_rows = form.find_elements_by_class_name("search-row")
+        self.assertEqual(len(search_rows), 1)
+        self.assertFalse(search_rows[-1].find_elements_by_tag_name("button"))
+        button.click()
+        search_rows = form.find_elements_by_class_name("search-row")
+        self.assertEqual(len(search_rows), 2)
+
+        # User searches for sites with organism mus m and code 1aa
+        drowndown = search_rows[0].find_element_by_tag_name("select")
+        drowndown = Select(drowndown)
+        drowndown.select_by_visible_text("PDB Organism")
+        text = search_rows[0].find_element_by_tag_name("input")
+        text.send_keys("mus m")
+        drowndown = search_rows[1].find_element_by_tag_name("select")
+        drowndown = Select(drowndown)
+        drowndown.select_by_visible_text("PDB Code")
+        text = search_rows[1].find_element_by_tag_name("input")
+        text.send_keys("1aa")
+        submit = form.find_elements_by_tag_name("input")[-1]
+        self.click(submit)
+
+        # They are on the search results page
+        self.check_page("/search?organism=mus+m&code=1aa")
+        self.check_title("Search Results")
+        self.check_h1("Search Results")
+
+        # There is a result count
+        result_count = self.browser.find_element_by_id("result-count")
+        self.assertIn("1 result", result_count.text)
+        self.assertIn("Page 1 of 1", result_count.text)
+
+        # There are no pagination links
+        self.assertEqual(len(self.browser.find_elements_by_class_name("page-links")), 0)
+
+        # The results are below
+        results_table = self.browser.find_element_by_tag_name("table")
+        th = results_table.find_element_by_tag_name("tr")
+        self.assertEqual(th.find_elements_by_tag_name("th")[0].text, "ZincSite ID")
+        self.assertEqual(th.find_elements_by_tag_name("th")[1].text, "PDB")
+        self.assertEqual(th.find_elements_by_tag_name("th")[2].text, "Deposited")
+        self.assertEqual(th.find_elements_by_tag_name("th")[3].text, "Resolution")
+        self.assertEqual(th.find_elements_by_tag_name("th")[4].text, "Organism")
+        results = ["1AABA100"]
+        for row, result in zip(results_table.find_elements_by_tag_name("tr")[1:], results):
+            self.assertEqual(row.find_element_by_tag_name("td").text, result)
+
+
+

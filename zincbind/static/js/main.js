@@ -38,3 +38,27 @@ function updateSearchTerm(select) {
   var input = $(select).parent().find("input");
   input.attr("name", $(select).val());
 }
+
+
+function addSearchRow(button) {
+  var rows = $(button).parent().find(".search-row");
+  lastRow = rows.last();
+  newRow = lastRow.clone();
+  newRow.find("input").val("");
+  $(newRow).insertAfter(lastRow);
+  rows = $(button).parent().find(".search-row");
+  rows.each(function(index, row) {
+    if ($(row).find("button").length == 0) {
+      $(row).append('<button type="button" onclick="removeRow(this)">x</button>')
+    }
+  });
+}
+
+
+function removeRow(button) {
+  var rows = $(button).parent().parent().find(".search-row");
+  if (rows.length == 2) {
+    rows.first().find("button").remove();
+  }
+  $(button).parent().remove();
+}
