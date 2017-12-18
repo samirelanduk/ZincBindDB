@@ -50,13 +50,18 @@ form {
 }
 
 select {
-    font-size: 200%;
+    font-size: 150%;
+    width: 260px;
     margin-right: 10px;
+    padding: 10px;
+    border-radius: 5px;
 }
 
 .search-con {
     font-size: 150%;
     font-style: italic;
+    width: 140px;
+    text-align: center;
 }
 
 .search-row input {
@@ -65,12 +70,37 @@ select {
     flex-grow: 5
 }
 
+.search-row button {
+  border-radius: 20px;
+  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  line-height: 1;
+  border: none;
+  background-color: #FFBABA;
+  color: #D8000C;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.add-row {
+  display: block;
+  font-size: 110%;
+  width: 90px;
+  border-radius: 4px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 25px;
+}
+
 input[type='submit'] {
     margin-top: 15px;
     display: block;
     width: auto;
     margin-left: auto;
     margin-right: auto;
+    margin-bottom: 25px;  
 }
 
 @media only screen and (max-width: 769px) {
@@ -81,7 +111,7 @@ input[type='submit'] {
   }
 
   select {
-      font-size: 150%;
+      font-size: 100%;
       margin-right: 5px;
   }
 
@@ -91,6 +121,7 @@ input[type='submit'] {
   }
 
   .search-row input {
+
       margin-left: 5px;
   }
 }
