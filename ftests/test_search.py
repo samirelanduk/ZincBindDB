@@ -188,7 +188,7 @@ class MainSearchTests(BrowserTest):
 
 class AdvancedSearchTests(BrowserTest):
 
-    def test_can_search_by_title(self):
+    def check_advanced_search(self, dropdown, name, term, results):
         # User goes to the search page
         self.get("/")
         nav = self.browser.find_element_by_tag_name("nav")
@@ -203,23 +203,23 @@ class AdvancedSearchTests(BrowserTest):
         self.assertEqual(len(search_rows), 1)
         row = search_rows[0]
 
-        # They search for sites with 'B 7' in title
+        # They search for sites
         drowndown = row.find_element_by_tag_name("select")
         drowndown = Select(drowndown)
-        drowndown.select_by_visible_text("PDB Title")
+        drowndown.select_by_visible_text(dropdown)
         text = row.find_element_by_tag_name("input")
-        text.send_keys("B 7")
+        text.send_keys(term)
         submit = form.find_elements_by_tag_name("input")[-1]
         self.click(submit)
 
         # They are on the search results page
-        self.check_page("/search?title=B+7")
+        self.check_page("/search?{}={}".format(name, term.replace(" ", "+")))
         self.check_title("Search Results")
         self.check_h1("Search Results")
 
         # There is a result count
         result_count = self.browser.find_element_by_id("result-count")
-        self.assertIn("1 result", result_count.text)
+        self.assertIn(str(len(results)) + " result", result_count.text)
         self.assertIn("Page 1 of 1", result_count.text)
 
         # There are no pagination links
@@ -233,6 +233,17 @@ class AdvancedSearchTests(BrowserTest):
         self.assertEqual(th.find_elements_by_tag_name("th")[2].text, "Deposited")
         self.assertEqual(th.find_elements_by_tag_name("th")[3].text, "Resolution")
         self.assertEqual(th.find_elements_by_tag_name("th")[4].text, "Organism")
-        results = ["2AACE500"]
         for row, result in zip(results_table.find_elements_by_tag_name("tr")[1:], results):
             self.assertEqual(row.find_element_by_tag_name("td").text, result)
+
+
+    def test_can_search_by_title(self):
+        self.check_advanced_search("PDB Title", "title", "B 7", ["2AACE500"])
+
+
+    def test_can_search_by_organism(self):
+        self.check_advanced_search("PDB Organism", "organism", "mus m", ["2AACE500", "1AABA100"])
+
+
+    def test_can_search_by_pdb_code(self):
+        self.check_advanced_search("PDB Code", "code", "1aA", ["1AADA200", "1AADB200", "1AABA100"])

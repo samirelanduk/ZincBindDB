@@ -32,3 +32,9 @@ function checkEmpty() {
     };
     return true;
 }
+
+
+function updateSearchTerm(select) {
+  var input = $(select).parent().find("input");
+  input.attr("name", $(select).val());
+}

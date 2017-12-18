@@ -10,8 +10,10 @@
 
 <form method="GET" action="/search">
     <div class="search-row">
-        <select>
+        <select onchange="updateSearchTerm(this);">
           <option value="title">PDB Title</option>
+          <option value="organism">PDB Organism</option>
+          <option value="code">PDB Code</option>
         </select>
         <span class="search-con"> contains </span>
         <input name="title">

@@ -27,6 +27,10 @@ class FunctionalTest(StaticLiveServerTestCase):
                  expression="E. COLI",
                  classification="IMMUNOGLOBULIN" if index == 6 else "LYASE"
                 )
+        # 1AABA100
+        # 1AADA200
+        # 1AADB200
+        # 2AACE500
 
         site1 = ZincSite.objects.create(
          id=pdb_codes[1] + "A100", x=1.5, y=2.5, z=2.5,
