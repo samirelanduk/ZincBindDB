@@ -82,6 +82,11 @@ h2 {
   list-style-type: square;
 }
 
+.other-sites td {
+  font-weight: normal;
+  text-align: center;
+}
+
 @media only screen and (max-width: 769px) {
   /* iPad and down */
   h2 {

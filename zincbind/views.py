@@ -70,7 +70,11 @@ def process_search(request):
 def site(request, site_id):
     try:
         site = ZincSite.objects.get(pk=site_id)
-        return render(request, "site.html", {"site": site})
+        pdb_sites = ZincSite.objects.filter(pdb=site.pdb).exclude(id=site.id)
+        species_sites = ZincSite.objects.filter(pdb__organism__contains=site.pdb.organism).exclude(id=site.id)
+        return render(request, "site.html", {
+         "site": site, "pdb_sites": pdb_sites, "species_sites": species_sites
+        })
     except ObjectDoesNotExist:
         raise Http404
 

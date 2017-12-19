@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block title %}{{ site.id }}{% endblock %}
 
@@ -61,15 +62,41 @@
         </td></tr>
       </table>
   </div><div class="half-width right">
-      <table>
+      <table class="other-sites">
         <tr>
           <th>Other Sites in this PDB</th>
         </tr>
+        {% if pdb_sites.count == 0 %}
+          <tr><td><em>None</em></td></tr>
+        {% endif %}
+        {% if pdb_sites.count <= 3 %}
+          {% for site in pdb_sites %}
+          <tr><td><a href="/{{ site.id }}/">{{ site.id }}</a></td></tr>
+          {% endfor %}
+        {% else %}
+          <tr><td><a href="/{{ pdb_sites.0.id }}/">{{ pdb_sites.0.id }}</a></td></tr>
+          <tr><td><a href="/{{ pdb_sites.1.id }}/">{{ pdb_sites.1.id }}</a></td></tr>
+          <tr><td><a href="/search?code={{ site.pdb.id }}">See all {{ pdb_sites.count|add:"1"|intcomma }} zinc sites in this PDB</a></td></tr>
+        {% endif %}
       </table>
-      <table>
+      <table class="other-sites">
         <tr>
           <th>Other Sites from this Organism</th>
         </tr>
+        {% if species_sites.count == 0 %}
+          <tr><td><em>None</em></td></tr>
+        {% endif %}
+        {% if species_sites.count <= 3 %}
+          {% for site in species_sites %}
+          <tr><td><a href="/{{ site.id }}/">{{ site.id }}</a></td></tr>
+          {% endfor %}
+        {% elif species_sites.count == 0 %}
+          <tr><td><em>None</em></td></tr>
+        {% else %}
+          <tr><td><a href="/{{ species_sites.0.id }}/">{{ species_sites.0.id }}</a></td></tr>
+          <tr><td><a href="/{{ species_sites.1.id }}/">{{ species_sites.1.id }}</a></td></tr>
+          <tr><td><a href="/search?organism={{ site.pdb.organism|urlencode }}">See all {{ species_sites.count|add:"1"|intcomma }} zinc sites in this Organism</a></td></tr>
+        {% endif %}
       </table>
     </div>
   </div>

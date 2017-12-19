@@ -1,9 +1,14 @@
 from time import sleep
+from zincbind.models import ZincSite, Pdb
 from .base import BrowserTest
 
 class SiteTests(BrowserTest):
 
     def test_can_view_zinc_site(self):
+        for i in range(2):
+            ZincSite.objects.create(
+             id="1AAD{}".format(i), x=1.5, y=2.5, z=2.5, pdb=Pdb.objects.get(id="1AAD")
+            )
         self.get("/1AADA200/")
         self.check_title("1AADA200")
         self.check_h1("Zinc Site: 1AADA200")
@@ -50,3 +55,67 @@ class SiteTests(BrowserTest):
          ["Classification", "LYASE"], ["Source Organism", "Homo sapiens"],
          ["Expression System", "E. coli"]
         ])
+
+        # There is a list of other sites in this PDB
+        other_in_pdb = pdb_section.find_elements_by_tag_name("table")[1]
+        self.assertIn("PDB", other_in_pdb.find_element_by_tag_name("th").text)
+        rows = other_in_pdb.find_elements_by_tag_name("tr")
+        self.assertEqual(len(rows), 4)
+        self.assertIn("1AADB200", other_in_pdb.text)
+        self.assertIn("1AAD0", other_in_pdb.text)
+        self.assertIn("1AAD1", other_in_pdb.text)
+
+        # There is a list of other sites in this species
+        other_in_species = pdb_section.find_elements_by_tag_name("table")[2]
+        self.assertIn("Organism", other_in_species.find_element_by_tag_name("th").text)
+        rows = other_in_species.find_elements_by_tag_name("tr")
+        self.assertEqual(len(rows), 4)
+        self.assertIn("1AADB200", other_in_species.text)
+        self.assertIn("1AAD0", other_in_species.text)
+        self.assertIn("1AAD1", other_in_species.text)
+
+        # The links work
+        first = rows[1].text.split()[0]
+        self.click(rows[1].find_element_by_tag_name("a"))
+        self.check_page("/{}/".format(first))
+
+
+    def test_can_view_zinc_site_with_lots_of_matches(self):
+        for i in range(20):
+            ZincSite.objects.create(
+             id="1AAD{}".format(i), x=1.5, y=2.5, z=2.5, pdb=Pdb.objects.get(id="1AAD")
+            )
+        self.get("/1AADA200/")
+        self.check_title("1AADA200")
+        self.check_h1("Zinc Site: 1AADA200")
+        pdb_section = self.browser.find_element_by_id("site-pdb")
+
+        # There is a list of other sites in this PDB
+        other_in_pdb = pdb_section.find_elements_by_tag_name("table")[1]
+        self.assertIn("PDB", other_in_pdb.find_element_by_tag_name("th").text)
+        rows = other_in_pdb.find_elements_by_tag_name("tr")
+        self.assertEqual(len(rows), 4)
+        self.assertIn("1AADB200", other_in_pdb.text)
+        self.assertIn("1AAD0", other_in_pdb.text)
+        self.assertEqual(rows[-1].text, "See all 22 zinc sites in this PDB")
+
+        # There is a list of other sites in this species
+        other_in_species = pdb_section.find_elements_by_tag_name("table")[2]
+        self.assertIn("Organism", other_in_species.find_element_by_tag_name("th").text)
+        rows = other_in_species.find_elements_by_tag_name("tr")
+        self.assertEqual(len(rows), 4)
+        self.assertIn("1AADB200", other_in_species.text)
+        self.assertIn("1AAD0", other_in_species.text)
+        self.assertEqual(rows[-1].text, "See all 22 zinc sites in this Organism")
+
+        # The links work
+        self.click(rows[-1].find_element_by_tag_name("a"))
+        sleep(0.4)
+        self.check_page("/search?organism=HOMO%20SAPIENS")
+        self.browser.back()
+        pdb_section = self.browser.find_element_by_id("site-pdb")
+        other_in_pdb = pdb_section.find_elements_by_tag_name("table")[1]
+        rows = other_in_pdb.find_elements_by_tag_name("tr")
+        self.click(rows[-1].find_element_by_tag_name("a"))
+        sleep(0.4)
+        self.check_page("/search?code=1AAD")
