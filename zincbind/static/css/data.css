@@ -1,10 +1,11 @@
 #data-description {
     font-size: 130%;
-    line-height: 150%;
+    line-height: 200%;
+    text-align: center;
     margin-top: 50px;
     margin-left: 10%;
     margin-right: 10%;
-    margin-bottom: 70px;
+    margin-bottom: 100px;
 }
 
 #charts {
