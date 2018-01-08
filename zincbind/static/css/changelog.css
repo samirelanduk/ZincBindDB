@@ -1,15 +1,14 @@
 .release {
-  border: 1.25px solid #D0D0D0;
   padding: 20px 50px;
-  border-radius: 20px;
   margin-top: 20px;
   margin-bottom: 20px;
-  line-height: 1.5;
+  line-height: 1.8;
   background-color: rgba(108, 52, 122, 0.05);
-  width: 80%;
-  margin-left: auto;
-  margin-right: auto;
-  font-size: 150%;
+  width: 100%;
+  font-size: 120%;
+  box-sizing: border-box;
+  padding-left: 20%;
+  padding-right: 20%;
 }
 
 .release h2 {
