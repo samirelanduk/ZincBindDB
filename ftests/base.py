@@ -116,6 +116,8 @@ class BrowserTest(FunctionalTest):
         self.browser.quit()
         try:
             os.remove("ghostdriver.log")
+        except IOError: pass
+        try:
             os.remove("geckodriver.log")
         except IOError: pass
 
