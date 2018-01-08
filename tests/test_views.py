@@ -1,4 +1,4 @@
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, MagicMock
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from .base import ZincBindTest
@@ -222,11 +222,14 @@ class SiteViewTests(ZincBindTest):
     def setUp(self):
         ZincBindTest.setUp(self)
         self.get_patcher = patch("zincbind.views.ZincSite.objects.get")
+        self.filter_patcher = patch("zincbind.views.ZincSite.objects.filter")
         self.mock_get = self.get_patcher.start()
+        self.mock_filter = self.filter_patcher.start()
 
 
     def tearDown(self):
         self.get_patcher.stop()
+        self.mock_filter.stop()
 
 
     def test_site_view_uses_site_template(self):
@@ -235,12 +238,61 @@ class SiteViewTests(ZincBindTest):
 
 
     def test_site_view_sends_site(self):
-        site = Mock()
-        site.pdb = Mock()
-        self.mock_get.return_value = site
+        mock_site = Mock()
+        mock_site.pdb = Mock()
+        self.mock_get.return_value = mock_site
         request = self.get_request("/somesite/")
         self.check_view_has_context(
-         site, request, {"site":site}, "siteid"
+         site, request, {"site":mock_site}, "siteid"
+        )
+        self.mock_get.assert_called_with(pk="siteid")
+
+
+    def test_site_view_sends_pdb_sites(self):
+        mock_site = Mock()
+        mock_site.pdb = Mock()
+        self.mock_get.return_value = mock_site
+        pdb_sites = Mock()
+        pdb_sites.exclude = MagicMock()
+        pdb_sites.exclude.return_value = ["1", "2", "3"]
+        self.mock_filter.return_value = pdb_sites
+        request = self.get_request("/somesite/")
+        self.check_view_has_context(
+         site, request, {"pdb_sites": ["1", "2", "3"]}, "siteid"
+        )
+        self.mock_filter.assert_any_call(pdb=mock_site.pdb)
+        mock_site = Mock()
+        mock_site.pdb = Mock()
+        self.mock_get.return_value = mock_site
+        request = self.get_request("/somesite/")
+        self.check_view_has_context(
+         site, request, {"site":mock_site}, "siteid"
+        )
+        self.mock_get.assert_called_with(pk="siteid")
+
+
+    def test_site_view_sends_species_sites(self):
+        mock_site = Mock()
+        mock_site.pdb = Mock()
+        mock_site.pdb.organism = Mock()
+        self.mock_get.return_value = mock_site
+        species_sites = Mock()
+        species_sites.exclude = MagicMock()
+        species_sites.exclude.return_value = ["1", "2", "3"]
+        self.mock_filter.return_value = species_sites
+        request = self.get_request("/somesite/")
+        self.check_view_has_context(
+         site, request, {"species_sites": ["1", "2", "3"]}, "siteid"
+        )
+        self.mock_filter.assert_any_call(
+         pdb__organism__contains=mock_site.pdb.organism
+        )
+        mock_site = Mock()
+        mock_site.pdb = Mock()
+        self.mock_get.return_value = mock_site
+        request = self.get_request("/somesite/")
+        self.check_view_has_context(
+         site, request, {"site":mock_site}, "siteid"
         )
         self.mock_get.assert_called_with(pk="siteid")
 
