@@ -24,6 +24,9 @@
 
 <div id="charts">
   <div id="pdb-prop"></div>
+  <div id="res-freq"></div>
+  <div id="species-freq"></div>
+  <div id="res-dist"></div>
 </div>
 
 <script>
@@ -58,6 +61,70 @@ Highcharts.chart('pdb-prop', {
             y: {{ pdb_without_zinc}},
         }]
     }]
+});
+
+Highcharts.chart('res-freq', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Residue frequency'
+    },
+    tooltip: {
+        headerFormat: '',
+        pointFormat: '<b>{point.category}</b>: {point.y}'
+    },
+    credits: false,
+    xAxis: {
+        categories: {{ residue_frequencies.0|safe }},
+        crosshair: true,
+        title: {
+          text: 'Residue name'
+        }
+    },
+    yAxis: {
+      title: {
+          text: 'Count'
+        }
+    },
+    series: [{
+      data: {{ residue_frequencies.1|safe }}
+    }],
+    legend: {
+      enabled: false
+    }
+});
+
+Highcharts.chart('species-freq', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Species frequency'
+    },
+    tooltip: {
+        headerFormat: '',
+        pointFormat: '<b>{point.category}</b>: {point.y}'
+    },
+    credits: false,
+    xAxis: {
+        categories: {{ species_frequencies.0|safe }}.map(formatSpecies),
+        crosshair: true,
+        title: {
+          text: 'Species name'
+        }
+    },
+    yAxis: {
+      title: {
+          text: 'Count'
+        }
+    },
+    series: [{
+      data: {{ species_frequencies.1|safe }}
+    }],
+    legend: {
+      enabled: false
+    }
 });
 </script>
 

@@ -37,7 +37,7 @@ class DataViewTests(ZincBindTest):
 
 
     @patch("zincbind.views.Pdb.objects.exclude")
-    def test_home_view_gets_pdb_count(self, mock_exclude):
+    def test_data_view_gets_pdb_count(self, mock_exclude):
         resultset = Mock()
         mock_exclude.return_value = resultset
         resultset.count.return_value = 50
@@ -47,13 +47,35 @@ class DataViewTests(ZincBindTest):
 
 
     @patch("zincbind.views.Pdb.objects.filter")
-    def test_home_view_gets_pdb_count(self, mock_filter):
+    def test_data_view_gets_negative_pdb_count(self, mock_filter):
         resultset = Mock()
         mock_filter.return_value = resultset
         resultset.count.return_value = 50
         request = self.get_request("/")
         self.check_view_has_context(data, request, {"pdb_without_zinc": 50})
         mock_filter.assert_called_with(title=None)
+
+
+    @patch("zincbind.views.Residue.objects.values_list")
+    def test_data_view_gets_residue_frequencies(self, mock_values):
+        mock_values.return_value = list("AAAAAAAABBBBBBBCCCCCCDDDDDEEEEFFFGGHIJK")
+        request = self.get_request("/")
+        self.check_view_has_context(data, request, {"residue_frequencies": [
+         ["A", "B", "C", "D", "E", "F", "G", "Other"],
+         [8, 7, 6, 5, 4, 3, 2, 4]
+        ]})
+        mock_values.assert_called_with("name", flat=True)
+
+
+    @patch("zincbind.views.ZincSite.objects.values_list")
+    def test_data_view_gets_species_frequencies(self, mock_values):
+        mock_values.return_value = list("AAAAAAAABBBBBBBCCCCCCDDDDDEEEEFFFGGHIJK")
+        request = self.get_request("/")
+        self.check_view_has_context(data, request, {"species_frequencies": [
+         ["A", "B", "C", "D", "E", "F", "G", "Other"],
+         [8, 7, 6, 5, 4, 3, 2, 4]
+        ]})
+        mock_values.assert_called_with("pdb__organism", flat=True)
 
 
 
@@ -213,10 +235,12 @@ class SiteViewTests(ZincBindTest):
 
 
     def test_site_view_sends_site(self):
-        self.mock_get.return_value = "ZINCSITE"
+        site = Mock()
+        site.pdb = Mock()
+        self.mock_get.return_value = site
         request = self.get_request("/somesite/")
         self.check_view_has_context(
-         site, request, {"site": "ZINCSITE"}, "siteid"
+         site, request, {"site":site}, "siteid"
         )
         self.mock_get.assert_called_with(pk="siteid")
 

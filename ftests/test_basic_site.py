@@ -151,6 +151,15 @@ class DataPageTests(BrowserTest):
         # There is a pie chart for PDB proportions
         pie = charts.find_element_by_id("pdb-prop")
 
+        # There is a pie chart for residue frequencies
+        res_bar = charts.find_element_by_id("res-freq")
+
+        # There is a pie chart for organism frequencies
+        species_bar = charts.find_element_by_id("species-freq")
+
+        # There is a pie chart for residue distribution
+        resolution = charts.find_element_by_id("res-dist")
+
 
 
 class ChangelogTests(BrowserTest):

@@ -1,10 +1,11 @@
 """ZincBind views."""
 
+from collections import Counter
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
-from .models import ZincSite, Pdb
+from .models import ZincSite, Pdb, Residue
 from .search import omni_search, specific_search
 
 def home(request):
@@ -16,9 +17,27 @@ def home(request):
 
 def data(request):
     valid = Pdb.objects.exclude(title=None)
+    residue_frequencies = Counter(Residue.objects.values_list("name", flat=True))
+    common_residues = residue_frequencies.most_common(7)
+    residue_frequencies = common_residues + [
+     ("Other", sum(
+      residue_frequencies.values()) - sum([l[1] for l in common_residues]
+     ))
+    ]
+    species_frequencies = Counter(
+     ZincSite.objects.values_list("pdb__organism", flat=True)
+    )
+    common_species = species_frequencies.most_common(7)
+    species_frequencies = common_species + [
+     ("Other", sum(
+      species_frequencies.values()) - sum([l[1] for l in common_species]
+     ))
+    ]
     return render(request, "data.html", {
      "pdb_with_zinc": valid.count(),
      "pdb_without_zinc": Pdb.objects.filter(title=None).count(),
+     "residue_frequencies": [list(l) for l in list(zip(*residue_frequencies))],
+     "species_frequencies": [list(l) for l in list(zip(*species_frequencies))]
     })
 
 
@@ -71,7 +90,9 @@ def site(request, site_id):
     try:
         site = ZincSite.objects.get(pk=site_id)
         pdb_sites = ZincSite.objects.filter(pdb=site.pdb).exclude(id=site.id)
-        species_sites = ZincSite.objects.filter(pdb__organism__contains=site.pdb.organism).exclude(id=site.id)
+        species_sites = ZincSite.objects.filter(
+         pdb__organism__contains=site.pdb.organism
+        ).exclude(id=site.id)
         return render(request, "site.html", {
          "site": site, "pdb_sites": pdb_sites, "species_sites": species_sites
         })
