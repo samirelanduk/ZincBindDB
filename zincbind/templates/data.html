@@ -23,6 +23,7 @@
 </div>
 
 <div id="charts">
+  <h2>Statistics</h2>
   <div id="pdb-prop"></div>
   <div id="res-freq"></div>
   <div id="species-freq"></div>
@@ -88,7 +89,8 @@ Highcharts.chart('res-freq', {
         }
     },
     series: [{
-      data: {{ residue_frequencies.1|safe }}
+      data: {{ residue_frequencies.1|safe }},
+      color: '#4A9586'
     }],
     legend: {
       enabled: false
@@ -120,7 +122,8 @@ Highcharts.chart('species-freq', {
         }
     },
     series: [{
-      data: {{ species_frequencies.1|safe }}
+      data: {{ species_frequencies.1|safe }},
+      color: '#f39c12'
     }],
     legend: {
       enabled: false

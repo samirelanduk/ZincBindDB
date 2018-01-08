@@ -3,11 +3,36 @@
     line-height: 200%;
     text-align: center;
     margin-top: 50px;
-    margin-left: 10%;
-    margin-right: 10%;
+    margin-left: 20%;
+    margin-right: 20%;
     margin-bottom: 100px;
+}
+
+h2 {
+	text-align: center;
+	padding-left: 0px;
 }
 
 #charts {
     margin-bottom: 40px;
+}
+
+#charts div {
+	width: 60%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 80px;
+}
+
+@media only screen and (max-width: 769px) {
+  /* iPad and down */
+
+  #data-description {
+    margin-left: 10%;
+    margin-right: 10%;
+}
+
+  #charts div {
+	width: 80%;
+
 }
