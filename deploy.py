@@ -32,23 +32,23 @@ for tracked_file in tracked_files:
 
 # Turn off Debug
 subprocess.call(
- "ssh %s 'sed -i s/\"DEBUG = True\"/\"DEBUG = False\"/g ~/%s/source/zincdb/settings.py'" % (sitename, sitename),
+ "ssh %s 'sed -i s/\"DEBUG = True\"/\"DEBUG = False\"/g ~/%s/source/zincbind/settings.py'" % (sitename, sitename),
  shell=True
 )
 
 # Add allowed hosts
 subprocess.call(
- "ssh %s 'sed -i s/\"ALLOWED_HOSTS = \[\]\"/\"ALLOWED_HOSTS = \[£'%s£', £'www.%s£'\]\"/g ~/%s/source/zincdb/settings.py'" % (sitename, sitename, sitename, sitename),
+ "ssh %s 'sed -i s/\"ALLOWED_HOSTS = \[\]\"/\"ALLOWED_HOSTS = \[£'%s£', £'www.%s£'\]\"/g ~/%s/source/zincbind/settings.py'" % (sitename, sitename, sitename, sitename),
  shell=True
 )
 subprocess.call(
- "ssh %s 'sed -i s/£/\\\"/g ~/%s/source/zincdb/settings.py'" % (sitename, sitename),
+ "ssh %s 'sed -i s/£/\\\"/g ~/%s/source/zincbind/settings.py'" % (sitename, sitename),
  shell=True
 )
 
 # Upload the secret settings
 subprocess.call(
- "scp -r ./zincdb/secrets.py %s:~/%s/source/zincdb/secrets.py" % (sitename, sitename), shell=True
+ "scp -r ./zincbind/secrets.py %s:~/%s/source/zincbind/secrets.py" % (sitename, sitename), shell=True
 )
 
 # Install pip packages
