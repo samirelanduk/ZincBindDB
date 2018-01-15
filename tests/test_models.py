@@ -118,48 +118,54 @@ class ZincSiteTests(ZincBindTest):
 
 
     def test_can_create_zinc_site(self):
-        site = ZincSite(pk="1ZZZA500", x=1.5, y=-1.5, z=10.0, pdb=self.pdb)
+        site = ZincSite(pk="1ZZZA500", x=1.5, y=-1.5, z=10.0, contrast="[]", pdb=self.pdb)
         self.assertEqual(site.residue_set.count(), 0)
         site.full_clean()
 
 
     def test_x_is_required(self):
-        site = ZincSite(pk="1ZZZA500", x=None, y=-1.5, z=10.0, pdb=self.pdb)
+        site = ZincSite(pk="1ZZZA500", x=None, y=-1.5, z=10.0, contrast="[]", pdb=self.pdb)
         with self.assertRaises(ValidationError):
             site.full_clean()
-        site = ZincSite(pk="1ZZZA500", x=0, y=-1.5, z=10.0, pdb=self.pdb)
+        site = ZincSite(pk="1ZZZA500", x=0, y=-1.5, z=10.0, contrast="[]", pdb=self.pdb)
         site.full_clean()
 
 
     def test_y_is_required(self):
-        site = ZincSite(pk="1ZZZA500", x=0, y=None, z=10.0, pdb=self.pdb)
+        site = ZincSite(pk="1ZZZA500", x=0, y=None, z=10.0, contrast="[]", pdb=self.pdb)
         with self.assertRaises(ValidationError):
             site.full_clean()
-        site = ZincSite(pk="1ZZZA500", x=1.5, y=0, z=10.0, pdb=self.pdb)
+        site = ZincSite(pk="1ZZZA500", x=1.5, y=0, z=10.0, contrast="[]", pdb=self.pdb)
         site.full_clean()
 
 
     def test_z_is_required(self):
-        site = ZincSite(pk="1ZZZA500", x=1.5, y=-1.5, z=None, pdb=self.pdb)
+        site = ZincSite(pk="1ZZZA500", x=1.5, y=-1.5, z=None, contrast="[]", pdb=self.pdb)
         with self.assertRaises(ValidationError):
             site.full_clean()
-        site = ZincSite(pk="1ZZZA500", x=1.5, y=-1.5, z=0.0, pdb=self.pdb)
+        site = ZincSite(pk="1ZZZA500", x=1.5, y=-1.5, z=0.0, contrast="[]", pdb=self.pdb)
         site.full_clean()
 
 
+    def test_contrast_is_required(self):
+        site = ZincSite(pk="1ZZZA500", x=1.5, y=-1.5, z=None, contrast=None, pdb=self.pdb)
+        with self.assertRaises(ValidationError):
+            site.full_clean()
+
+
     def test_pdb_is_required(self):
-        site = ZincSite(pk="1ZZZA500", x=1.5, y=-1.5, z=None, pdb=None)
+        site = ZincSite(pk="1ZZZA500", x=1.5, y=-1.5, z=None, contrast="[]", pdb=None)
         with self.assertRaises(ValidationError):
             site.full_clean()
 
 
     def test_site_chain_property(self):
-        site = ZincSite(pk="1ZZZA500", x=1.5, y=-1.5, z=10.0, pdb=self.pdb)
+        site = ZincSite(pk="1ZZZA500", x=1.5, y=-1.5, z=10.0, contrast="[]", pdb=self.pdb)
         self.assertEqual(site.chain, "A")
 
 
     def test_site_number_id_property(self):
-        site = ZincSite(pk="1ZZZA500", x=1.5, y=-1.5, z=10.0, pdb=self.pdb)
+        site = ZincSite(pk="1ZZZA500", x=1.5, y=-1.5, z=10.0, contrast="[]", pdb=self.pdb)
         self.assertEqual(site.number_id, "500")
 
 

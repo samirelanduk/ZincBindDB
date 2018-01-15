@@ -28,6 +28,7 @@ class ZincSite(models.Model):
     x = models.FloatField()
     y = models.FloatField()
     z = models.FloatField()
+    contrast = models.TextField()
     pdb = models.ForeignKey(Pdb)
 
     @property
@@ -107,7 +108,7 @@ class Atom(models.Model):
     def zinc_distance(self):
         site = self.residue.site
         return sqrt(
-         ((self.x - site.x) ** 2) + 
-         ((self.y - site.y) ** 2) + 
+         ((self.x - site.x) ** 2) +
+         ((self.y - site.y) ** 2) +
          ((self.z - site.z) ** 2)
         )
