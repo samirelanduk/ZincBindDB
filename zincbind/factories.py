@@ -4,6 +4,7 @@ from datetime import datetime
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 from .models import Pdb, Residue, Atom, ZincSite
+from .utilities import hydrophobic_contrast
 from .exceptions import DuplicateSiteError
 
 def create_empty_pdb(pdb_code):
@@ -70,12 +71,13 @@ def create_zinc_site(pdb, zinc, residues):
     pdb_record = create_pdb(pdb)
     try:
         atom = zinc.atom()
+        rings = atom.nearby_rings(cutoff=7, step=0.25, exclude="H")
         site = ZincSite.objects.create(
          pk=pdb_record.id + zinc.molecule_id(),
          x=atom.x(), y=atom.y(), z=atom.z(),
-         pdb=pdb_record
+         contrast=str(hydrophobic_contrast(rings)), pdb=pdb_record
         )
     except IntegrityError: raise DuplicateSiteError
     residue_records = [create_residue(res, zinc.atom(), site) for res in residues]
-    
+
     return site
