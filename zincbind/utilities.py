@@ -83,3 +83,28 @@ def model_is_skeleton(model):
             if name not in ["C", "N", "CA", "O"]:
                 return False
     return True
+
+
+def atomic_solvation(atom):
+    """Gets the atomic solvation parameter of an atomium atom. Values are taken
+    from 'Where metal ions bind in proteins' (1990).
+
+    :rtype: ``float``"""
+
+    if atom.element() == "C":
+        return 75.312
+    elif atom.element() == "O":
+        if atom.charge() <= -1:
+            return -154.808
+        if ((atom.residue().name() == "GLU" and atom.name() in ["OE1", "OE2"])
+         or (atom.residue().name() == "ASP" and atom.name() in ["OD1", "OD2"])):
+            return -96.232
+        return -37.656
+    elif atom.element() == "N":
+        if atom.charge() >= 1 or (atom.residue().name() == "LYS" and atom.name() == "NZ"):
+            return -158.992
+        if ((atom.residue().name() == "ARG" and atom.name() in ["NH1", "NH2"])
+         or (atom.residue().name().startswith("HI") and atom.name() in ["ND1", "NE2"])):
+            return -98.324
+        return -37.656
+    return 0

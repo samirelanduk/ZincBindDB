@@ -1,5 +1,5 @@
 django==1.11.6
-atomium==0.8
+atomium==0.9
 selenium==3.6
 mixer==5.6.6
 requests==2.18.4
