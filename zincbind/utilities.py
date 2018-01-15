@@ -96,15 +96,39 @@ def atomic_solvation(atom):
     elif atom.element() == "O":
         if atom.charge() <= -1:
             return -154.808
-        if ((atom.residue().name() == "GLU" and atom.name() in ["OE1", "OE2"])
-         or (atom.residue().name() == "ASP" and atom.name() in ["OD1", "OD2"])):
-            return -96.232
+        if atom.residue():
+            if ((atom.residue().name() == "GLU" and atom.name() in ["OE1", "OE2"])
+             or (atom.residue().name() == "ASP" and atom.name() in ["OD1", "OD2"])):
+                return -96.232
         return -37.656
     elif atom.element() == "N":
-        if atom.charge() >= 1 or (atom.residue().name() == "LYS" and atom.name() == "NZ"):
+        if atom.charge() >= 1 or (
+         atom.residue() and atom.residue().name() == "LYS" and atom.name() == "NZ"
+        ):
             return -158.992
-        if ((atom.residue().name() == "ARG" and atom.name() in ["NH1", "NH2"])
-         or (atom.residue().name().startswith("HI") and atom.name() in ["ND1", "NE2"])):
-            return -98.324
+        if atom.residue():
+            if ((atom.residue().name() == "ARG" and atom.name() in ["NH1", "NH2"])
+             or (atom.residue().name().startswith("HI") and atom.name() in ["ND1", "NE2"])):
+                return -98.324
         return -37.656
+    elif atom.element() == "S":
+        return -20.92
     return 0
+
+
+def hydrophobic_contrast(rings):
+    """Applies the hydrophobic contrast function to some atomium atom rings,
+    returning the average atomic solvation values at each radius.
+
+    :rtype: ``list``"""
+
+    radii = sorted(rings.keys())
+    output = []
+    for radius in radii:
+        if not rings[radius]:
+            output.append(None)
+        else:
+            output.append(sum(
+             atomic_solvation(atom) for atom in rings[radius]
+            ) / len(rings[radius]))
+    return list(zip(radii, output))
