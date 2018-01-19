@@ -116,19 +116,48 @@ def atomic_solvation(atom):
     return 0
 
 
-def hydrophobic_contrast(rings):
-    """Applies the hydrophobic contrast function to some atomium atom rings,
-    returning the average atomic solvation values at each radius.
+def average_solvation(atom, sphere):
+    """Takes a set of atoms and returns their average atomic solvation.
 
-    :rtype: ``list``"""
+    :rtype: ``float``"""
 
-    radii = sorted(rings.keys())
-    output = []
-    for radius in radii:
-        if not rings[radius]:
-            output.append(None)
-        else:
-            output.append(sum(
-             atomic_solvation(atom) for atom in rings[radius]
-            ) / len(rings[radius]))
-    return list(zip(radii, output))
+    if sphere:
+        atom_count = len(sphere)
+        return sum([atomic_solvation(a) for a in sphere]) / atom_count
+
+
+def hydrophobic_contrast(atom, sphere):
+    """Returns the hydrophobic contrast score of a sphere of atoms from their
+    central atom.
+
+    :rtype: ``float``"""
+
+    if sphere:
+        atom_count = len(sphere)
+        average_distance = sum(
+         [a.distance_to(atom) ** 2 for a in sphere]
+        ) / atom_count
+        average_solv = average_solvation(atom, sphere)
+        average = atom_count * average_distance * average_solv
+        sum_ = sum([
+         (atomic_solvation(a) * (a.distance_to(atom) ** 2)) for a in sphere
+        ])
+        return sum_ - average
+
+
+def apply_function(func, atom, max_radius, step):
+    """Takes an atom, and takes spheres of increasing size away from it,
+    applying some fucntion to them as it goes.
+
+    :rtype:  ``list``"""
+
+    sphere = atom.nearby(cutoff=max_radius, exclude="H")
+    radius = max_radius
+    results = []
+    while radius > 0:
+        results.append([radius, func(atom, sphere)])
+        if results[-1][1]: results[-1][1] = round(results[-1][1], 3)
+        radius = round(radius - step, 6)
+        if radius > 0:
+            sphere = atom.nearby(cutoff=radius, exclude="H", atoms=sphere)
+    return results[::-1]

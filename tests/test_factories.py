@@ -6,6 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from .base import ZincBindTest
 from zincbind.factories import *
 from zincbind.exceptions import DuplicateSiteError
+from zincbind.factories import average_solvation, hydrophobic_contrast
 
 class FactoryTest(ZincBindTest):
 
@@ -206,30 +207,31 @@ class ZincSiteFactoryTests(FactoryTest):
     @patch("zincbind.factories.create_pdb")
     @patch("zincbind.factories.create_residue")
     @patch("zincbind.models.ZincSite.objects.create")
-    @patch("zincbind.factories.hydrophobic_contrast")
-    def test_can_create_zinc_site(self, mock_con, mock_zinc, mock_res, mock_pdb):
+    @patch("zincbind.factories.apply_function")
+    def test_can_create_zinc_site(self, mock_apply, mock_zinc, mock_res, mock_pdb):
         mock_pdb.return_value = self.pdb_record
         residue_record1, residue_record2 = Mock(), Mock()
         mock_res.side_effect = [residue_record1, residue_record2]
         site_record = Mock()
         mock_zinc.return_value = site_record
-        mock_con.return_value = 5
-        self.atom1.nearby_rings.return_value = "RINGS"
+        mock_apply.side_effect = [[5], [None]]
         site = create_zinc_site(self.pdb, self.zinc, [self.res1, self.res2])
         mock_pdb.assert_called_with(self.pdb)
         mock_res.assert_any_call(self.res1, self.atom1, site)
         mock_res.assert_any_call(self.res2, self.atom1, site)
-        mock_con.assert_called_with("RINGS")
-        self.atom1.nearby_rings.assert_called_with(cutoff=7, step=0.25, exclude="H")
-        mock_zinc.assert_called_with(pk="1ABCB505", x=15, y=16, z=17, contrast="5", pdb=self.pdb_record)
+        mock_apply.assert_any_call(average_solvation, self.atom1, 10, 0.1)
+        mock_zinc.assert_called_with(
+         pk="1ABCB505", x=15, y=16, z=17,
+         solvation="[5]", contrast="[null]", pdb=self.pdb_record
+        )
         self.assertIs(site, site_record)
 
 
     @patch("zincbind.factories.create_pdb")
     @patch("zincbind.factories.create_residue")
     @patch("zincbind.models.ZincSite.objects.create")
-    @patch("zincbind.factories.hydrophobic_contrast")
-    def test_error_on_duplicate_zinc_sites(self, mock_con, mock_zinc, mock_res, mock_pdb):
+    @patch("zincbind.factories.apply_function")
+    def test_error_on_duplicate_zinc_sites(self, mock_apply, mock_zinc, mock_res, mock_pdb):
         mock_zinc.side_effect = IntegrityError()
         with self.assertRaises(DuplicateSiteError):
             create_zinc_site(self.pdb, self.zinc, [self.res1, self.res2])

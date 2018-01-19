@@ -4,7 +4,7 @@ from datetime import datetime
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 from .models import Pdb, Residue, Atom, ZincSite
-from .utilities import hydrophobic_contrast
+from .utilities import apply_function, average_solvation, hydrophobic_contrast
 from .exceptions import DuplicateSiteError
 
 def create_empty_pdb(pdb_code):
@@ -69,13 +69,20 @@ def create_zinc_site(pdb, zinc, residues):
     Any components that don't exist will be created first."""
 
     pdb_record = create_pdb(pdb)
+
     try:
         atom = zinc.atom()
-        rings = atom.nearby_rings(cutoff=7, step=0.25, exclude="H")
+        solvation = str(apply_function(
+         average_solvation, atom, 10, 0.1
+        )).replace("None", "null")
+        contrast = str(apply_function(
+         hydrophobic_contrast, atom, 10, 0.1)
+        ).replace("None", "null")
         site = ZincSite.objects.create(
          pk=pdb_record.id + zinc.molecule_id(),
          x=atom.x(), y=atom.y(), z=atom.z(),
-         contrast=str(hydrophobic_contrast(rings)), pdb=pdb_record
+         solvation=solvation, contrast=contrast,
+         pdb=pdb_record
         )
     except IntegrityError: raise DuplicateSiteError
     residue_records = [create_residue(res, zinc.atom(), site) for res in residues]

@@ -28,6 +28,7 @@ class ZincSite(models.Model):
     x = models.FloatField()
     y = models.FloatField()
     z = models.FloatField()
+    solvation = models.TextField()
     contrast = models.TextField()
     pdb = models.ForeignKey(Pdb)
 

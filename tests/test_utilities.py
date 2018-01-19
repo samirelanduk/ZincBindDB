@@ -297,34 +297,66 @@ class AtomicSolvationTests(ZincBindTest):
 
 
 
+class AverageSolvationTests(ZincBindTest):
+
+    def test_empty_sphere_returns_none(self):
+        self.assertIsNone(average_solvation(None, set()))
+
+
+    @patch("zincbind.utilities.atomic_solvation")
+    def test_average_solvation(self, mock_solv):
+        atoms = [Mock(), Mock(), Mock()]
+        mock_solv.side_effect = [5, 12, 16]
+        self.assertEqual(average_solvation(None, set(atoms)), 11)
+        mock_solv.assert_any_call(atoms[0])
+        mock_solv.assert_any_call(atoms[1])
+        mock_solv.assert_any_call(atoms[2])
+
+
+
 class HydrophobicContrastTests(ZincBindTest):
 
     def setUp(self):
-        self.atoms = [Mock(), Mock(), Mock(), Mock(), Mock(), Mock()]
-        for index, atom in enumerate(self.atoms):
-            atom.solv = index + 1
-        self.ring1 = self.atoms[:2]
-        self.ring2 = self.atoms[2:5]
-        self.ring3 = self.atoms[5:6]
-        self.rings = {
-         1: self.ring1, 2: self.ring2, 3: self.ring3
-        }
+        self.atom = Mock()
 
 
+    def test_empty_sphere_returns_none(self):
+        self.assertIsNone(hydrophobic_contrast(self.atom, set()))
+
+
+    @patch("zincbind.utilities.average_solvation")
     @patch("zincbind.utilities.atomic_solvation")
-    def test_hydrophobic_contrast_function(self, mock_solv):
-        mock_solv.side_effect = lambda a: a.solv
-        contrast = hydrophobic_contrast(self.rings)
-        for atom in self.atoms:
-            mock_solv.assert_any_call(atom)
-        self.assertEqual(contrast, [(1, 1.5), (2, 4), (3, 6)])
+    def test_hydrophobic_contrast(self, mock_solv, mock_avg):
+        atoms = [Mock(), Mock(), Mock()]
+        atoms[0].distance_to.return_value = 2
+        atoms[1].distance_to.return_value = 4
+        atoms[2].distance_to.return_value = 5
+        mock_avg.return_value = 2
+        mock_solv.side_effect = [2, 4, 6]
+        contrast = hydrophobic_contrast(self.atom, atoms)
+        atoms[0].distance_to.assert_any_call(self.atom)
+        atoms[1].distance_to.assert_any_call(self.atom)
+        atoms[2].distance_to.assert_any_call(self.atom)
+        mock_avg.assert_called_with(self.atom, atoms)
+        mock_solv.assert_any_call(atoms[0])
+        mock_solv.assert_any_call(atoms[1])
+        mock_solv.assert_any_call(atoms[2])
+        self.assertEqual(contrast, 132)
 
 
-    @patch("zincbind.utilities.atomic_solvation")
-    def test_hydrophobic_contrast_function_with_missing_values(self, mock_solv):
-        self.rings[4] = []
-        mock_solv.side_effect = lambda a: a.solv
-        contrast = hydrophobic_contrast(self.rings)
-        for atom in self.atoms:
-            mock_solv.assert_any_call(atom)
-        self.assertEqual(contrast, [(1, 1.5), (2, 4), (3, 6), (4, None)])
+
+class FunctionApplicationTests(ZincBindTest):
+
+    def test_can_get_series(self):
+        atom = Mock()
+        atom.nearby.side_effect = [["a1", "a2", "a3"], ["a1", "a2"], ["a1"]]
+        func = MagicMock()
+        func.side_effect = lambda a, x: len(x)
+        results = apply_function(func, atom, max_radius=6, step=2)
+        atom.nearby.assert_any_call(cutoff=6, exclude="H")
+        atom.nearby.assert_any_call(cutoff=4, exclude="H", atoms=["a1", "a2", "a3"])
+        atom.nearby.assert_any_call(cutoff=2, exclude="H", atoms=["a1", "a2"])
+        func.assert_any_call(atom, ["a1", "a2", "a3"])
+        func.assert_any_call(atom, ["a1", "a2"])
+        func.assert_any_call(atom, ["a1"])
+        self.assertEqual(results, [[2, 1], [4, 2], [6, 3]])
