@@ -211,6 +211,32 @@ class ZincSiteTests(ZincBindTest):
         self.assertEqual(site.number_id, "500")
 
 
+    @patch("zincbind.models.ZincSite.chain")
+    @patch("zincbind.models.ZincSite.number_id")
+    def test_ngl_zinc_id_property(self, mock_chain, mock_num):
+        site = ZincSite(
+         pk="1ZZZA500", x=1.5, y=-1.5, z=10.0,
+         solvation="[]", contrast="[]", pdb=self.pdb
+        )
+        site.chain = "P"
+        site.number_id = "23"
+        self.assertEqual(site.ngl_zinc_id, ":P and 23")
+
+
+    @patch("zincbind.models.ZincSite.residue_set")
+    def test_ngl_residues_id_property(self, mock_set):
+        residues = [Mock(), Mock(), Mock()]
+        mock_set.all.return_value = residues
+        residues[0].ngl_residue_id = "A"
+        residues[1].ngl_residue_id = "B"
+        residues[2].ngl_residue_id = "C"
+        site = ZincSite(
+         pk="1ZZZA500", x=1.5, y=-1.5, z=10.0,
+         solvation="[]", contrast="[]", pdb=self.pdb
+        )
+        self.assertEqual(site.ngl_residues_id, "A or B or C")
+
+
 
 class ResidueTests(ZincBindTest):
 
@@ -331,7 +357,7 @@ class ResidueTests(ZincBindTest):
 
 
     @patch("zincbind.models.Residue.atom_set")
-    def test_residue_ca_property(self, mock_set):
+    def test_residue_ca_property_none(self, mock_set):
         atomset = Mock()
         atomset.get = MagicMock()
         atomset.get.side_effect = ObjectDoesNotExist
@@ -359,7 +385,7 @@ class ResidueTests(ZincBindTest):
 
 
     @patch("zincbind.models.Residue.atom_set")
-    def test_residue_cb_property(self, mock_set):
+    def test_residue_cb_property_none(self, mock_set):
         atomset = Mock()
         atomset.get = MagicMock()
         atomset.get.side_effect = ObjectDoesNotExist
@@ -369,6 +395,30 @@ class ResidueTests(ZincBindTest):
         )
         residue.atom_set = atomset
         self.assertIsNone(residue.cb)
+
+
+    @patch("zincbind.models.Residue.number_id")
+    def test_ngl_residue_id_property(self, mock_num):
+        residue = Residue(
+         pk="1XYZA10", residue_id="A10", name="VAL", chain="A", number=10,
+         site=self.site
+        )
+        residue.number_id = 23
+        self.assertEqual(
+         residue.ngl_residue_id, "((sidechain or .CA) and :A and 23)"
+        )
+
+
+    @patch("zincbind.models.Residue.number_id")
+    def test_ngl_residue_id_property_when_chain_none(self, mock_num):
+        residue = Residue(
+         pk="1XYZA10", residue_id="A10", name="VAL", chain=None, number=10,
+         site=self.site
+        )
+        residue.number_id = 23
+        self.assertEqual(
+         residue.ngl_residue_id, "(:A and 23)"
+        )
 
 
 

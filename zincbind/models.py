@@ -42,6 +42,16 @@ class ZincSite(models.Model):
         return self.id[5:]
 
 
+    @property
+    def ngl_zinc_id(self):
+        return ":{} and {}".format(self.chain, self.number_id)
+
+
+    @property
+    def ngl_residues_id(self):
+        return " or ".join([res.ngl_residue_id for res in self.residue_set.all()])
+
+
 
 class Residue(models.Model):
     """Represents a residue in the PDB sense - that is it can be an amino acid
@@ -85,6 +95,15 @@ class Residue(models.Model):
         try:
             return self.atom_set.get(beta=True)
         except ObjectDoesNotExist: return None
+
+
+    @property
+    def ngl_residue_id(self):
+        return "({}:{} and {})".format(
+         "(sidechain or .CA) and " if self.chain else "",
+         self.chain if self.chain else self.residue_id[0],
+         self.number_id
+        )
 
 
 

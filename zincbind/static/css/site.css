@@ -37,8 +37,7 @@
     font-size: 120%;
 }
 
-iframe {
-  display: block;
+#ngl-site {
   width: 100%;
   height: 100%;
   border: none;

@@ -30,6 +30,9 @@
 <script src="https://unpkg.com/ngl"></script>
 <script>
   var stage = new NGL.Stage("site");
+
+
+
   function defaultStructureRepresentation(component) {
       var zincChain = "{{ site.id }}"[4];
       var zincID = "{{ site.id }}".slice(5);
@@ -37,12 +40,7 @@
           sele: ":" + zincChain + " and " + zincID,
           aspectRatio: 8
       };
-      var residueCommand = "";
-      {% for residue in site.residue_set.all %}
-          residueCommand += "((sidechain or .CA) and :" + "{{ residue.id }}"[4] + " and " + "{{ residue.residue_id }}) or ".slice(1);
-      {% endfor %}
-      console.log(residueCommand)
-      residueCommand = residueCommand.slice(0, -4)
+      var residueCommand = {{ site.ngl_residues_id }};
       residueCommand = {
           sele: residueCommand,
       }

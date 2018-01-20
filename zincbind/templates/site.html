@@ -16,7 +16,18 @@
         <div class="half-width left">
             <div id="ngl-container">
               <div class="box-header">3D view</div>
-              <iframe scrolling="no" src="/ngl/{{site.id}}/"></iframe>
+              <div id="ngl-site"></div>
+              <script src="https://unpkg.com/ngl"></script>
+              <script src="/static/js/ngl.js"></script>
+              <script>
+                var otherZincs = [];
+                var otherSites = [];
+                {% for site in pdb_sites %}
+                otherZincs.push("{{ site.ngl_zinc_id }}");
+                otherSites.push("{{ site.ngl_residues_id }}");
+                {% endfor %}
+                drawNgl("{{ site.pdb.id }}", "{{ site.ngl_zinc_id }}", "{{ site.ngl_residues_id }}", otherZincs, otherSites)
+              </script>
 
             </div>
             <div class="box-legend">
