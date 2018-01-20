@@ -3,6 +3,7 @@
 
 {% block title %}{{ site.id }}{% endblock %}
 
+
 {% block css %}
  <link rel="stylesheet" type="text/css" href="/static/css/site.css">
 {% endblock %}
@@ -23,6 +24,95 @@
                 this PDB will also be visible.
             </div>
         </div><div class="half-width right">
+          <div id="solvation-chart"></div>
+          <script src="https://code.highcharts.com/highcharts.js"></script>
+          <script>
+            Highcharts.chart("solvation-chart", {
+            chart: {
+                zoomType: "xy",
+                type: "line",
+                plotBorderWidth: 1,
+            },
+            title: {
+                text: "Hydrophobic Contrast"
+            },
+            credits: {
+                enabled: false
+            },
+            xAxis: [{
+                crosshair: true,
+                min: 0,
+                max: 10,
+                title: {
+                    useHTML: true,
+                    text: "Sphere radius (&#x212B;)"
+                }
+            }],
+            yAxis: [{ // Primary yAxis
+                gridLineWidth: 1,
+                title: {
+                    useHTML: true,
+                    text: "Average Solvation (J mol<sup>-1</sup> A<sup>-2</sup>)",
+                    style: {
+                        color: Highcharts.getOptions().colors[0]
+                    }
+                },
+                labels: {
+                    style: {
+                        color: Highcharts.getOptions().colors[0]
+                    }
+                }
+            }, { // Secondary yAxis
+                gridLineWidth: 0,
+                title: {
+                    useHTML: true,
+                    text: "Hydrophobic Contrast Score (J mol<sup>-1</sup>)",
+                    style: {
+                        color: "#85144b"
+                    },
+                },
+                labels: {
+                    style: {
+                        color: "#85144b"
+                    }
+                },
+                opposite: true
+
+            }],
+            tooltip: {
+                shared: true
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'left',
+                x: 80,
+                verticalAlign: 'top',
+                y: 55,
+                floating: true,
+            },
+            series: [{
+                name: 'solvation',
+                data: {{ site.solvation }},
+                useHTML: true,
+                tooltip: {
+                    useHTML: true,
+                    valueSuffix: ' J mol<sup>-1</sup> A<sup>-2</sup>'
+                },
+                color: Highcharts.getOptions().colors[0]
+
+            }, {
+                name: 'contrast',
+                yAxis: 1,
+                data: {{ site.contrast }},
+                tooltip: {
+                    valueSuffix: ' J mol<sup>-1</sup>'
+                },
+                color: "#85144b"
+            }]
+            });
+
+
+          </script>
           <table class="site-info">
               <tr>
                   <td>Residues</td>
