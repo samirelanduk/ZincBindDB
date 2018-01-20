@@ -9,91 +9,57 @@ from zincbind.models import Pdb, Residue, ZincSite, Atom
 class FunctionalTest(StaticLiveServerTestCase):
 
     def setUp(self):
-        # Create 8 Pdbs
-        pdb_codes = [
-         "{}AA{}".format(n, chr(c + 65)) for n in range(1, 3) for c in range(4)
-        ]
-        for index, code in enumerate(pdb_codes):
-            if index not in [1, 3, 6]:
-                Pdb.objects.create(pk=code, checked=datetime.now())
-            else:
-                day = datetime(2012, 1, 1) + timedelta(days=index)
-                Pdb.objects.create(
-                 id=code, checked=datetime.now(),
-                 title="PDB {}".format(index + 1), deposited=day,
-                 resolution=5-(index / 10), rfactor=10-(index / 5),
-                 technique="X RAY" if index == 1 else "NMR",
-                 organism="HOMO SAPIENS" if index == 3 else "MUS MUSCULUS",
-                 expression="E. COLI",
-                 classification="IMMUNOGLOBULIN" if index == 6 else "LYASE"
-                )
-        # 1AABA100
-        # 1AADA200
-        # 1AADB200
-        # 2AACE500
+        # Create 80 empty Pdbs - A001 to A80
+        for index in range(1, 81):
+            Pdb.objects.create(
+             pk="A" + str(index).zfill(3), checked=datetime.now()
+            )
+        # Create 20 filled in Pdbs - A081 to A100
+        for index in range(81, 101):
+            day = datetime(2012, 1, 1) + timedelta(days=index - 1)
+            Pdb.objects.create(
+             id="A" + str(index).zfill(3), checked=datetime.now(),
+             title="PDB {}".format(index), deposited=day,
+             resolution=5-(index / 10), rfactor=10-(index / 5),
+             technique="X RAY" if index % 2 else "NMR",
+             organism=None if index % 10 == 0 else "MUS MUSCULUS",
+             expression="E. COLI" if index % 3 == 0 else "SYNTH ORG",
+             classification="IMMUNOGLOBULIN" if index % 5 == 0 else "LYASE"
+            )
 
-        site1 = ZincSite.objects.create(
-         id=pdb_codes[1] + "A100", x=1.5, y=2.5, z=2.5,
-         pdb=Pdb.objects.get(pk=pdb_codes[1])
-        )
-        for r in range(11, 14):
-            residue = Residue.objects.create(
-             id=pdb_codes[1] + "A" + str(r), residue_id="A" + str(r),
-             name="VAL" if r % 2 else "CYS", number=r, chain="A", site=site1
+        # Create 24 ZincSites - every fifth PDB has two
+        for index, pdb in enumerate(Pdb.objects.exclude(deposited=None)):
+            site = ZincSite.objects.create(
+             id=pdb.id + "A" + str(index * 100), x=1.5, y=2.5, z=2.5,
+             pdb=pdb
             )
-            for a in range(1, 5):
-                Atom.objects.create(
-                 id=pdb_codes[1] + str(a + r * 10), x=a, y=a, z=a, charge=0, bfactor=1.5,
-                 name=str(a), element="C", atom_id=a + r * 10, residue=residue,
-                 alpha=(a == 1), beta=(a == 2), liganding=(a > 2)
+            for r in range(11, 14):
+                residue = Residue.objects.create(
+                 id=site.id + "A" + str(r), residue_id="A" + str(r),
+                 name="VAL" if r % 2 else "CYS", number=r, chain="A", site=site
                 )
-
-        site2 = ZincSite.objects.create(
-         id=pdb_codes[3] + "A200", x=1.5, y=2.5, z=2.5,
-         pdb=Pdb.objects.get(pk=pdb_codes[3])
-        )
-        for r in range(11, 14):
-            residue = Residue.objects.create(
-             id=pdb_codes[3] + "A" + str(r), residue_id="A" + str(r),
-             name="VAL" if r % 2 else "CYS", number=r, chain="A", site=site2
-            )
-            for a in range(1, 5):
-                Atom.objects.create(
-                 id=pdb_codes[3] + str(a + r * 10), x=a, y=a, z=a, charge=0, bfactor=1.5,
-                 name=str(a), element="C", atom_id=a + r * 10, residue=residue,
-                 alpha=(a == 1), beta=(a == 2), liganding=(a > 2)
+                for a in range(1, 5):
+                    Atom.objects.create(
+                     id=residue.id + str(a + r * 10), x=a, y=a, z=a, charge=0, bfactor=1.5,
+                     name=str(a), element="C", atom_id=a + r * 10, residue=residue,
+                     alpha=(a == 1), beta=(a == 2), liganding=(a > 2)
+                    )
+            if index % 5 == 0:
+                site = ZincSite.objects.create(
+                 id=pdb.id + "B" + str(index * 100), x=1.5, y=2.5, z=2.5,
+                 pdb=pdb
                 )
-        site3 = ZincSite.objects.create(
-         id=pdb_codes[3] + "B200", x=1.5, y=2.5, z=2.5,
-         pdb=Pdb.objects.get(pk=pdb_codes[3])
-        )
-        for r in range(11, 14):
-            residue = Residue.objects.create(
-             id=pdb_codes[3] + "B" + str(r), residue_id="B" + str(r),
-             name="VAL" if r % 2 else "CYS", number=r, chain="B", site=site3
-            )
-            for a in range(1, 5):
-                Atom.objects.create(
-                 id=pdb_codes[3] + str(a + r * 100), x=a, y=a, z=a, charge=0, bfactor=1.5,
-                 name=str(a), element="C", atom_id=a + r * 100, residue=residue,
-                 alpha=(a == 1), beta=(a == 2), liganding=(a > 2)
-                )
-
-        site4 = ZincSite.objects.create(
-         id=pdb_codes[6] + "E500", x=1.5, y=2.5, z=2.5,
-         pdb=Pdb.objects.get(pk=pdb_codes[6])
-        )
-        for r in range(11, 14):
-            residue = Residue.objects.create(
-             id=pdb_codes[6] + "E" + str(r), residue_id="E" + str(r),
-             name="VAL" if r % 2 else "CYS", number=r, chain="E", site=site4
-            )
-            for a in range(1, 5):
-                Atom.objects.create(
-                 id=pdb_codes[6] + str(a + r * 100), x=a, y=a, z=a, charge=0, bfactor=1.5,
-                 name=str(a), element="C", atom_id=a + r * 100, residue=residue,
-                 alpha=(a == 1), beta=(a == 2), liganding=(a > 2)
-                )
+                for r in range(11, 14):
+                    residue = Residue.objects.create(
+                     id=site.id + "B" + str(r), residue_id="B" + str(r),
+                     name="VAL" if r % 2 else "CYS", number=r, chain="B", site=site
+                    )
+                    for a in range(1, 5):
+                        Atom.objects.create(
+                         id=residue.id + str(a + r * 10), x=a, y=a, z=a, charge=0, bfactor=1.5,
+                         name=str(a), element="C", atom_id=a + r * 10, residue=residue,
+                         alpha=(a == 1), beta=(a == 2), liganding=(a > 2)
+                        )
 
 
 

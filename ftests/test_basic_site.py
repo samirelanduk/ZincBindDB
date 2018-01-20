@@ -118,8 +118,8 @@ class HomePageTests(BrowserTest):
 
         description = self.browser.find_element_by_class_name("site-description")
         self.assertIn("zincbind is", description.text.lower())
-        self.assertIn("4 zinc", description.text.lower())
-        self.assertIn("3 pdb", description.text.lower())
+        self.assertIn("24 zinc", description.text.lower())
+        self.assertIn("20 pdb", description.text.lower())
 
         search = self.browser.find_element_by_id("site-search")
         searchbox = search.find_element_by_tag_name("input")
