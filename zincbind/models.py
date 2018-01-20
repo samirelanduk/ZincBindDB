@@ -44,7 +44,7 @@ class ZincSite(models.Model):
 
     @property
     def ngl_zinc_id(self):
-        return ":{} and {}".format(self.chain, self.number_id)
+        return "{}:{}/0".format(self.number_id, self.chain)
 
 
     @property
@@ -99,10 +99,10 @@ class Residue(models.Model):
 
     @property
     def ngl_residue_id(self):
-        return "({}:{} and {})".format(
+        return "({}{}:{}/0)".format(
          "(sidechain or .CA) and " if self.chain else "",
-         self.chain if self.chain else self.residue_id[0],
-         self.number_id
+         self.number_id,
+         self.chain if self.chain else self.residue_id[0]
         )
 
 

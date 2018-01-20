@@ -3,40 +3,26 @@ function drawNgl(pdb, zinc, residues, otherZincs, otherSites) {
   var stage = new NGL.Stage("ngl-site", {backgroundColor: "white"});
   stage.loadFile("rcsb://" + pdb).then(function (component) {
     // Make the whole thing a cartoon
-    component.addRepresentation("cartoon", {color: "#4A9586"});
+    component.addRepresentation("cartoon", {sele: "/0"});
 
     // Select the zinc atom and make it a ball
-    var zincCommand = {
-        sele: zinc,
-        aspectRatio: 8
-    };
-    component.addRepresentation("ball+stick", zincCommand);
+    component.addRepresentation("ball+stick", {sele: zinc, aspectRatio: 8});
 
     // Select the residues and make them sticks
-    residueCommand = {
-        sele: residues,
-    }
-    component.addRepresentation("licorice", residueCommand);
+    component.addRepresentation("licorice", {sele: residues});
 
     // Make any other zincs present but transparent
     otherZincs.forEach(function(zinc) {
-      zincCommand = {
-        sele: zinc,
-        aspectRatio: 8,
-        opacity: 0.3
-      };
-      component.addRepresentation("ball+stick", zincCommand);
+      component.addRepresentation("ball+stick", {
+          sele: zinc, aspectRatio: 8, opacity: 0.3
+      });
     })
     otherSites.forEach(function(site) {
-      zincCommand = {
-        sele: site,
-        opacity: 0.3
-      };
-      component.addRepresentation("licorice", zincCommand);
+      component.addRepresentation("licorice", {sele: site, opacity: 0.3});
     })
 
-    //Centre the view on the sites
-    component.autoView(residueCommand.sele);
+    //Centre the view on the site
+    component.autoView(residues);
   });
 
   // Handle resizing of the window

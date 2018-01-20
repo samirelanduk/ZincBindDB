@@ -220,7 +220,7 @@ class ZincSiteTests(ZincBindTest):
         )
         site.chain = "P"
         site.number_id = "23"
-        self.assertEqual(site.ngl_zinc_id, ":P and 23")
+        self.assertEqual(site.ngl_zinc_id, "23:P/0")
 
 
     @patch("zincbind.models.ZincSite.residue_set")
@@ -405,7 +405,7 @@ class ResidueTests(ZincBindTest):
         )
         residue.number_id = 23
         self.assertEqual(
-         residue.ngl_residue_id, "((sidechain or .CA) and :A and 23)"
+         residue.ngl_residue_id, "((sidechain or .CA) and 23:A/0)"
         )
 
 
@@ -417,7 +417,7 @@ class ResidueTests(ZincBindTest):
         )
         residue.number_id = 23
         self.assertEqual(
-         residue.ngl_residue_id, "(:A and 23)"
+         residue.ngl_residue_id, "(23:A/0)"
         )
 
 
