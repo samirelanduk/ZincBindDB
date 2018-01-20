@@ -14,6 +14,29 @@
     margin-top: 20px;
 }
 
+#ngl-container {
+    height: 400px;
+    overflow: hidden;
+    margin: 10px;
+    margin-bottom: 0px;
+    border: 1px solid silver;
+    border-bottom-width: 0px;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+#ngl-container .box-header {
+    background-color: #f1ecf0;
+    border-bottom: 1px solid silver;
+    font-weight: bold;
+    padding: 2px;
+    font-size: 120%;
+}
+
 iframe {
   display: block;
   width: 100%;
@@ -22,15 +45,17 @@ iframe {
   overflow: hidden;
 }
 
-#ngl-container {
-    height: 400px;
-    overflow: hidden;
-    margin: 10px;
-    border: 1px solid silver;
-    border-radius: 10px;
-    width: 90%;
+.box-legend {
+    width: calc(90% - 10px);
     margin-left: auto;
     margin-right: auto;
+    text-align: center;
+    border: 1px solid silver;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    font-style: italic;
+    padding: 5px;
+    background-color: #f1ecf0;
 }
 
 .site-info, .site-info tr, .site-info td {
