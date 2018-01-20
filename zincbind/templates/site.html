@@ -23,7 +23,28 @@
                 Click and drag to move and/or zoom. Any other zinc sites in
                 this PDB will also be visible.
             </div>
+
+            <div class="gui-selector">
+                <label>GUI Program Selector: </label>
+                <select onchange="updateSelector(this);">
+                    <option value=""></option>
+                    <option value="sele {{ site.id }}, {% for residue in site.residue_set.all %}(chain {{ residue.chain }} and resi {{ residue.number_id }}) + {% endfor %} (chain {{ site.chain }} and resi {{ site.number_id }})">PyMol</option>
+                    <option value="{% for residue in site.residue_set.all %}(chain {{ residue.chain }} and resid {{ residue.number_id }}) or {% endfor %} (chain {{ site.chain }} and resid {{ site.number_id }})">VMD</option>
+                </select>
+                <code></code>
+            </div>
         </div><div class="half-width right">
+            <div class="site-residues">
+                <h2>Residues</h2>
+                {% for residue in site.residue_set.all %}<div class="residue">
+                  <strong>{{ residue.full_name }}</strong> ({{ residue.residue_id }})
+                  <ul>
+                    <li>CA distance: {% if residue.ca %}
+                    {{ residue.ca.zinc_distance|floatformat:"2" }} &#8491;{% else %}N/A{% endif %}</li>
+                    <li>CB distance: {% if residue.cb %}
+                    {{ residue.cb.zinc_distance|floatformat:"2" }} &#8491;{% else %}N/A{% endif %}</li>
+                  </ul><br></div>
+                {% endfor %}</div>
           <div id="solvation-chart"></div>
           <script src="https://code.highcharts.com/highcharts.js"></script>
           <script>
@@ -113,28 +134,6 @@
 
 
           </script>
-          <table class="site-info">
-              <tr>
-                  <td>Residues</td>
-                  <td>{% for residue in site.residue_set.all %}<div class="residue">
-                        <strong>{{ residue.full_name }}</strong> ({{ residue.residue_id }})
-                        <ul>
-                          <li>CA distance: {% if residue.ca %}
-                          {{ residue.ca.zinc_distance|floatformat:"2" }} &#8491;{% else %}N/A{% endif %}</li>
-                          <li>CB distance: {% if residue.cb %}
-                          {{ residue.cb.zinc_distance|floatformat:"2" }} &#8491;{% else %}N/A{% endif %}</li>
-                        </ul><br></div>
-                      {% endfor %}</td>
-              </tr>
-              <tr>
-                  <td>PyMol Selector</td>
-                  <td><code>sele {{ site.id }}, {% for residue in site.residue_set.all %}(chain {{ residue.chain }} and resi {{ residue.number_id }}) + {% endfor %} (chain {{ site.chain }} and resi {{ site.number_id }})</code></td>
-              </tr>
-              <tr>
-                  <td>VMD Selector</td>
-                  <td><code>{% for residue in site.residue_set.all %}(chain {{ residue.chain }} and resid {{ residue.number_id }}) or {% endfor %} (chain {{ site.chain }} and resid {{ site.number_id }})</code></td>
-              </tr>
-          </table>
         </div>
     </div>
 </div>

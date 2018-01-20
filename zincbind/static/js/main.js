@@ -80,3 +80,9 @@ function validateSearch() {
   };
   return true;
 }
+
+
+function updateSelector(select) {
+    var value = $(select).find(":selected").val();
+    $("code").html(value);
+}

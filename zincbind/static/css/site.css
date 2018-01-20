@@ -49,6 +49,7 @@ iframe {
     width: calc(90% - 10px);
     margin-left: auto;
     margin-right: auto;
+    margin-bottom: 20px;
     text-align: center;
     border: 1px solid silver;
     border-bottom-right-radius: 10px;
@@ -58,17 +59,35 @@ iframe {
     background-color: #f1ecf0;
 }
 
-.site-info, .site-info tr, .site-info td {
-    border: none;
+.gui-selector {
+    width: 90%;
+    margin-top: 40px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.site-info td:first-child {
+.gui-selector select {
+    margin-left: 8px;
+}
+
+.gui-selector code {
+    display: block;
+    margin-top: 10px;
+}
+
+label {
     font-weight: bold;
-    text-align: right;
 }
 
-.site-info td:last-child {
-    text-align: left;
+.site-residues {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 40px;
+}
+
+.site-residues h2 {
+    margin-left: 0px;
 }
 
 #site-pdb {
