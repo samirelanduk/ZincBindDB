@@ -249,52 +249,36 @@ class SiteViewTests(ZincBindTest):
 
 
     def test_site_view_sends_pdb_sites(self):
+        filtered = Mock()
+        self.mock_filter.side_effect = [filtered, Mock()]
+        filtered.exclude.return_value = ["1", "2", "3"]
         mock_site = Mock()
-        mock_site.pdb = Mock()
         self.mock_get.return_value = mock_site
-        pdb_sites = Mock()
-        pdb_sites.exclude = MagicMock()
-        pdb_sites.exclude.return_value = ["1", "2", "3"]
-        self.mock_filter.return_value = pdb_sites
+        mock_site.id = "ID"
         request = self.get_request("/somesite/")
         self.check_view_has_context(
          site, request, {"pdb_sites": ["1", "2", "3"]}, "siteid"
         )
         self.mock_filter.assert_any_call(pdb=mock_site.pdb)
-        mock_site = Mock()
-        mock_site.pdb = Mock()
-        self.mock_get.return_value = mock_site
-        request = self.get_request("/somesite/")
-        self.check_view_has_context(
-         site, request, {"site":mock_site}, "siteid"
-        )
-        self.mock_get.assert_called_with(pk="siteid")
+        filtered.exclude.assert_any_call(id="ID")
 
 
-    def test_site_view_sends_species_sites(self):
+    def test_site_view_sends_class_sites(self):
+        filtered = Mock()
+        self.mock_filter.side_effect = [Mock(), filtered]
+        excluded = Mock()
+        filtered.exclude.return_value = excluded
+        excluded.order_by.return_value = ["1", "2", "3"]
         mock_site = Mock()
-        mock_site.pdb = Mock()
-        mock_site.pdb.organism = Mock()
         self.mock_get.return_value = mock_site
-        species_sites = Mock()
-        species_sites.exclude = MagicMock()
-        species_sites.exclude.return_value = ["1", "2", "3"]
-        self.mock_filter.return_value = species_sites
+        mock_site.id = "ID"
         request = self.get_request("/somesite/")
         self.check_view_has_context(
-         site, request, {"species_sites": ["1", "2", "3"]}, "siteid"
+         site, request, {"class_sites": ["1", "2", "3"]}, "siteid"
         )
-        self.mock_filter.assert_any_call(
-         pdb__organism__contains=mock_site.pdb.organism
-        )
-        mock_site = Mock()
-        mock_site.pdb = Mock()
-        self.mock_get.return_value = mock_site
-        request = self.get_request("/somesite/")
-        self.check_view_has_context(
-         site, request, {"site":mock_site}, "siteid"
-        )
-        self.mock_get.assert_called_with(pk="siteid")
+        self.mock_filter.assert_any_call(pdb=mock_site.pdb)
+        filtered.exclude.assert_any_call(id="ID")
+        excluded.order_by.assert_called_with("-pdb__deposited")
 
 
     def test_404_on_unknown_site(self):

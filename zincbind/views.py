@@ -90,11 +90,13 @@ def site(request, site_id):
     try:
         site = ZincSite.objects.get(pk=site_id)
         pdb_sites = ZincSite.objects.filter(pdb=site.pdb).exclude(id=site.id)
-        species_sites = ZincSite.objects.filter(
-         pdb__organism__contains=site.pdb.organism
-        ).exclude(id=site.id)
+        class_sites = ZincSite.objects.filter(
+         pdb__classification=site.pdb.classification
+        ).exclude(id=site.id).order_by("-pdb__deposited")
+        if not site.pdb.classification:
+            class_sites = ZincSite.objects.filter(id="XXXXXXXXX")
         return render(request, "site.html", {
-         "site": site, "pdb_sites": pdb_sites, "species_sites": species_sites
+         "site": site, "pdb_sites": pdb_sites, "class_sites": class_sites
         })
     except ObjectDoesNotExist:
         raise Http404

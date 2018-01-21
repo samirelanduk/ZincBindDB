@@ -187,21 +187,21 @@
       </table>
       <table class="other-sites">
         <tr>
-          <th>Other Sites from this Organism</th>
+          <th>Other Sites from this PDB Class</th>
         </tr>
-        {% if species_sites.count == 0 %}
+        {% if class_sites.count == 0 %}
           <tr><td><em>None</em></td></tr>
         {% endif %}
-        {% if species_sites.count <= 3 %}
-          {% for site in species_sites %}
+        {% if class_sites.count <= 3 %}
+          {% for site in class_sites %}
           <tr><td><a href="/{{ site.id }}/">{{ site.id }}</a></td></tr>
           {% endfor %}
-        {% elif species_sites.count == 0 %}
+        {% elif class_sites.count == 0 %}
           <tr><td><em>None</em></td></tr>
         {% else %}
-          <tr><td><a href="/{{ species_sites.0.id }}/">{{ species_sites.0.id }}</a></td></tr>
-          <tr><td><a href="/{{ species_sites.1.id }}/">{{ species_sites.1.id }}</a></td></tr>
-          <tr><td><a href="/search?organism={{ site.pdb.organism|urlencode }}">See all {{ species_sites.count|add:"1"|intcomma }} zinc sites in this Organism</a></td></tr>
+          <tr><td><a href="/{{ class_sites.0.id }}/">{{ class_sites.0.id }}</a></td></tr>
+          <tr><td><a href="/{{ class_sites.1.id }}/">{{ class_sites.1.id }}</a></td></tr>
+          <tr><td><a href="/search?classification={{ site.pdb.classification|urlencode }}">See all {{ class_sites.count|add:"1"|intcomma }} zinc sites in this Class</a></td></tr>
         {% endif %}
       </table>
     </div>

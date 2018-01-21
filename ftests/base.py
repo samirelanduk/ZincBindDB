@@ -3,6 +3,7 @@ import sys
 from time import sleep
 from datetime import datetime, timedelta
 from selenium import webdriver
+from selenium.webdriver.support.ui import Select
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from zincbind.models import Pdb, Residue, ZincSite, Atom
 
@@ -16,15 +17,15 @@ class FunctionalTest(StaticLiveServerTestCase):
             )
         # Create 20 filled in Pdbs - A081 to A100
         for index in range(81, 101):
-            day = datetime(2012, 1, 1) + timedelta(days=index - 1)
+            day = datetime(2012, 1, 1) + timedelta(days=index - 80)
             Pdb.objects.create(
              id="A" + str(index).zfill(3), checked=datetime.now(),
-             title="PDB {}".format(index), deposited=day,
-             resolution=5-(index / 10), rfactor=10-(index / 5),
-             technique="X RAY" if index % 2 else "NMR",
+             title="PDB {}".format(index - 80), deposited=day,
+             resolution=5-((index - 81) / 10), rfactor=10-((index - 81) / 5),
+             technique="X-RAY" if index % 2 else "NMR",
              organism=None if index % 10 == 0 else "MUS MUSCULUS",
              expression="E. COLI" if index % 3 == 0 else "SYNTH ORG",
-             classification="IMMUNOGLOBULIN" if index % 5 == 0 else "LYASE"
+             classification="METAL" if (index - 1) % 9 == 0 else "LYASE"
             )
 
         # Create 24 ZincSites - every fifth PDB has two
@@ -44,7 +45,7 @@ class FunctionalTest(StaticLiveServerTestCase):
                      name=str(a), element="C", atom_id=a + r * 10, residue=residue,
                      alpha=(a == 1), beta=(a == 2), liganding=(a > 2)
                     )
-            if index % 5 == 0:
+            if (index - 1) % 5 == 0:
                 site = ZincSite.objects.create(
                  id=pdb.id + "B" + str(index * 100), x=1.5, y=2.5, z=2.5,
                  pdb=pdb
@@ -122,3 +123,13 @@ class BrowserTest(FunctionalTest):
             self.assertEqual(len(cells), len(value_row))
             for cell, value in zip(cells, value_row):
                 self.assertEqual(cell.text, value)
+
+
+    def get_select_value(self, dropdown):
+        dropdown = Select(dropdown)
+        return dropdown.first_selected_option.text
+
+
+    def select_dropdown(self, dropdown, option):
+        dropdown = Select(dropdown)
+        dropdown.select_by_visible_text(option)
