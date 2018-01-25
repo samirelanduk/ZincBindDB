@@ -269,6 +269,15 @@ class AdvancedSearchTests(BrowserTest):
         )
 
 
+    def test_can_search_by_expression(self):
+        for pdb in Pdb.objects.filter(title="PDB 12"):
+            pdb.expression = "HOMO HABILIS"
+            pdb.save()
+        self.check_advanced_search(
+         "PDB Expression", "expression", "Homo h", ["A092A1100", "A092B1100"]
+        )
+
+
     def test_can_search_by_pdb_code(self):
         self.check_advanced_search("PDB Code", "code", "092", ["A092A1100", "A092B1100"])
 
@@ -276,6 +285,14 @@ class AdvancedSearchTests(BrowserTest):
     def test_can_search_by_pdb_classification(self):
         self.check_advanced_search("PDB Classification", "classification", "metal", [
          "A100A1900", "A091A1000", "A082A100", "A082B100"
+        ])
+
+
+    def test_can_search_by_pdb_technique(self):
+        self.check_advanced_search("PDB Technique", "technique", "nmr", [
+         "A100A1900", "A098A1700", "A096A1500", "A094A1300",
+         "A092A1100","A092B1100", "A090A900", "A088A700",
+         "A086A500", "A084A300", "A082A100", "A082B100"
         ])
 
 
