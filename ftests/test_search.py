@@ -273,6 +273,12 @@ class AdvancedSearchTests(BrowserTest):
         self.check_advanced_search("PDB Code", "code", "092", ["A092A1100", "A092B1100"])
 
 
+    def test_can_search_by_pdb_classification(self):
+        self.check_advanced_search("PDB Classification", "classification", "metal", [
+         "A100A1900", "A091A1000", "A082A100", "A082B100"
+        ])
+
+
     def test_can_search_by_multiple_criteria(self):
         # User goes to the search page
         self.get("/")

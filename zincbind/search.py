@@ -11,7 +11,7 @@ def omni_search(term):
     return results
 
 
-def specific_search(title=None, organism=None, code=None, **kwargs):
+def specific_search(title=None, organism=None, code=None, classification=None, **kwargs):
     qs = []
     if title is not None:
         qs.append(Q(pdb__title__contains=title[0].upper()))
@@ -19,5 +19,7 @@ def specific_search(title=None, organism=None, code=None, **kwargs):
         qs.append(Q(pdb__organism__contains=organism[0].upper()))
     if code is not None:
         qs.append(Q(pdb__id__contains=code[0].upper()))
+    if classification is not None:
+        qs.append(Q(pdb__classification__contains=classification[0].upper()))
     results = ZincSite.objects.filter(*qs).order_by("-pdb__deposited")
     return results
