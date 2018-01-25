@@ -69,17 +69,21 @@ function validateSearch() {
   var rows = $(".search-row");
   var dataCount = 0;
   rows.each(function(index, row) {
-    if ($(row).find("input").val() == "") {
-      $(row).find("input").removeAttr("name");
-    } else {
+    if ($(row).find("input").val() != "") {
       dataCount++;
     }
   });
   if (dataCount == 0) {
-      $(".error-message").text("Please enter a search term")
+      $(".error-message").text("Please enter a search term");
       return false;
-  };
+  } else {
+    rows.each(function(index, row) {
+    if ($(row).find("input").val() == "") {
+      $(row).find("input").removeAttr("name");
+    }
+  });
   return true;
+  };
 }
 
 
