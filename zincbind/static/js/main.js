@@ -52,6 +52,7 @@ function addSearchRow(button) {
       $(row).append('<button type="button" onclick="removeRow(this)">x</button>')
     }
   });
+  updateSearchTerm($(newRow).find("select"));
 }
 
 
