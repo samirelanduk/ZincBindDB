@@ -57,11 +57,13 @@ function addSearchRow(button) {
 
 
 function removeRow(button) {
-  var rows = $(button).parent().parent().find(".search-row");
-  if (rows.length == 2) {
+  var parent = $(button).parent().parent();
+  var rows = parent.find(".search-row");
+  $(button).parent().remove();
+  rows = parent.find(".search-row");
+  if (rows.length == 1) {
     rows.first().find("button").remove();
   }
-  $(button).parent().remove();
 }
 
 

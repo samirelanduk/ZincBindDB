@@ -9,6 +9,7 @@
 {% block main %}
 
 <form method="GET" action="/search">
+  <div class="search-heading">Construct Specific Query</div>
 	<div class="error-message"></div>
     <div class="search-row">
         <select onchange="updateSearchTerm(this);">
@@ -19,7 +20,6 @@
           <option value="expression">PDB Expression</option>
           <option value="technique">PDB Technique</option>
         </select>
-        <span class="search-con"> contains </span>
         <input name="title">
     </div>
 

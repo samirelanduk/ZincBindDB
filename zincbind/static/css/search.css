@@ -46,22 +46,27 @@ td, th {
 }
 
 form {
-    margin-top: 20px;
+    margin: 20px;
+    border-radius: 15px;
+    border: 1px solid silver;
+}
+
+.search-heading {
+  background-color: #f1ecf0;
+  border-bottom: 1px solid silver;
+  font-weight: bold;
+  padding: 2px;
+  font-size: 120%;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  text-align: center;
 }
 
 select {
-    font-size: 150%;
     width: 260px;
     margin-right: 10px;
-    padding: 10px;
+    padding: 4px;
     border-radius: 5px;
-}
-
-.search-con {
-    font-size: 150%;
-    font-style: italic;
-    width: 140px;
-    text-align: center;
 }
 
 .search-row input {
@@ -80,7 +85,6 @@ select {
   background-color: #FFBABA;
   color: #D8000C;
   font-weight: bold;
-  cursor: pointer;
   margin-left: 10px;
 }
 

@@ -160,6 +160,10 @@ input[type='submit'] {
     cursor: pointer;
 }
 
+button {
+  cursor: pointer;
+}
+
 
 td, th {
    border: 1px solid silver;
