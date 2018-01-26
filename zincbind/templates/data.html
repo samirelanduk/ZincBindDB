@@ -27,7 +27,7 @@
   <div id="pdb-prop"></div>
   <div id="res-freq"></div>
   <div id="species-freq"></div>
-  <div id="res-dist"></div>
+  <div id="class-freq"></div>
 </div>
 
 <script>
@@ -124,6 +124,38 @@ Highcharts.chart('species-freq', {
     series: [{
       data: {{ species_frequencies.1|safe }},
       color: '#f39c12'
+    }],
+    legend: {
+      enabled: false
+    }
+});
+Highcharts.chart('class-freq', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Class frequency'
+    },
+    tooltip: {
+        headerFormat: '',
+        pointFormat: '<b>{point.category}</b>: {point.y}'
+    },
+    credits: false,
+    xAxis: {
+        categories: {{ class_frequencies.0|safe }},
+        crosshair: true,
+        title: {
+          text: 'Class name'
+        }
+    },
+    yAxis: {
+      title: {
+          text: 'Count'
+        }
+    },
+    series: [{
+      data: {{ class_frequencies.1|safe }},
+      color: '#85144b'
     }],
     legend: {
       enabled: false

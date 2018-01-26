@@ -33,11 +33,21 @@ def data(request):
       species_frequencies.values()) - sum([l[1] for l in common_species]
      ))
     ]
+    class_frequencies = Counter(
+     ZincSite.objects.values_list("pdb__classification", flat=True)
+    )
+    common_classes = class_frequencies.most_common(7)
+    class_frequencies = common_classes + [
+     ("Other", sum(
+      class_frequencies.values()) - sum([l[1] for l in common_classes]
+     ))
+    ]
     return render(request, "data.html", {
      "pdb_with_zinc": valid.count(),
      "pdb_without_zinc": Pdb.objects.filter(title=None).count(),
      "residue_frequencies": [list(l) for l in list(zip(*residue_frequencies))],
-     "species_frequencies": [list(l) for l in list(zip(*species_frequencies))]
+     "species_frequencies": [list(l) for l in list(zip(*species_frequencies))],
+     "class_frequencies": [list(l) for l in list(zip(*class_frequencies))]
     })
 
 

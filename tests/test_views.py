@@ -64,7 +64,7 @@ class DataViewTests(ZincBindTest):
          ["A", "B", "C", "D", "E", "F", "G", "Other"],
          [8, 7, 6, 5, 4, 3, 2, 4]
         ]})
-        mock_values.assert_called_with("name", flat=True)
+        mock_values.assert_any_call("name", flat=True)
 
 
     @patch("zincbind.views.ZincSite.objects.values_list")
@@ -75,7 +75,18 @@ class DataViewTests(ZincBindTest):
          ["A", "B", "C", "D", "E", "F", "G", "Other"],
          [8, 7, 6, 5, 4, 3, 2, 4]
         ]})
-        mock_values.assert_called_with("pdb__organism", flat=True)
+        mock_values.assert_any_call("pdb__organism", flat=True)
+
+
+    @patch("zincbind.views.ZincSite.objects.values_list")
+    def test_data_view_gets_class_frequencies(self, mock_values):
+        mock_values.return_value = list("AAAAAAAABBBBBBBCCCCCCDDDDDEEEEFFFGGHIJK")
+        request = self.get_request("/")
+        self.check_view_has_context(data, request, {"class_frequencies": [
+         ["A", "B", "C", "D", "E", "F", "G", "Other"],
+         [8, 7, 6, 5, 4, 3, 2, 4]
+        ]})
+        mock_values.assert_any_call("pdb__classification", flat=True)
 
 
 
