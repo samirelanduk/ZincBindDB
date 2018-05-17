@@ -5,10 +5,8 @@
 import sys
 import os
 sys.path.append(os.path.join("..", "zincbind"))
-import django
-sys.path.append(os.path.join("..", "zincbind"))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
-django.setup()
+import django; django.setup()
 from zinc.utilities import get_zinc_pdb_codes
 from zinc.models import *
 import atomium
