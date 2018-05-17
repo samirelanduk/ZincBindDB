@@ -39,3 +39,6 @@ class DatabaseBuildingTests(DjangoTest):
         self.assertTrue(
          Pdb.objects.get(id="1A1Q").title, "HEPATITIS C VIRUS NS3 PROTEINASE"
         )
+        self.assertEqual(Chain.objects.count(), 6)
+        chain1 = Chain.objects.get(id="1A1QA")
+        self.assertEqual(chain1.sequence[:10], "PITAYSQQTR")

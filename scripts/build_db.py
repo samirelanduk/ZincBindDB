@@ -20,8 +20,9 @@ def main():
     # Go through each PDB
     for code in tqdm(codes):
         pdb = atomium.fetch(code, pdbe=True)
-        Pdb.create_from_atomium(pdb)
-
+        pdb_record = Pdb.create_from_atomium(pdb)
+        for chain in pdb.model.chains():
+            Chain.create_from_atomium(chain, pdb_record)
 
 if __name__ == "__main__":
     main()
