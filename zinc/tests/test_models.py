@@ -5,7 +5,7 @@ from testarsenal import DjangoTest
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.utils import IntegrityError
-from zinc.models import Pdb
+from zinc.models import Pdb, Chain
 
 class PdbTests(DjangoTest):
 
@@ -69,3 +69,38 @@ class PdbTests(DjangoTest):
         atomium_pdb.code = "2AAA"
         mock_is.return_value = False
         self.assertEqual(Pdb.create_from_atomium(atomium_pdb).skeleton, False)
+
+
+
+class ChainTests(DjangoTest):
+
+    def setUp(self):
+        self.pdb = mixer.blend(Pdb)
+        self.kwargs = {
+         "id": "1XXYB", "sequence": "MLLYTCDDWATTY", "pdb": self.pdb
+        }
+
+
+    def test_can_create_chain(self):
+        chain = Chain(**self.kwargs)
+        chain.full_clean(), chain.save()
+
+
+    def test_db_fields_required(self):
+        for field in self.kwargs:
+            kwargs = self.kwargs.copy()
+            del kwargs[field]
+            with self.assertRaises(ValidationError):
+                Chain(**kwargs).full_clean()
+
+
+    def test_can_create_from_atomium_chain(self):
+        atomium_chain = Mock(id="B")
+        residues = [Mock(), Mock(), Mock()]
+        for r, n, in zip(residues, ["TYR", "MET", "VAL"]): r.name = n
+        atomium_chain.residues.return_value = residues
+        pdb = mixer.blend(Pdb, id="1AAA")
+        chain = Chain.create_from_atomium(atomium_chain, pdb)
+        self.assertEqual(chain.id, "1AAAB")
+        self.assertEqual(chain.sequence, "TMV")
+        self.assertEqual(chain.pdb, pdb)
