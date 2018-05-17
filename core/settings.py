@@ -1,5 +1,9 @@
 import os
-from .secrets import SECRET_KEY, BASE_DIR, DATABASES
+import binascii
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+SECRET_KEY = binascii.hexlify(os.urandom(24)).decode()
 
 VERSION = "0.4.0"
 
@@ -30,3 +34,8 @@ TEMPLATES = [{
  "BACKEND": "django.template.backends.django.DjangoTemplates",
  "APP_DIRS": True,
 }]
+
+DATABASES = {"default": {
+ "ENGINE": "django.db.backends.sqlite3",
+ "NAME": os.path.join(BASE_DIR, "data", "zinc.sqlite3")
+}}
