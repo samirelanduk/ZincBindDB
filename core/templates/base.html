@@ -6,15 +6,31 @@
     <meta name="description" content="ZincBind - the database of zinc binding sites">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{% endblock %} - ZincBind</title>
+    <link href='https://fonts.googleapis.com/css?family=Exo+2|Raleway' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="/static/css/base.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/core.css">
     {% block css %}{% endblock %}
     <script src="https://code.jquery.com/jquery.min.js"></script>
+    <script src="/static/js/main.js"></script>
     {% block scripts %}{% endblock %}
     {% block head %}{% endblock %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!--analytics-->
 </head>
 
+
 <body>
-{% block body %}{% endblock %}
+    <nav>
+        <div id="logo">ZincBind</div>
+        <div id="mobile-menu">
+            <div id="mobile-menu-icon"><div></div><div></div><div></div></div>
+        </div>
+        <div id="nav-links">
+            <a href="#">Link 1</a>
+            <a href="#">Link 2</a>
+            <a href="#">Link 3</a>
+        </div>
+    </nav>
 </body>
 
 </html>
