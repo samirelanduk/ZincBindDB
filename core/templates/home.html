@@ -1,3 +1,18 @@
 {% extends "base.html" %}
 
 {% block title %}Home{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="/static/css/home.css">
+{% endblock %}
+
+{% block main %}
+<div id="home-1" class="home-row">
+    <div id="site-description">
+        <h1>The database of zinc binding sites</h1>
+        <p>ZincBind is a database of zinc binding sites, automatically generated
+        from the Protein Data Bank.</p>
+    </div>
+    <div></div>
+</div>
+{% endblock %}

@@ -13,3 +13,7 @@ class HomePageTests(FunctionalTest):
         nav_links = nav.find_element_by_id("nav-links")
         nav_links = nav_links.find_elements_by_tag_name("a")
         self.assertGreaterEqual(len(nav_links), 3)
+
+        # There is a site description
+        description = self.browser.find_element_by_id("site-description")
+        self.assertIn("database of zinc binding sites", description.text.lower())

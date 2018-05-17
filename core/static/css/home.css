@@ -1,0 +1,50 @@
+main {
+    font-size: 120%;
+}
+
+h1 {
+    margin: 0px;
+}
+
+.home-row {
+    display: grid;
+    grid-template-columns: auto 400px;
+}
+
+#home-1 {
+    background-color: #f1ecf0;
+}
+
+#site-description {
+    padding: 50px;
+    text-align: center;
+}
+
+#site-description h1 {
+    font-size: 270%;
+    line-height: 1.5;
+}
+
+#site-description p {
+    line-height: 2;
+}
+
+
+@media only screen and (max-width: 769px) {
+
+    main {
+        font-size: 110%;
+    }
+
+    .home-row {
+        grid-template-columns: auto;
+    }
+}
+
+@media only screen and (max-width: 568px) {
+
+    main {
+        font-size: 100%;
+    }
+
+}
