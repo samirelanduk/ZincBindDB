@@ -14,7 +14,7 @@ def get_zinc_pdb_codes():
 
     query = "<orgPdbQuery>"\
     "<queryType>org.pdb.query.simple.ChemCompFormulaQuery</queryType>"\
-    "<formula>ZN</formula></orgPdbuery>"
+    "<formula>ZN</formula></orgPdbQuery>"
     url = "https://www.rcsb.org//pdb/rest/search/"
     response = requests.post(url, data=query.encode(), headers={
      "Content-Type": "application/x-www-form-urlencoded"
