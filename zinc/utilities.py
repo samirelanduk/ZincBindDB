@@ -24,3 +24,14 @@ def get_zinc_pdb_codes():
         if len(codes) > 10000:
             return response.text.split()
     raise RcsbError("RCSB didn't send back PDB codes")
+
+
+def model_is_skeleton(model):
+    """Returns ``True`` if the model given only contains backbone atoms."""
+
+    for chain in model.chains():
+        atom_names = set([atom.name for atom in chain.atoms()])
+        for name in atom_names:
+            if name not in ["C", "N", "CA", "O"]:
+                return False
+    return True

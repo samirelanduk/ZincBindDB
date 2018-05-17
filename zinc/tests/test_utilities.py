@@ -24,3 +24,25 @@ class ZincPdbTests(DjangoTest):
         response.status_code, response.text = 200, "1 2 3"
         with self.assertRaises(RcsbError):
             pdbs = get_zinc_pdb_codes()
+
+
+
+class SkeletonPdbTests(DjangoTest):
+
+    def setUp(self):
+        self.model = Mock()
+        self.atoms = [Mock() for _ in range(5)]
+        for a, n in zip(self.atoms, ["N", "CA", "C", "O", "CB"]): a.name = n
+        chaina, chainb = Mock(), Mock()
+        chaina.atoms.return_value = set(self.atoms[:3])
+        chainb.atoms.return_value = set(self.atoms[3:])
+        self.model.chains.return_value = set([chaina, chainb])
+
+
+    def test_can_pass_model(self):
+        self.assertFalse(model_is_skeleton(self.model))
+
+
+    def test_can_fail_model(self):
+        self.atoms[4].name = "CA"
+        self.assertTrue(model_is_skeleton(self.model))

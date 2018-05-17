@@ -1,5 +1,7 @@
 django==2.0.2
 requests==2.18.4
+atomium==0.9
+tqdm==4.23.3
 selenium==3.9.0
 mixer==6.0.1
 psycopg2==2.7.3.2
