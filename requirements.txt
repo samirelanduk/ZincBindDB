@@ -1,6 +1,6 @@
 django==2.0.2
 selenium==3.9.0
-testarsenal==0.2
+testarsenal==0.3
 mixer==6.0.1
 freezegun==0.3.10
 psycopg2==2.7.3.2
