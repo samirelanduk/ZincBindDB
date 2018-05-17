@@ -3,7 +3,8 @@ main {
 }
 
 h1 {
-    margin: 0px;
+    background-color: inherit;
+    padding: none;
 }
 
 .home-row {

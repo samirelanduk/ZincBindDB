@@ -4,4 +4,15 @@
 
 {% block main %}
 <h1>{{ pdb.id }}</h1>
+
+<div id="pdb-information" class="page-section">
+    <h2>{{ pdb.title }}</h2>
+    <div class="info-row"><div class="field">Deposited:</div><div class="field-value">{{ pdb.deposited }}</div></div>
+    <div class="info-row"><div class="field">Classification:</div><div class="field-value">{{ pdb.classification }}</div></div>
+    <div class="info-row"><div class="field">Technique:</div><div class="field-value">{{ pdb.technique }}</div></div>
+    <div class="info-row"><div class="field">Source Organism:</div><div class="field-value">{{ pdb.organism }}</div></div>
+    <div class="info-row"><div class="field">Expression System:</div><div class="field-value">{{ pdb.expression }}</div></div>
+    <div class="info-row"><div class="field">Resolution:</div><div class="field-value">{{ pdb.resolution }}</div></div>
+    <div class="info-row"><div class="field">R-factor:</div><div class="field-value">{{ pdb.rfactor }}</div></div>
+</div>
 {% endblock %}
