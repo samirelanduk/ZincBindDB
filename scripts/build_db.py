@@ -23,6 +23,8 @@ def main():
         pdb_record = Pdb.create_from_atomium(pdb)
         for chain in pdb.model.chains():
             Chain.create_from_atomium(chain, pdb_record)
+        for zinc in pdb.model.atoms(element="ZN"):
+            Zinc.create_from_atomium(zinc, pdb_record)
 
 if __name__ == "__main__":
     main()
