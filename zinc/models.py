@@ -23,7 +23,7 @@ class Pdb(models.Model):
     @staticmethod
     def create_from_atomium(pdb):
         """Creates a Pdb record from an atomium Pdb object."""
-        
+
         from .utilities import model_is_skeleton
         return Pdb.objects.create(
          id=pdb.code, rfactor=pdb.rfactor, classification=pdb.classification,
@@ -52,5 +52,5 @@ class Chain(models.Model):
 
         return Chain.objects.create(
          id=f"{pdb.id}{chain.id}", pdb=pdb,
-         sequence = "".join([res.name[0] for res in chain.residues()])
+         sequence = "".join([res.code for res in chain.residues()])
         )

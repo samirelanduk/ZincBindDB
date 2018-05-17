@@ -96,8 +96,7 @@ class ChainTests(DjangoTest):
 
     def test_can_create_from_atomium_chain(self):
         atomium_chain = Mock(id="B")
-        residues = [Mock(), Mock(), Mock()]
-        for r, n, in zip(residues, ["TYR", "MET", "VAL"]): r.name = n
+        residues = [Mock(code="T"), Mock(code="M"), Mock(code="V")]
         atomium_chain.residues.return_value = residues
         pdb = mixer.blend(Pdb, id="1AAA")
         chain = Chain.create_from_atomium(atomium_chain, pdb)
