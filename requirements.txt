@@ -1,4 +1,5 @@
 django==2.0.2
+requests==2.18.4
 selenium==3.9.0
 testarsenal==0.3
 mixer==6.0.1

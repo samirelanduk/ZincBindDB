@@ -1,6 +1,4 @@
-from datetime import date, datetime
 from unittest.mock import patch, Mock, MagicMock
-from django.http import HttpResponse, QueryDict
 from testarsenal import DjangoTest
 from core.views import *
 
