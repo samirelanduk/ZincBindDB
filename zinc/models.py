@@ -54,3 +54,27 @@ class Chain(models.Model):
          id=f"{pdb.id}{chain.id}", pdb=pdb,
          sequence = "".join([res.code for res in chain.residues()])
         )
+
+
+
+class Zinc(models.Model):
+    """A zinc atom in a PDB."""
+
+    class Meta:
+        db_table = "zincs"
+
+    id = models.CharField(primary_key=True, max_length=128)
+    x = models.FloatField()
+    y = models.FloatField()
+    z = models.FloatField()
+    pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
+
+
+    @staticmethod
+    def create_from_atomium(zinc, pdb):
+        """Creates a zinc record from an atomium Zinc atom and an existing
+        Pdb record."""
+
+        return Zinc.objects.create(
+         id=f"{pdb.id}{zinc.id}", x=zinc.x, y=zinc.y, z=zinc.z, pdb=pdb,
+        )

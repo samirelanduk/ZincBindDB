@@ -5,7 +5,7 @@ from testarsenal import DjangoTest
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.utils import IntegrityError
-from zinc.models import Pdb, Chain
+from zinc.models import Pdb, Chain, Zinc
 
 class PdbTests(DjangoTest):
 
@@ -103,3 +103,37 @@ class ChainTests(DjangoTest):
         self.assertEqual(chain.id, "1AAAB")
         self.assertEqual(chain.sequence, "TMV")
         self.assertEqual(chain.pdb, pdb)
+
+
+
+class ZincTests(DjangoTest):
+
+    def setUp(self):
+        self.pdb = mixer.blend(Pdb)
+        self.kwargs = {
+         "id": "1XXY4576", "x": 1.4, "y": -0.4, "z": 0.0, "pdb": self.pdb
+        }
+
+
+    def test_can_create_zinc(self):
+        zinc = Zinc(**self.kwargs)
+        zinc.full_clean(), zinc.save()
+
+
+    def test_db_fields_required(self):
+        for field in self.kwargs:
+            kwargs = self.kwargs.copy()
+            del kwargs[field]
+            with self.assertRaises(ValidationError):
+                Zinc(**kwargs).full_clean()
+
+
+    def test_can_create_from_atomium_atom(self):
+        atomium_zinc = Mock(id=108, x=1.1, y=0, z=-3.3)
+        pdb = mixer.blend(Pdb, id="1AAA")
+        zinc = Zinc.create_from_atomium(atomium_zinc, pdb)
+        self.assertEqual(zinc.id, "1AAA108")
+        self.assertEqual(zinc.x, 1.1)
+        self.assertEqual(zinc.y, 0)
+        self.assertEqual(zinc.z, -3.3)
+        self.assertEqual(zinc.pdb, pdb)
