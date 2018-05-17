@@ -2,3 +2,9 @@ a {
     color: #0074D9;
     text-decoration: none;
 }
+
+h1 {
+    margin: 0px;
+    background-color: #5c687744;
+    padding-left: 25px;
+}
