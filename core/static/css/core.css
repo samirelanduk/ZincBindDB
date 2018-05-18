@@ -14,12 +14,13 @@ h1 {
 
 h2 {
     text-align: center;
+    padding: 20px;
+    border-bottom: 1px solid silver;
     margin-bottom: 20px;
 }
 
 .page-section {
     background-color: #ffffff;
-    padding: 15px;
     margin: 10px;
 }
 
@@ -37,8 +38,10 @@ h2 {
 .field {
     text-align: right;
     font-weight: bold;
+    padding-left: 10px;
 }
 
 .field-value {
     padding-left: 10px;
+    padding-right: 10px;
 }
