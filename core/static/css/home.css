@@ -54,7 +54,9 @@ h1 {
 #site-search form input {
     margin: 0px;
     -webkit-appearance: none;
-    border: 1px solid silver;
+    border: 1px solid #e6ecf0;
+    font-size: 70%;
+    padding: 20px;
 }
 
 #site-search form input[type=text] {
@@ -62,6 +64,7 @@ h1 {
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
     color: #444;
+    border-right-width: 0px;
 }
 
 #site-search form input[type=submit] {
@@ -69,11 +72,11 @@ h1 {
     border-bottom-right-radius: 10px;
     background-color: #4A9586;
     color: #ffffff;
-    border-width: 0px;
+    border-color: darkgreen;
     font-size: 80%;
     padding: 0px;
     padding-left: 8px;
-    padding-right: 8px
+    padding-right: 8px;
 }
 
 @media only screen and (max-width: 1024px) {
