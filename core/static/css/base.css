@@ -50,6 +50,10 @@ nav #nav-links {
     color: inherit;
 }
 
+main {
+    padding: 10px;
+}
+
 @media only screen and (max-width: 568px) {
 
     nav #mobile-menu {
