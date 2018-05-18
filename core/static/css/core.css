@@ -15,7 +15,7 @@ h1 {
 h2 {
     text-align: center;
     padding: 20px;
-    border-bottom: 1px solid silver;
+    border-bottom: 1px solid #e6ecf0;
     margin-bottom: 20px;
 }
 
@@ -24,15 +24,22 @@ h2 {
     margin: 10px;
 }
 
+.info-rows {
+    display: table;
+    width: 100%;
+}
+
 .info-row {
     margin-top: 20px;
     margin-bottom: 20px;
     display: table-row;
     line-height: 2.2;
+    width: 100%;
 }
 
 .field, .field-value {
     display: table-cell;
+    width: 50%;
 }
 
 .field {

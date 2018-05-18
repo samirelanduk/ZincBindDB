@@ -7,33 +7,35 @@
 
 <div id="pdb-information" class="page-section">
     <h2>{{ pdb.title }}</h2>
-    <div class="info-row">
-         <div class="field">Deposited:</div>
-         <div class="field-value">{{ pdb.deposited }}</div>
-    </div>
-    <div class="info-row">
-        <div class="field">Classification:</div>
-        <div class="field-value">{{ pdb.classification }}</div>
-    </div>
-    <div class="info-row">
-        <div class="field">Technique:</div>
-        <div class="field-value">{{ pdb.technique }}</div>
-    </div>
-    <div class="info-row">
-        <div class="field">Source Organism:</div>
-        <div class="field-value"><em><script>document.write(formatSpecies("{{ pdb.organism }}"));</script></em></div>
-    </div>
-    <div class="info-row">
-        <div class="field">Expression System:</div>
-        <div class="field-value"><em><script>document.write(formatSpecies("{{ pdb.expression }}"));</script></em></div>
-    </div>
-    <div class="info-row">
-        <div class="field">Resolution:</div>
-        <div class="field-value">{{ pdb.resolution }}</div>
-    </div>
-    <div class="info-row">
-        <div class="field">R-factor:</div>
-        <div class="field-value">{{ pdb.rfactor }}</div>
+    <div class="info-rows">
+        <div class="info-row">
+             <div class="field">Deposited:</div>
+             <div class="field-value">{{ pdb.deposited }}</div>
+        </div>
+        <div class="info-row">
+            <div class="field">Classification:</div>
+            <div class="field-value">{{ pdb.classification }}</div>
+        </div>
+        <div class="info-row">
+            <div class="field">Technique:</div>
+            <div class="field-value">{{ pdb.technique }}</div>
+        </div>
+        <div class="info-row">
+            <div class="field">Source Organism:</div>
+            <div class="field-value"><em><script>document.write(formatSpecies("{{ pdb.organism }}"));</script></em></div>
+        </div>
+        <div class="info-row">
+            <div class="field">Expression System:</div>
+            <div class="field-value"><em><script>document.write(formatSpecies("{{ pdb.expression }}"));</script></em></div>
+        </div>
+        <div class="info-row">
+            <div class="field">Resolution:</div>
+            <div class="field-value">{{ pdb.resolution }}</div>
+        </div>
+        <div class="info-row">
+            <div class="field">R-factor:</div>
+            <div class="field-value">{{ pdb.rfactor }}</div>
+        </div>
     </div>
 </div>
 {% endblock %}
