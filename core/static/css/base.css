@@ -52,6 +52,7 @@ nav #nav-links {
 
 main {
     padding: 10px;
+    font-size: 80%;
 }
 
 @media only screen and (max-width: 568px) {

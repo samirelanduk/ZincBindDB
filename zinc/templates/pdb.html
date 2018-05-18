@@ -10,7 +10,7 @@
         <div class="info-rows">
             <div class="info-row">
                  <div class="field">PDB Code:</div>
-                 <div class="field-value">{{ pdb.id }}</div>
+                 <div class="field-value"><a href="https://www.rcsb.org/structure/{{ pdb.id }}" target="_blank">{{ pdb.id }}</a></div>
             </div>
             <div class="info-row">
                  <div class="field">Deposited:</div>
@@ -47,6 +47,15 @@
         <h2>3D Display</h2>
         <div id="ngl-display"></div>
     </div>
+</div>
+
+<div id="pdb-zincs">
+    <div class="count">{{ pdb.zinc_set.count }} zinc{% if pdb.zinc_set.count != 1%}s{% endif %}</div>
+    {% for site in pdb.zinc_set.all %}
+    <div class="pdb-zinc">
+        {{ site.id }}
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}
 

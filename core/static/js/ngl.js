@@ -4,6 +4,8 @@ function drawNgl(code) {
     stage.loadFile("rcsb://" + code).then(function (component) {
         // Make the whole thing a cartoon
         component.addRepresentation("cartoon", {sele: "/0"});
+
+        component.addRepresentation("ball+stick", {sele: "ZN", aspectRatio: 10});
     });
 
     // Handle resizing of the window
