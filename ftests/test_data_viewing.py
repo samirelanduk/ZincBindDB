@@ -21,8 +21,3 @@ class PdbPageTests(FunctionalTest):
 
         # There is an NGL 3D display of the PDB
         pdb_display = self.browser.find_element_by_id("ngl-display")
-
-        # There are summaries of the sites contained within
-        sites = self.browser.find_element_by_id("pdb-zincs")
-        sites = sites.find_elements_by_class_name("pdb-zinc")
-        self.assertEqual(len(sites), 2)

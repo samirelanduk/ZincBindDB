@@ -2,10 +2,11 @@ body {
     margin: 0px;
     font-family: Muli;
     background-color: #e6ecf0;
+    color: #404040;
 }
 
 nav {
-    background-color: #5c6877;
+    background-color: #472b52;
     color: #ffffff;
     display: flex;
     position: relative;

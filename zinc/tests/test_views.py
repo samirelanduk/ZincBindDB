@@ -11,6 +11,10 @@ class PdbViewTests(DjangoTest):
         self.mock_get.return_value = self.pdb
 
 
+    def tearDown(self):
+        self.patch1.stop()
+
+
     def test_pdb_view_uses_pdb_template(self):
         request = self.make_request("---")
         self.check_view_uses_template(pdb, request, "pdb.html", "AXXX")

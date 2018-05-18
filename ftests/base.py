@@ -20,9 +20,8 @@ class FunctionalTest(StaticLiveServerTestCase, BrowserTest):
          expression="ESCHERICHIA COLI BL21(DE3)", rfactor=4.5,
          classification="REDUCTASE", technique="X-RAY",
         )
-        Zinc.objects.create(id="A001456", x=1.4, y=-0.9, z=120, pdb=pdb)
-        Zinc.objects.create(id="A001458", x=10.4, y=-1.9, z=1.2, pdb=pdb)
 
 
     def tearDown(self):
+        Pdb.objects.all().delete()
         self.browser.close()
