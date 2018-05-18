@@ -24,6 +24,7 @@ def main():
         with transaction.atomic():
             # Create the PDB record
             pdb = atomium.fetch(code, pdbe=True)
+            if not pdb: continue
             pdb_record = Pdb.create_from_atomium(pdb)
 
             # Get zincs and cluster

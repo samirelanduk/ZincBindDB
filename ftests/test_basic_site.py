@@ -19,6 +19,12 @@ class HomePageTests(FunctionalTest):
         description = self.browser.find_element_by_id("site-description")
         self.assertIn("database of zinc binding sites", description.text.lower())
 
+        # There is a search bar
+        search = self.browser.find_element_by_id("site-search")
+        search_form = search.find_element_by_tag_name("form")
+        inputs = search_form.find_elements_by_tag_name("input")
+        self.assertEqual(len(inputs), 2)
+
         # The logo leads back to the home page
         logo = nav.find_element_by_id("logo")
         self.click(logo)
