@@ -66,7 +66,13 @@ class PdbTests(DjangoTest):
     def test_can_search_pdbs_by_id(self):
         pdbs = [mixer.blend(Pdb, id=code) for code in ["1A23", "2B46", "3C72"]]
         self.assertEqual(list(Pdb.search("2B46")), [pdbs[1]])
-        self.assertEqual(list(Pdb.search("1A23")), [pdbs[0]])
+        self.assertEqual(list(Pdb.search("1a23")), [pdbs[0]])
+
+
+    def test_can_search_pdbs_by_title(self):
+        pdbs = [mixer.blend(Pdb, title=d) for d in ["ABCD", "EFGH", "CDEF"]]
+        self.assertEqual(list(Pdb.search("CD")), [pdbs[0], pdbs[2]])
+        self.assertEqual(list(Pdb.search("fg")), [pdbs[1]])
 
 
 

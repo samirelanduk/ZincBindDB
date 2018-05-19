@@ -9,7 +9,7 @@ class PdbPageTests(FunctionalTest):
 
         # There is information about the PDB
         pdb_information = self.browser.find_element_by_id("pdb-information")
-        self.assertIn("A SUPERB PDB", pdb_information.text)
+        self.assertIn("A SUPERB PDB FILE", pdb_information.text)
         self.assertIn("Deposited: 28 September, 1990", pdb_information.text)
         self.assertIn("Classification: REDUCTASE", pdb_information.text)
         self.assertIn("Technique: X-RAY", pdb_information.text)

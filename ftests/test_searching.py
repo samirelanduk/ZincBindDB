@@ -51,7 +51,27 @@ class QuickSearchTests(FunctionalTest):
         self.assertIn("PDB: A001", results[0].text)
         self.assertIn("28 September, 1990", results[0].text)
         self.assertIn("Felis catus", results[0].text)
-        self.assertIn("SUPERB PDB", results[0].text)
+        self.assertIn("SUPERB PDB FILE", results[0].text)
         self.assertIn("2.1 Å", results[0].text)
         self.assertIn("X-RAY", results[0].text)
         self.assertIn("REDUCTASE", results[0].text)
+
+
+    def test_can_search_pdb_titles(self):
+        # User searches for PDB code
+        self.get("/")
+        self.quick_search("PDB file")
+
+        # They are on the search page
+        self.check_page("/search?q=PDB+file")
+        self.check_title("Search Results: PDB file")
+
+        # The search information is there.
+        info = self.browser.find_element_by_class_name("search-info")
+        self.assertIn("2 results", info.text)
+
+        # There are two results
+        results = self.browser.find_elements_by_class_name("pdb-result")
+        self.assertEqual(len(results), 2)
+        self.assertIn("PDB: A001", results[0].text)
+        self.assertIn("PDB: A002", results[1].text)

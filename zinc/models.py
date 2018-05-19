@@ -35,7 +35,9 @@ class Pdb(models.Model):
 
     @staticmethod
     def search(term):
-        return Pdb.objects.filter(models.Q(id=term.upper()))
+        return Pdb.objects.filter(
+         models.Q(id=term.upper()) | models.Q(title__contains=term.upper())
+        )
 
 
 
