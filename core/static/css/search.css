@@ -70,3 +70,17 @@ main {
     padding: 5px;
     font-size: 95%;
 }
+
+#search-nav {
+    background-color: white;
+    padding: 10px;
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+.next-page, .previous-page {
+    display: block;
+    text-align: center;
+    width: 50%;
+}

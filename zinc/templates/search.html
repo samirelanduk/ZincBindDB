@@ -7,12 +7,13 @@
 {% endblock %}
 
 {% block main %}
-{% if results %}
+{% if results.count %}
     <div class="search-info shadow">
-        {{ results.count }} result{% if results.count != 1 %}s{% endif %}
+        <div>{{ results.count }} result{% if results.count != 1 %}s{% endif %}</div>
+        {% if results.num_pages > 1 %}<div>Page {{ page.number }} of {{ results.num_pages }}</div>{% endif %}
     </div>
 
-    {% for pdb in results %}
+    {% for pdb in page %}
     <div class="search-result shadow">
         <div class="pdb-result"><a href="/pdbs/{{ pdb.id }}/">
             <div class="pdb-result-main">
@@ -25,13 +26,21 @@
         </a></div>
     </a></div>
     {% endfor %}
+
+    {% if results.num_pages > 1 %}
+        <div id="search-nav" class="shadow">
+            {% if page.has_previous %}<a class="previous-page" href="/search?q={{ request.GET.q }}&page={{ page.previous_page_number}}">Previous Page</a>{% endif %}
+            {% if page.has_next %}<a class="next-page" href="/search?q={{ request.GET.q }}&page={{ page.next_page_number}}">Next Page</a>{% endif %}
+        </div>
+    {% endif %}
 {% else %}
-<div class="search-info no-results shadow">
-    <div>There were no results matching your query.</div>
-    <div class="search-help">
-        Search is case-insensitive, and searches PDB codes (for exact matches)
-        and PDB descriptions (for partial matches).
+
+    <div class="search-info no-results shadow">
+        <div>There were no results matching your query.</div>
+        <div class="search-help">
+            Search is case-insensitive, and searches PDB codes (for exact matches)
+            and PDB descriptions (for partial matches).
+        </div>
     </div>
-</div>
 {% endif %}
 {% endblock %}
