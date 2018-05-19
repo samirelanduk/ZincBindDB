@@ -37,8 +37,9 @@ TEMPLATES = [{
  "OPTIONS": {
   "context_processors": [
    "django.template.context_processors.request"
-  ]
- }
+  ],
+  "builtins": ["zinc.templatetags"],
+ },
 }]
 
 DATABASES = {"default": {

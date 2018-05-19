@@ -23,8 +23,8 @@ class FunctionalTest(StaticLiveServerTestCase, BrowserTest):
         pdb = Pdb.objects.create(
          id="A002", title="A FINE PDB FILE", deposited=date(1992, 9, 28),
          resolution=0.0, organism="HOMO SAPIENS", skeleton=False,
-         expression="ESCHERICHIA COLI", rfactor=4.8,
-         classification="TRANSFERASE", technique="X-RAY",
+         expression="ESCHERICHIA COLI", rfactor=0,
+         classification="TRANSFERASE", technique="NMR",
         )
         pdb = Pdb.objects.create(
          id="B123", title="A MESS OF ATOMS", deposited=date(2002, 7, 28),

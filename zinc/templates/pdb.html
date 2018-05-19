@@ -16,8 +16,8 @@
             <div class="pdb-info-row"><strong>Classification: </strong> {{ pdb.classification }}</div>
         </div>
         <div class="pdb-info-column">
-            <div class="pdb-info-row"><strong>Resolution: </strong> {{ pdb.resolution }} Å</div>
-            <div class="pdb-info-row"><strong>R-factor: </strong> {{ pdb.rfactor }} Å</div>
+            <div class="pdb-info-row"><strong>Resolution: </strong> {{ pdb.resolution|angstroms }}</div>
+            <div class="pdb-info-row"><strong>R-factor: </strong> {{ pdb.rfactor|angstroms }}</div>
         </div>
     </div>
     <div class="pdb-info-row"><strong>Deposition Date: </strong> {{ pdb.deposited }}</div>
