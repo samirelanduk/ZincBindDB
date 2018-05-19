@@ -73,5 +73,7 @@ class QuickSearchTests(FunctionalTest):
         # There are two results
         results = self.browser.find_elements_by_class_name("pdb-result")
         self.assertEqual(len(results), 2)
-        self.assertIn("PDB: A001", results[0].text)
-        self.assertIn("PDB: A002", results[1].text)
+        self.assertIn("PDB: A002", results[0].text)
+        self.assertIn("28 September, 1992", results[0].text)
+        self.assertIn("PDB: A001", results[1].text)
+        self.assertIn("28 September, 1990", results[1].text)

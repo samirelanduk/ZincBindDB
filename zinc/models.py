@@ -37,7 +37,7 @@ class Pdb(models.Model):
     def search(term):
         return Pdb.objects.filter(
          models.Q(id=term.upper()) | models.Q(title__contains=term.upper())
-        )
+        ).order_by("-deposited")
 
 
 
