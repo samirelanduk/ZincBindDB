@@ -13,10 +13,17 @@ from zinc.models import Pdb, Chain, ZincSite, Metal, Residue
 import atomium
 from tqdm import tqdm
 
-def main():
+
+
+def main(reset=False):
     # Get all PDBs which contain zinc
     codes = get_zinc_pdb_codes()
     print(f"There are {len(codes)} PDBs with zinc")
+    if not reset:
+        checked = [p.id for p in Pdb.objects.all()]
+        print(f"{len(checked)} have already beed checked")
+        codes = [code for code in codes if code not in checked]
+
 
     # Go through each PDB
     for code in tqdm(codes):
@@ -59,4 +66,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(reset="reset" in sys.argv)
