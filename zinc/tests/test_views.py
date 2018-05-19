@@ -1,5 +1,6 @@
 from unittest.mock import patch, Mock, MagicMock
 from testarsenal import DjangoTest
+from django.http import Http404
 from zinc.views import *
 
 class SearchViewTests(DjangoTest):
@@ -37,6 +38,13 @@ class SearchViewTests(DjangoTest):
          search, request, {"results": self.pag, "page": self.pag.page()}
         )
         self.pag.page.assert_called_with("3")
+
+
+    def test_can_raise_404_on_invalid_page_number(self):
+        request = self.make_request("---", data={"q": "X", "page": 100})
+        self.pag.page.side_effect = Exception
+        with self.assertRaises(Http404):
+            search(request)
 
 
 

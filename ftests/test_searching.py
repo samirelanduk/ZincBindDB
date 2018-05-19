@@ -168,3 +168,15 @@ class QuickSearchTests(FunctionalTest):
         self.assertIn("Page 1 of 5", info.text)
         results = self.browser.find_elements_by_class_name("pdb-result")
         self.assertEqual(len(results), 25)
+
+
+    def test_can_handle_malformed_search_urls(self):
+        for n in range(105):
+            Pdb.objects.create(
+             id=f"A{n}", title="FILLER", skeleton=False,
+             deposited=date(1990, 9, 28) + timedelta(days=n)
+            )
+        self.get("/search?q=filler&page=100")
+        self.check_title("Page Not Found")
+        self.get("/search?q=filler&page=ABC")
+        self.check_title("Page Not Found")

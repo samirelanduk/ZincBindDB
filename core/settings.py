@@ -7,7 +7,7 @@ SECRET_KEY = binascii.hexlify(os.urandom(24)).decode()
 
 VERSION = "0.4.0"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost"]
 
 DEBUG = True
 

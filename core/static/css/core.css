@@ -91,6 +91,16 @@ input[type=submit] {
     overflow: hidden;
 }
 
+#page-not-found {
+    font-size: 500%;
+    text-align: center;
+    background-color: #ffffff;
+    max-width: 800px;
+    padding: 100px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 @media only screen and (max-width: 769px) {
 
     .page-row {

@@ -1,11 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
+from django.http import Http404
 from zinc.models import Pdb
 
 def search(request):
     results = Pdb.search(request.GET["q"])
     paginated_results = Paginator(results, 25)
-    page = paginated_results.page(request.GET.get("page", 1))
+    try:
+        page = paginated_results.page(request.GET.get("page", 1))
+    except: raise Http404
     return render(request, "search.html", {
      "page": page, "results": paginated_results
     })
