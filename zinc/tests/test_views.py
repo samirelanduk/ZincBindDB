@@ -2,6 +2,14 @@ from unittest.mock import patch, Mock, MagicMock
 from testarsenal import DjangoTest
 from zinc.views import *
 
+class SearchViewTests(DjangoTest):
+
+    def test_search_view_uses_search_template(self):
+        request = self.make_request("---")
+        self.check_view_uses_template(search, request, "search.html")
+
+
+        
 class PdbViewTests(DjangoTest):
 
     def setUp(self):

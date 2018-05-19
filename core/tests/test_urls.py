@@ -8,5 +8,9 @@ class UrlTests(DjangoTest):
         self.check_url_returns_view("/", core_views.home)
 
 
+    def test_search_url(self):
+        self.check_url_returns_view("/search", zinc_views.search)
+
+
     def test_pdb_url(self):
         self.check_url_returns_view("/pdbs/a111/", zinc_views.pdb)
