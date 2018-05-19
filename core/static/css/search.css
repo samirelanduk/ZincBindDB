@@ -6,7 +6,6 @@ main {
 
 .search-info {
     font-size: 140%;
-    background-color: #ffffff;
     text-align: center;
     margin-bottom: 10px;
     padding: 15px;
@@ -23,7 +22,6 @@ main {
 }
 
 .search-result {
-    background-color: white;
     margin-bottom: 10px;
 }
 
@@ -31,7 +29,7 @@ main {
     color: inherit;
 }
 
-.pdb-result:hover {
+main div.pdb-result:hover {
     background-color: #f1ecf0;
     transition: 0.5s;
 }
@@ -72,7 +70,6 @@ main {
 }
 
 #search-nav {
-    background-color: white;
     padding: 10px;
     margin-top: 15px;
     display: flex;
