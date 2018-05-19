@@ -55,7 +55,7 @@ class QuickSearchTests(FunctionalTest):
         self.assertIn("Felis catus", results[0].text)
         self.assertIn("SUPERB PDB FILE", results[0].text)
         self.assertIn("2.1 Å", results[0].text)
-        self.assertIn("X-RAY", results[0].text)
+        self.assertIn("X-RAY (2.1 Å)", results[0].text)
         self.assertIn("REDUCTASE", results[0].text)
 
         # There is no search nav
@@ -82,8 +82,10 @@ class QuickSearchTests(FunctionalTest):
         self.assertEqual(len(results), 2)
         self.assertIn("PDB: A002", results[0].text)
         self.assertIn("28 September, 1992", results[0].text)
+        self.assertIn("X-RAY", results[1].text)
         self.assertIn("PDB: A001", results[1].text)
         self.assertIn("28 September, 1990", results[1].text)
+        self.assertIn("X-RAY (2.1 Å)", results[1].text)
 
 
     def test_can_paginate_search_results(self):

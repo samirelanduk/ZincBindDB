@@ -22,7 +22,7 @@
                 <div class="pdb-species"><script>document.write(formatSpecies("{{ pdb.organism }}"));</script></div>
             </div>
             <div class="pdb-title">{{ pdb.title|truncatewords:20 }}</div>
-            <div class="pdb-secondary">{{ pdb.resolution }} Å | {{ pdb.technique }} | {{ pdb.classification}}</div>
+            <div class="pdb-secondary">{{ pdb.technique }}{% if pdb.resolution %} ({{ pdb.resolution }} Å){% endif %} | {{ pdb.classification}}</div>
         </a></div>
     </a></div>
     {% endfor %}
