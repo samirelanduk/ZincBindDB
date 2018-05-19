@@ -7,6 +7,7 @@ h1 {
     background-color: inherit;
     padding: none;
     margin-bottom: 40px;
+    box-shadow: none;
 }
 
 .home-row {

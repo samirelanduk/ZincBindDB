@@ -6,8 +6,9 @@ class PdbPageTests(FunctionalTest):
         # User goes to PDB page
         self.get("/pdbs/A001/")
         self.check_title("A001")
+        self.check_h1("A SUPERB PDB FILE")
 
-        # There is information about the PDB
+        '''# There is information about the PDB
         pdb_information = self.browser.find_element_by_id("pdb-information")
         self.assertIn("A SUPERB PDB FILE", pdb_information.text)
         self.assertIn("Deposited: 28 September, 1990", pdb_information.text)
@@ -20,4 +21,4 @@ class PdbPageTests(FunctionalTest):
         self.assertIn("PDB Code: A001", pdb_information.text)
 
         # There is an NGL 3D display of the PDB
-        pdb_display = self.browser.find_element_by_id("ngl-display")
+        pdb_display = self.browser.find_element_by_id("ngl-display")'''
