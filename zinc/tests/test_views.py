@@ -4,12 +4,28 @@ from zinc.views import *
 
 class SearchViewTests(DjangoTest):
 
+    def setUp(self):
+        self.patch1 = patch("zinc.views.Pdb.search")
+        self.mock_search = self.patch1.start()
+        self.mock_search.return_value = "RESULTS"
+
+
+    def tearDown(self):
+        self.patch1.stop()
+
+
     def test_search_view_uses_search_template(self):
-        request = self.make_request("---")
+        request = self.make_request("---", data={"q": "X"})
         self.check_view_uses_template(search, request, "search.html")
 
 
-        
+    def test_search_view_sends_search_results(self):
+        request = self.make_request("---", data={"q": "X"})
+        self.check_view_has_context(search, request, {"results": "RESULTS"})
+        self.mock_search.assert_called_with("X")
+
+
+
 class PdbViewTests(DjangoTest):
 
     def setUp(self):

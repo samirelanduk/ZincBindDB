@@ -63,6 +63,12 @@ class PdbTests(DjangoTest):
         self.assertEqual(Pdb.create_from_atomium(atomium_pdb).skeleton, False)
 
 
+    def test_can_search_pdbs_by_id(self):
+        pdbs = [mixer.blend(Pdb, id=code) for code in ["1A23", "2B46", "3C72"]]
+        self.assertEqual(list(Pdb.search("2B46")), [pdbs[1]])
+        self.assertEqual(list(Pdb.search("1A23")), [pdbs[0]])
+
+
 
 class ChainTests(DjangoTest):
 
@@ -179,7 +185,7 @@ class ResidueTests(DjangoTest):
         site = mixer.blend(ZincSite, id="A10023-45", pdb=pdb)
         chain = mixer.blend(Chain, id="A100C",)
         res = Residue.create_from_atomium(atomium_residue, site, chain, 14)
-        self.assertEqual(res.id, "A100A10")
+        self.assertEqual(res.id, "A100A10TYR")
         self.assertEqual(res.site, site)
         self.assertEqual(res.chain, chain)
         self.assertEqual(res.number, 14)

@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from zinc.models import Pdb
 
 def search(request):
-    return render(request, "search.html")
+    results = Pdb.search(request.GET["q"])
+    return render(request, "search.html", {"results": results})
 
 
 def pdb(request, code):

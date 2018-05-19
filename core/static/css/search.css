@@ -1,0 +1,62 @@
+main {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.search-info {
+    font-size: 140%;
+    background-color: #ffffff;
+    text-align: center;
+    margin-bottom: 10px;
+    padding: 15px;
+}
+
+.search-result {
+    background-color: white;
+    margin-bottom: 10px;
+}
+
+.search-result a {
+    color: inherit;
+}
+
+.pdb-result:hover {
+    background-color: #f1ecf0;
+    transition: 0.5s;
+}
+
+.pdb-result-main {
+    border-bottom: 1px solid #BBB;
+    display: flex;
+}
+
+.pdb-result-main div {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    border-right: 1px solid #BBB;
+}
+
+.pdb-result-main div:last-child {
+    border-right-width: 0px;
+}
+
+.pdb-result-main .pdb-code {
+    font-size: 170%;
+}
+
+.pdb-result-main .pdb-species {
+    font-style: italic;
+    padding-right: 8px;
+}
+
+.pdb-result .pdb-title {
+    padding: 5px;
+    font-size: 105%;
+}
+
+.pdb-result .pdb-secondary {
+    padding: 5px;
+    font-size: 95%;
+}

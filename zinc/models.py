@@ -33,6 +33,11 @@ class Pdb(models.Model):
         )
 
 
+    @staticmethod
+    def search(term):
+        return Pdb.objects.filter(models.Q(id=term.upper()))
+
+
 
 class Chain(models.Model):
     """A chain of residues in a PDB."""
@@ -115,8 +120,8 @@ class Residue(models.Model):
         ZincSite and Chain records. You must specify the residue number."""
 
         residue_record = Residue.objects.create(
-         id=f"{site.pdb.id}{residue.id}", number=number, chain=chain,
-         site=site, residue_id=residue.id, name=residue.name
+         id=f"{site.pdb.id}{residue.id}{residue.name}", number=number,
+         chain=chain, site=site, residue_id=residue.id, name=residue.name
         )
         for atom in residue.atoms():
             Atom.create_from_atomium(atom, residue_record)
