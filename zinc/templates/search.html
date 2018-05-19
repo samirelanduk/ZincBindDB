@@ -7,21 +7,31 @@
 {% endblock %}
 
 {% block main %}
-<div class="search-info shadow">
-    {{ results.count }} result{% if results.count != 1 %}s{% endif %}
-</div>
+{% if results %}
+    <div class="search-info shadow">
+        {{ results.count }} result{% if results.count != 1 %}s{% endif %}
+    </div>
 
-{% for pdb in results %}
-<div class="search-result shadow">
-    <div class="pdb-result"><a href="/pdbs/{{ pdb.id }}/">
-        <div class="pdb-result-main">
-            <div class="pdb-code">PDB: {{ pdb.id }}</div>
-            <div class="pdb-deposited">{{ pdb.deposited }}</div>
-            <div class="pdb-species"><script>document.write(formatSpecies("{{ pdb.organism }}"));</script></div>
-        </div>
-        <div class="pdb-title">{{ pdb.title|truncatewords:20 }}</div>
-        <div class="pdb-secondary">{{ pdb.resolution }} Å | {{ pdb.technique }} | {{ pdb.classification}}</div>
+    {% for pdb in results %}
+    <div class="search-result shadow">
+        <div class="pdb-result"><a href="/pdbs/{{ pdb.id }}/">
+            <div class="pdb-result-main">
+                <div class="pdb-code">PDB: {{ pdb.id }}</div>
+                <div class="pdb-deposited">{{ pdb.deposited }}</div>
+                <div class="pdb-species"><script>document.write(formatSpecies("{{ pdb.organism }}"));</script></div>
+            </div>
+            <div class="pdb-title">{{ pdb.title|truncatewords:20 }}</div>
+            <div class="pdb-secondary">{{ pdb.resolution }} Å | {{ pdb.technique }} | {{ pdb.classification}}</div>
+        </a></div>
     </a></div>
-</a></div>
-{% endfor %}
+    {% endfor %}
+{% else %}
+<div class="search-info no-results shadow">
+    <div>There were no results matching your query.</div>
+    <div class="search-help">
+        Search is case-insensitive, and searches PDB codes (for exact matches)
+        and PDB descriptions (for partial matches).
+    </div>
+</div>
+{% endif %}
 {% endblock %}

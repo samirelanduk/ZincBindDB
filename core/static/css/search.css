@@ -12,6 +12,16 @@ main {
     padding: 15px;
 }
 
+.no-results {
+    font-size: 200%;
+    padding: 40px;
+}
+
+.no-results .search-help {
+    margin-top: 30px;
+    font-size: 60%;
+}
+
 .search-result {
     background-color: white;
     margin-bottom: 10px;
