@@ -77,9 +77,9 @@ def get_residues_from_atoms(atoms):
 
 
 def check_clusters_have_unique_residues(clusters):
-    """Takes a list of clusters and returns True if they don't share any resides
-    in common."""
-    
+    """Takes a list of clusters and returns True if they don't share any
+    residues in common."""
+
     residue_count = sum([len(cluster["residues"]) for cluster in clusters])
     unique_residue_count = len(set.union(
      *[cluster["residues"] for cluster in clusters]
@@ -94,7 +94,6 @@ def merge_metal_groups(metals):
     It then creates a list of clusters from this, where each cluster is a dict
     object with metals and residues. Two metals and their residues will be
     merged together if they share residues."""
-
 
     clusters = [{"metals": {metal}, "residues": residues}
      for metal, residues in metals.items()]

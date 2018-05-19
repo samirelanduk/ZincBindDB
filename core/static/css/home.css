@@ -6,6 +6,7 @@ main {
 h1 {
     background-color: inherit;
     padding: none;
+    margin-bottom: 40px;
 }
 
 .home-row {
@@ -16,6 +17,8 @@ h1 {
 .home-row div {
     box-sizing: border-box;
     width: 512px;
+    margin-top: 40px;
+    margin-bottom: 40px;
 }
 
 #home-1 {
@@ -45,10 +48,11 @@ h1 {
 }
 
 #site-search form {
-    height: 40px;
+    height: 45px;
     display: flex;
     align-items: stretch;
     width: 80%;
+    box-sizing: border-box;
 }
 
 #site-search form input {
@@ -57,6 +61,7 @@ h1 {
     border: 1px solid #e6ecf0;
     font-size: 70%;
     padding: 20px;
+    box-sizing: border-box;
 }
 
 #site-search form input[type=text] {
@@ -65,6 +70,7 @@ h1 {
     border-bottom-left-radius: 10px;
     color: #444;
     border-right-width: 0px;
+    box-sizing: border-box;
 }
 
 #site-search form input[type=submit] {
@@ -72,7 +78,7 @@ h1 {
     border-bottom-right-radius: 10px;
     background-color: #4A9586;
     color: #ffffff;
-    border-color: darkgreen;
+    border-color: #00640022;
     font-size: 80%;
     padding: 0px;
     padding-left: 8px;
@@ -98,6 +104,10 @@ h1 {
         grid-template-columns: auto;
     }
 
+    .home-row div {
+        margin-top: 10px;
+    }
+
     #site-description p {
         padding-left: 80px;
         padding-right: 80px;
@@ -105,7 +115,9 @@ h1 {
 
     #site-search form {
         margin-bottom: 40px;
-        width: 60%;
+        width: 100%;
+        margin-left: 100px;
+        margin-right: 100px;
     }
 
 
@@ -115,6 +127,17 @@ h1 {
 
     main {
         font-size: 100%;
+    }
+
+    #site-description p {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+
+    #site-search form {
+        margin-bottom: 40px;
+        margin-left: 50px;
+        margin-right: 50px;
     }
 
 }
