@@ -14,23 +14,30 @@ class FunctionalTest(StaticLiveServerTestCase, BrowserTest):
         else:
             self.browser = webdriver.Chrome()
 
-        pdb = Pdb.objects.create(
+        pdb1 = Pdb.objects.create(
          id="A001", title="A SUPERB PDB FILE", deposited=date(1990, 9, 28),
          resolution=2.1, organism="FELIS CATUS", skeleton=False,
          expression="ESCHERICHIA COLI BL21(DE3)", rfactor=4.5,
          classification="REDUCTASE", technique="X-RAY",
         )
-        pdb = Pdb.objects.create(
+        pdb2 = Pdb.objects.create(
          id="A002", title="A FINE PDB FILE", deposited=date(1992, 9, 28),
          resolution=0.0, organism="HOMO SAPIENS", skeleton=False,
          expression="ESCHERICHIA COLI", rfactor=0,
          classification="TRANSFERASE", technique="NMR",
         )
-        pdb = Pdb.objects.create(
+        pdb3 = Pdb.objects.create(
          id="B123", title="A MESS OF ATOMS", deposited=date(2002, 7, 28),
          resolution=2.5, organism="FELIS CATUS", skeleton=False,
          expression="ESCHERICHIA COLI", rfactor=2.5,
          classification="REDUCTASE", technique="X-RAY",
+        )
+
+        chain1 = Chain.objects.create(
+         pdb=pdb1, id="A001B", sequence="MVTTYRLKSSSSWMDE"
+        )
+        chain1 = Chain.objects.create(
+         pdb=pdb1, id="A001A", sequence="MVTTYRLKSSSSWMDE"
         )
 
 

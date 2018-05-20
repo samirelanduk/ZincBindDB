@@ -46,6 +46,7 @@ class Chain(models.Model):
 
     class Meta:
         db_table = "chains"
+        ordering = ["id"]
 
     id = models.CharField(primary_key=True, max_length=128)
     sequence = models.TextField()

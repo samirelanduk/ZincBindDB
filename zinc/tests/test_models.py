@@ -109,6 +109,14 @@ class ChainTests(DjangoTest):
         self.assertEqual(chain.pdb, pdb)
 
 
+    def test_chain_sorting(self):
+        chains = [Chain.objects.create(id=id, pdb=self.pdb, sequence="")
+         for id in ["A001C", "A001A", "A001B", "A001D"]]
+        self.assertEqual(
+         list(Chain.objects.all()), [chains[1], chains[2], chains[0], chains[3]]
+        )
+
+
 
 class ZincSiteTests(DjangoTest):
 

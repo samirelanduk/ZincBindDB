@@ -19,6 +19,10 @@ class PdbPageTests(FunctionalTest):
         self.assertIn("R-factor: 4.5 Å", pdb_information.text)
         self.assertIn("Code: A001", pdb_information.text)
 
+        # There is an overview of the PDB's chains
+        chain_information = self.browser.find_element_by_id("pdb-chains")
+        self.assertIn("2 zinc-bearing chains (A, B)", chain_information.text)
+
 
     def test_pdb_page_displays_angstroms_properly(self):
         # User goes to PDB page

@@ -4,7 +4,7 @@ main {
     margin-right: auto;
 }
 
-#pdb-info {
+#pdb-info, #pdb-chains {
     margin-top: 20px;
     box-shadow: 0 2px 2px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
     font-size: 130%;
@@ -20,4 +20,12 @@ main {
 .pdb-info-row {
     margin-top: 4px;
     margin-bottom: 4px;
+}
+
+#pdb-chains .chain {
+    margin-left: 20px;
+}
+
+.chain-sequence {
+    font-family: monospace;
 }

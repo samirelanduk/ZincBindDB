@@ -57,6 +57,7 @@ class QuickSearchTests(FunctionalTest):
         self.assertIn("2.1 Å", results[0].text)
         self.assertIn("X-RAY (2.1 Å)", results[0].text)
         self.assertIn("REDUCTASE", results[0].text)
+        self.assertIn("2 zinc-bearing chains", results[0].text)
 
         # There is no search nav
         with self.assertRaises(self.NoElement):

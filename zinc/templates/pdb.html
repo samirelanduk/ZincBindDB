@@ -25,6 +25,13 @@
     <div class="pdb-info-row"><strong>Source Organism: </strong><em><script>document.write(formatSpecies("{{ pdb.organism }}"));</script></em></div>
     <div class="pdb-info-row"><strong>Expression System: </strong><em><script>document.write(formatSpecies("{{ pdb.expression }}"));</script></em></div>
 </div>
+
+<div id="pdb-chains">
+    <div>
+        {{ pdb.chain_set.count }} zinc-bearing chain{% if pdb.chain_set.count != 1 %}s{% endif %}
+        ({% for chain in pdb.chain_set.all %}{{ chain.id|slice:"-1:" }}{% if not forloop.last %}, {% endif %}{% endfor %})
+    </div>
+</div>
 {% endblock %}
 
 {% block endjs %}
