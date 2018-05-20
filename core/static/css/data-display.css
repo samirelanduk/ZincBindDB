@@ -4,7 +4,7 @@ main {
     margin-right: auto;
 }
 
-#pdb-info, #pdb-chains, #pdb-sites {
+#pdb-info, #pdb-chains, #pdb-sites, #pdb-ngl {
     margin-top: 20px;
     box-shadow: 0 2px 2px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
     font-size: 130%;
@@ -78,6 +78,19 @@ main {
 
 .pdb-site-residue {
     font-size: 70%;
+}
+
+#pdb-ngl {
+    padding: 0px;
+}
+
+#ngl-container {
+    height: 300px;
+}
+
+.ngl-controls {
+    border-top: 1px solid #e6ecf0;
+    padding: 10px;
 }
 
 

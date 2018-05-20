@@ -50,10 +50,16 @@
         {% endfor %}
     </div>
 </div>
+
+<div id="pdb-ngl">
+    <div id="ngl-container"></div>
+    <div class="ngl-controls"></div>
+</div>
+
 {% endblock %}
 
 {% block endjs %}
-    <!--<script src="https://unpkg.com/ngl"></script>
+    <script src="https://unpkg.com/ngl"></script>
     <script src="/static/js/ngl.js"></script>
-    <script>drawNgl("{{ pdb.id }}")</script>-->
+    <script>drawNgl("{{ pdb.id }}")</script>
 {% endblock %}

@@ -35,6 +35,9 @@ class PdbPageTests(FunctionalTest):
         self.assertIn("3 residues", sites[1].text)
         self.assertIn("B500 (HOH), B25 (VAL), B23 (TYR)", sites[1].text)
 
+        # There is a 3D display
+        ngl = self.browser.find_element_by_id("pdb-ngl")
+
 
     def test_pdb_page_displays_angstroms_properly(self):
         # User goes to PDB page
