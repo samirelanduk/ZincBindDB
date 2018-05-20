@@ -1,3 +1,4 @@
+from mixer.backend.django import mixer
 from .base import FunctionalTest
 from zinc.models import *
 from datetime import date, timedelta
@@ -91,8 +92,8 @@ class QuickSearchTests(FunctionalTest):
 
     def test_can_paginate_search_results(self):
         for n in range(105):
-            Pdb.objects.create(
-             id=f"A{n}", title="FILLER", skeleton=False,
+            mixer.blend(
+             Pdb, id=f"A{n}", title="FILLER",
              deposited=date(1990, 9, 28) + timedelta(days=n)
             )
 
@@ -175,8 +176,8 @@ class QuickSearchTests(FunctionalTest):
 
     def test_can_handle_malformed_search_urls(self):
         for n in range(105):
-            Pdb.objects.create(
-             id=f"A{n}", title="FILLER", skeleton=False,
+            mixer.blend(
+             Pdb, id=f"A{n}", title="FILLER",
              deposited=date(1990, 9, 28) + timedelta(days=n)
             )
         self.get("/search?q=filler&page=100")

@@ -23,6 +23,18 @@ class PdbPageTests(FunctionalTest):
         chain_information = self.browser.find_element_by_id("pdb-chains")
         self.assertIn("2 zinc-bearing chains (A, B)", chain_information.text)
 
+        # There is an overview of the PDB's zinc sites
+        site_information = self.browser.find_element_by_id("pdb-sites")
+        self.assertIn("2 zinc binding sites", site_information.text)
+        sites = site_information.find_elements_by_class_name("pdb-site")
+        self.assertEqual(len(sites), 2)
+        self.assertIn("A0014003", sites[0].text)
+        self.assertIn("3 residues", sites[0].text)
+        self.assertIn("A25 (VAL), A23 (TYR), A21 (TYR)", sites[0].text)
+        self.assertIn("A0018003", sites[1].text)
+        self.assertIn("3 residues", sites[1].text)
+        self.assertIn("B500 (HOH), B25 (VAL), B23 (TYR)", sites[1].text)
+
 
     def test_pdb_page_displays_angstroms_properly(self):
         # User goes to PDB page

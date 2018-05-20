@@ -4,11 +4,12 @@ main {
     margin-right: auto;
 }
 
-#pdb-info, #pdb-chains {
+#pdb-info, #pdb-chains, #pdb-sites {
     margin-top: 20px;
     box-shadow: 0 2px 2px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
     font-size: 130%;
     padding: 10px;
+    box-sizing: border-box;
 }
 
 .pdb-info-columns {
@@ -28,4 +29,71 @@ main {
 
 .chain-sequence {
     font-family: monospace;
+}
+
+.pdb-sites-count {
+    padding-bottom: 15px;
+}
+
+.pdb-sites-list {
+    border: 1px solid #e6ecf0;
+    border-radius: 5px;
+}
+
+.pdb-site {
+    border-bottom: 1px solid #e6ecf0;
+    padding: 8px;
+    box-sizing: border-box;
+    font-size: 100%;
+    cursor: pointer;
+}
+
+.pdb-site:first-child {
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+}
+
+.pdb-site:last-child {
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-width: 0px;
+}
+
+.pdb-site div {
+    background-color: #ffffff00;
+}
+
+.pdb-site:hover {
+    background-color: #f1ecf0;
+    transition: 0.4s;
+}
+
+.pdb-site-id {
+    font-weight: bold;
+}
+
+.pdb-site-residue-count {
+    font-size: 95%;
+}
+
+.pdb-site-residue {
+    font-size: 70%;
+}
+
+
+@media only screen and (max-width: 769px) {
+
+    main {
+        font-size: 75%;
+    }
+
+}
+
+
+@media only screen and (max-width: 568px) {
+
+    main {
+        font-size: 70%;
+    }
+
 }

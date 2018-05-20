@@ -209,6 +209,15 @@ class ResidueTests(DjangoTest):
             mock_create.assert_any_call(atom, res)
 
 
+    def test_chain_sorting(self):
+        for number in [8, 23, 4, 42, 16, 15]:
+            self.kwargs["number"] = number
+            self.kwargs["id"] = str(number)
+            Residue.objects.create(**self.kwargs)
+        self.assertEqual(
+         [r.number for r in Residue.objects.all()], [4, 8, 15, 16, 23, 42]
+        )
+
 
 
 class AtomTests(DjangoTest):

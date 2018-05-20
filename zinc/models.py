@@ -108,6 +108,7 @@ class Residue(models.Model):
 
     class Meta:
         db_table = "residues"
+        ordering = ["number"]
 
     id = models.CharField(primary_key=True, max_length=128)
     number = models.IntegerField()

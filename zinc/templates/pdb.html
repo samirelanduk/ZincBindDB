@@ -32,6 +32,24 @@
         ({% for chain in pdb.chain_set.all %}{{ chain.id|slice:"-1:" }}{% if not forloop.last %}, {% endif %}{% endfor %})
     </div>
 </div>
+
+<div id="pdb-sites">
+    <div class="pdb-sites-count">{{ pdb.zincsite_set.count }} zinc binding site{% if pdb.zincsite_set.count != 1 %}s{% endif %}</div>
+
+    <div class="pdb-sites-list">
+        {% for site in pdb.zincsite_set.all %}
+        <div class="pdb-site">
+            <div class="pdb-site-id">{{ site.id }}</div>
+            <div class="pdb-site-residues">
+                {{ site.residue_set.count }} residue{% if pdb.residue_set.count != 1 %}s{% endif %}
+                {% for residue in site.residue_set.all %}
+                <span class="pdb-site-residue">{{ residue.residue_id }} ({{ residue.name }}){% if not forloop.last %}, {% endif %}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
 
 {% block endjs %}
