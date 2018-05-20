@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.http import Http404
-from zinc.models import Pdb
+from zinc.models import Pdb, ZincSite
 
 def search(request):
     results = Pdb.search(request.GET["q"])
@@ -17,3 +17,8 @@ def search(request):
 def pdb(request, code):
     pdb = get_object_or_404(Pdb, id=code)
     return render(request, "pdb.html", {"pdb": pdb})
+
+
+def zinc_site(request, pk):
+    site = get_object_or_404(ZincSite, id=pk)
+    return render(request, "zinc-site.html", {"site": site})

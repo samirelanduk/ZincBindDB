@@ -50,3 +50,23 @@ class PdbPageTests(FunctionalTest):
         self.assertIn("Technique: NMR", pdb_information.text)
         self.assertIn("Resolution: N/A", pdb_information.text)
         self.assertIn("R-factor: N/A", pdb_information.text)
+
+
+    def test_404_on_no_pdb(self):
+        self.get("/pdbs/XXX/")
+        self.check_title("Not Found")
+
+
+
+class ZincSitePageTests(FunctionalTest):
+
+    def test_pdb_page_layout(self):
+        # User goes to site page
+        self.get("/A0014003/")
+        self.check_title("A0014003")
+        self.check_h1("A0014003")
+
+
+    def test_404_on_no_site(self):
+        self.get("/XXXXXXX/")
+        self.check_title("Not Found")

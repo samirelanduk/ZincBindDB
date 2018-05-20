@@ -70,3 +70,28 @@ class PdbViewTests(DjangoTest):
         request = self.make_request("---")
         self.check_view_has_context(pdb, request, {"pdb": self.pdb}, "AXXX")
         self.mock_get.assert_called_with(Pdb, id="AXXX")
+
+
+
+class ZincSiteViewTests(DjangoTest):
+
+    def setUp(self):
+        self.patch1 = patch("zinc.views.get_object_or_404")
+        self.mock_get = self.patch1.start()
+        self.site = Mock()
+        self.mock_get.return_value = self.site
+
+
+    def tearDown(self):
+        self.patch1.stop()
+
+
+    def test_zinc_site_view_uses_zinc_site_template(self):
+        request = self.make_request("---")
+        self.check_view_uses_template(zinc_site, request, "zinc-site.html", "AXXX4")
+
+
+    def test_zinc_site_view_sends_zinc_site(self):
+        request = self.make_request("---")
+        self.check_view_has_context(zinc_site, request, {"site": self.site}, "AXXX4")
+        self.mock_get.assert_called_with(ZincSite, id="AXXX4")

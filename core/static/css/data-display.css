@@ -48,6 +48,10 @@ main {
     cursor: pointer;
 }
 
+.pdb-site a {
+    color: inherit;
+}
+
 .pdb-site:first-child {
     border-top-right-radius: 5px;
     border-top-left-radius: 5px;
