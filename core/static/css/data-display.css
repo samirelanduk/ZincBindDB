@@ -86,15 +86,36 @@ main {
 
 #pdb-ngl {
     padding: 0px;
+    display: flex;
 }
 
 #ngl-container {
-    height: 300px;
+    height: 400px;
+    width: 500px;
 }
 
 .ngl-controls {
-    border-top: 1px solid #e6ecf0;
+    border-left: 1px solid #e6ecf0;
     padding: 10px;
+}
+
+.color-options {
+    display: inline-flex;
+    border: 1px solid #cccccc;
+    width: auto;
+}
+
+.color-options input[type=radio] {
+    width: 30px;
+    height: 30px;
+    -webkit-appearance: none;
+    margin: 0px;
+    margin-left: -1px;
+    cursor: pointer;
+}
+
+.color-options input[type=radio]:checked {
+    box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
 }
 
 
@@ -104,6 +125,22 @@ main {
         font-size: 75%;
     }
 
+    #pdb-ngl {
+        display: block;
+    }
+
+    #ngl-container {
+        width: 100%;
+    }
+
+    .ngl-controls {
+        border-left: none;
+        border-top: 1px solid #e6ecf0;
+    }
+
+    .color-options {
+    }
+
 }
 
 
@@ -111,6 +148,10 @@ main {
 
     main {
         font-size: 70%;
+    }
+
+    #ngl-container {
+        height: 350px;
     }
 
 }

@@ -53,7 +53,17 @@
 
 <div id="pdb-ngl">
     <div id="ngl-container"></div>
-    <div class="ngl-controls"></div>
+    <div class="ngl-controls">
+        <div class="ngl-control">
+            <label>Background</label>
+            <div class="color-options">
+                <input type="radio" name="color" value="#ffffff" class="white" checked></input>
+                <input type="radio" name="color" value="#000000" class="black"></input>
+                <input type="radio" name="color" value="#472b52" class="purple"></input>
+                <input type="radio" name="color" value="#87ceeb" class="blue"></input>
+            </div>
+        </div>
+    </div>
 </div>
 
 {% endblock %}
@@ -61,5 +71,5 @@
 {% block endjs %}
     <script src="https://unpkg.com/ngl"></script>
     <script src="/static/js/ngl.js"></script>
-    <script>drawNgl("{{ pdb.id }}")</script>
+    <script>drawNgl("{{ pdb.id }}"); setUpControls();</script>
 {% endblock %}

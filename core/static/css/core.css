@@ -44,3 +44,19 @@ input[type=submit] {
     margin-left: auto;
     margin-right: auto;
 }
+
+.white {
+    background-color: #ffffff;
+}
+
+.black {
+    background-color: #000000;
+}
+
+.purple {
+    background-color: #472b52;
+}
+
+.blue {
+    background-color: #87ceeb;
+}
