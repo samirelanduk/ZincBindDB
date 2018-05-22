@@ -5,7 +5,7 @@ from testarsenal import DjangoTest
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.utils import IntegrityError
-from zinc.models import Pdb, Chain, ZincSite, Metal, Residue, Atom
+from zinc.models import *
 
 class PdbTests(DjangoTest):
 
@@ -76,48 +76,6 @@ class PdbTests(DjangoTest):
 
 
 
-class ChainTests(DjangoTest):
-
-    def setUp(self):
-        self.pdb = mixer.blend(Pdb)
-        self.kwargs = {
-         "id": "1XXYB", "sequence": "MLLYTCDDWATTY", "pdb": self.pdb
-        }
-
-
-    def test_can_create_chain(self):
-        chain = Chain(**self.kwargs)
-        chain.full_clean(), chain.save()
-
-
-    def test_db_fields_required(self):
-        for field in self.kwargs:
-            kwargs = self.kwargs.copy()
-            del kwargs[field]
-            with self.assertRaises(ValidationError):
-                Chain(**kwargs).full_clean()
-
-
-    def test_can_create_from_atomium_chain(self):
-        atomium_chain = Mock(id="B")
-        residues = [Mock(code="T"), Mock(code="M"), Mock(code="V")]
-        atomium_chain.residues.return_value = residues
-        pdb = mixer.blend(Pdb, id="1AAA")
-        chain = Chain.create_from_atomium(atomium_chain, pdb)
-        self.assertEqual(chain.id, "1AAAB")
-        self.assertEqual(chain.sequence, "TMV")
-        self.assertEqual(chain.pdb, pdb)
-
-
-    def test_chain_sorting(self):
-        chains = [Chain.objects.create(id=id, pdb=self.pdb, sequence="")
-         for id in ["A001C", "A001A", "A001B", "A001D"]]
-        self.assertEqual(
-         list(Chain.objects.all()), [chains[1], chains[2], chains[0], chains[3]]
-        )
-
-
-
 class ZincSiteTests(DjangoTest):
 
     def setUp(self):
@@ -141,19 +99,19 @@ class ZincSiteTests(DjangoTest):
 
 
 
-class MetalTests(DjangoTest):
+class ChainTests(DjangoTest):
 
     def setUp(self):
-        self.site = mixer.blend(ZincSite)
+        self.pdb = mixer.blend(Pdb)
         self.kwargs = {
-         "id": "1XXY4576", "x": 1.4, "y": -0.4, "z": 0.0, "site": self.site,
-         "element": "ZN"
+         "id": "1XXYB", "sequence": "MLLYTCDDWATTY", "pdb": self.pdb,
+         "chain_pdb_identifier": "A"
         }
 
 
-    def test_can_create_metal(self):
-        metal = Metal(**self.kwargs)
-        metal.full_clean(), metal.save()
+    def test_can_create_chain(self):
+        chain = Chain(**self.kwargs)
+        chain.full_clean(), chain.save()
 
 
     def test_db_fields_required(self):
@@ -161,7 +119,27 @@ class MetalTests(DjangoTest):
             kwargs = self.kwargs.copy()
             del kwargs[field]
             with self.assertRaises(ValidationError):
-                Metal(**kwargs).full_clean()
+                Chain(**kwargs).full_clean()
+
+
+    def test_can_create_from_atomium_chain(self):
+        atomium_chain = Mock(id="B")
+        residues = [Mock(code="T"), Mock(code="M"), Mock(code="V")]
+        atomium_chain.residues.return_value = residues
+        pdb = mixer.blend(Pdb, id="1AAA")
+        chain = Chain.create_from_atomium(atomium_chain, pdb)
+        self.assertEqual(chain.id, "1AAAB")
+        self.assertEqual(chain.chain_pdb_identifier, "B")
+        self.assertEqual(chain.sequence, "TMV")
+        self.assertEqual(chain.pdb, pdb)
+
+
+    def test_chain_sorting(self):
+        chains = [Chain.objects.create(id=id, pdb=self.pdb, sequence="")
+         for id in ["A001C", "A001A", "A001B", "A001D"]]
+        self.assertEqual(
+         list(Chain.objects.all()), [chains[1], chains[2], chains[0], chains[3]]
+        )
 
 
 
@@ -171,8 +149,8 @@ class ResidueTests(DjangoTest):
         self.site = mixer.blend(ZincSite)
         self.chain = mixer.blend(Chain)
         self.kwargs = {
-         "id": "1XXYA25", "site": self.site, "chain": self.chain, "number": 23,
-         "residue_id": "A25", "name": "VAL"
+         "id": "1XXYA25", "site": self.site, "chain": self.chain, "name": "VAL",
+         "residue_pdb_identifier": 23, "insertion_pdb_identifier": "A"
         }
 
 
@@ -183,39 +161,67 @@ class ResidueTests(DjangoTest):
 
     def test_db_fields_required(self):
         for field in self.kwargs:
-            kwargs = self.kwargs.copy()
-            del kwargs[field]
-            with self.assertRaises(ValidationError):
-                Residue(**kwargs).full_clean()
+            if field not in ["site"]:
+                kwargs = self.kwargs.copy()
+                del kwargs[field]
+                with self.assertRaises(ValidationError):
+                    Residue(**kwargs).full_clean()
+
+
+    def test_optional_db_fields(self):
+        for field in self.kwargs:
+            if field in ["site"]:
+                self.kwargs[field] = None
+                res = Residue(**self.kwargs)
+                res.full_clean()
 
 
     @patch("zinc.models.Atom.create_from_atomium")
     def test_can_create_from_atomium_residue(self, mock_create):
-        atomium_residue = Mock(id="A10")
+        atomium_residue = Mock(id="A-10B")
         atomium_residue.name = "TYR"
-        atoms = [Mock(), Mock(), Mock()]
-        atomium_residue.atoms.return_value = set(atoms)
         pdb = mixer.blend(Pdb, id="A100")
         site = mixer.blend(ZincSite, id="A10023-45", pdb=pdb)
-        chain = mixer.blend(Chain, id="A100C",)
-        res = Residue.create_from_atomium(atomium_residue, site, chain, 14)
-        self.assertEqual(res.id, "A100A10TYR")
+        chain = mixer.blend(Chain, id="A100C", chain_pdb_identifier="A")
+        atoms = [Mock(), Mock(), Mock()]
+        atomium_residue.atoms.return_value = atoms
+        res = Residue.create_from_atomium(atomium_residue, chain, site)
+        self.assertEqual(res.id, "A10023-45A-10BTYR")
+        self.assertEqual(res.residue_pdb_identifier, -10)
+        self.assertEqual(res.insertion_pdb_identifier, "B")
         self.assertEqual(res.site, site)
         self.assertEqual(res.chain, chain)
-        self.assertEqual(res.number, 14)
-        self.assertEqual(res.residue_id, "A10")
         self.assertEqual(res.name, "TYR")
         for atom in atoms:
             mock_create.assert_any_call(atom, res)
 
 
-    def test_chain_sorting(self):
+    @patch("zinc.models.Atom.create_from_atomium")
+    def test_can_create_from_atomium_residue_for_metal(self, mock_create):
+        atomium_residue = Mock(id="A-10B")
+        atomium_residue.name = "TYR"
+        pdb = mixer.blend(Pdb, id="A100")
+        chain = mixer.blend(Chain, id="A100C", chain_pdb_identifier="A")
+        atoms = [Mock(), Mock(), Mock()]
+        atomium_residue.atoms.return_value = atoms
+        res = Residue.create_from_atomium(atomium_residue, chain)
+        self.assertEqual(res.id, "A100CA-10BTYR")
+        self.assertEqual(res.residue_pdb_identifier, -10)
+        self.assertEqual(res.insertion_pdb_identifier, "B")
+        self.assertEqual(res.site, None)
+        self.assertEqual(res.chain, chain)
+        self.assertEqual(res.name, "TYR")
+        self.assertFalse(mock_create.called)
+
+
+    def test_residue_sorting(self):
         for number in [8, 23, 4, 42, 16, 15]:
-            self.kwargs["number"] = number
+            self.kwargs["residue_pdb_identifier"] = number
             self.kwargs["id"] = str(number)
             Residue.objects.create(**self.kwargs)
         self.assertEqual(
-         [r.number for r in Residue.objects.all()], [4, 8, 15, 16, 23, 42]
+         [r.residue_pdb_identifier for r in Residue.objects.all()],
+         [4, 8, 15, 16, 23, 42]
         )
 
 
@@ -225,9 +231,9 @@ class AtomTests(DjangoTest):
     def setUp(self):
         self.res = mixer.blend(Residue)
         self.kwargs = {
-         "id": "1XXY401", "residue": self.res, "atom_id": 401, "name": "CA",
+         "id": "1XXY401", "atom_pdb_identifier": 401, "name": "CA",
          "x": 1.4, "y": -0.4, "z": 0.0, "element": "C", "charge": 0.1,
-         "bfactor": 1.2, "liganding": False
+         "bfactor": 1.2, "residue": self.res, "liganding": True
         }
 
 
@@ -240,10 +246,9 @@ class AtomTests(DjangoTest):
         for field in self.kwargs:
             kwargs = self.kwargs.copy()
             del kwargs[field]
-            if field in ["liganding"]:
-                with transaction.atomic():
-                    with self.assertRaises(IntegrityError):
-                        Atom(**kwargs).save()
+            if field == "liganding":
+                with self.assertRaises(IntegrityError):
+                    Atom(**kwargs).save()
             else:
                 with self.assertRaises(ValidationError):
                     Atom(**kwargs).full_clean()
@@ -264,6 +269,58 @@ class AtomTests(DjangoTest):
         self.assertEqual(atom.bfactor, 1.4)
         self.assertEqual(atom.element, "P")
         self.assertEqual(atom.name, "PW")
-        self.assertEqual(atom.atom_id, 102)
+        self.assertEqual(atom.atom_pdb_identifier, 102)
         self.assertEqual(atom.residue, residue)
         self.assertEqual(atom.liganding, True)
+
+
+
+class MetalTests(DjangoTest):
+
+    def setUp(self):
+        self.res = mixer.blend(Residue)
+        self.site = mixer.blend(ZincSite)
+        self.pdb = mixer.blend(Pdb)
+        self.chain = mixer.blend(Chain)
+        self.kwargs = {
+         "id": "1XXY401", "atom_pdb_identifier": 401, "name": "CA",
+         "x": 1.4, "y": -0.4, "z": 0.0, "element": "C", "charge": 0.1,
+         "bfactor": 1.2, "residue": self.res, "site": self.site, "pdb": self.pdb
+        }
+
+
+    def test_can_create_metal(self):
+        metal = Metal(**self.kwargs)
+        metal.full_clean(), metal.save()
+
+
+    def test_db_fields_required(self):
+        for field in self.kwargs:
+            kwargs = self.kwargs.copy()
+            del kwargs[field]
+            with self.assertRaises(ValidationError):
+                Metal(**kwargs).full_clean()
+
+
+    @patch("zinc.models.Residue.create_from_atomium")
+    def test_can_create_from_atomium_atom(self, mock_create):
+        mock_create.return_value = self.res
+        self.res.id = "A100B10"
+        atomium_atom = Mock(id=102)
+        atomium_atom.x, atomium_atom.y, atomium_atom.z = 1.1, 2.2, 3.3
+        atomium_atom.charge, atomium_atom.bfactor = 0.5, 1.4
+        atomium_atom.element, atomium_atom.name = "P", "PW"
+        atom = Metal.create_from_atomium(atomium_atom, self.pdb, self.site, self.chain)
+        self.assertEqual(atom.id, "A100B10102")
+        self.assertEqual(atom.x, 1.1)
+        self.assertEqual(atom.y, 2.2)
+        self.assertEqual(atom.z, 3.3)
+        self.assertEqual(atom.charge, 0.5)
+        self.assertEqual(atom.bfactor, 1.4)
+        self.assertEqual(atom.element, "P")
+        self.assertEqual(atom.name, "PW")
+        self.assertEqual(atom.atom_pdb_identifier, 102)
+        self.assertEqual(atom.residue, self.res)
+        self.assertEqual(atom.site, self.site)
+        self.assertEqual(atom.pdb, self.pdb)
+        mock_create.assert_called_with(atomium_atom.molecule, self.chain)

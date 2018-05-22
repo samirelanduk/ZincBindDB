@@ -8,4 +8,15 @@
 
 {% block main %}
 <h1>{{ site.id }}</h1>
+{% include "ngl-pdb.html" %}
+
+
+
+
+{% endblock %}
+
+{% block endjs %}
+    <script src="https://unpkg.com/ngl"></script>
+    <script src="/static/js/ngl.js"></script>
+    <script>drawZincSite("{{ site.pdb.id }}", "{{ site.ngl_metals_sele }}", "{{ site.ngl_residues_sele }}"); setUpControls();</script>
 {% endblock %}
