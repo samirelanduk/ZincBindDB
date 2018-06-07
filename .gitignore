@@ -10,3 +10,4 @@ log.txt
 *.json
 *.pdb
 data/*
+*.css*

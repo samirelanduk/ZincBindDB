@@ -1,3 +1,5 @@
+{% load sass_tags %}
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -8,8 +10,7 @@
     <link rel="icon" type="image/png" href="/static/images/favicon.png">
     <title>{% block title %}{% endblock %} - ZincBind</title>
     <link href='https://fonts.googleapis.com/css?family=Exo+2|Source+Sans+Pro' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="/static/css/base.css">
-    <link rel="stylesheet" type="text/css" href="/static/css/core.css">
+    <link href="{% sass_src 'css/main.scss' %}" rel="stylesheet" type="text/css">
     {% block css %}{% endblock %}
     <script src="https://code.jquery.com/jquery.min.js"></script>
     <script src="/static/js/main.js"></script>
@@ -22,7 +23,7 @@
 
 <body>
     <nav>
-        <div id="logo"><a href="/">ZincBind</a></div>
+        <a id="logo" href="/">ZincBind</a>
         <div id="mobile-menu">
             <div id="mobile-menu-icon"><div></div><div></div><div></div></div>
         </div>

@@ -1,15 +1,34 @@
-main {
-    max-width: 769px;
-    margin-left: auto;
-    margin-right: auto;
+
+h1 {
+    @include white-box;
+    padding: $padding;
+}
+
+#pdb-info {
+    @include white-box;
+    padding: $padding;
+}
+
+#pdb-chains {
+    @include white-box;
+    padding: $padding;
+}
+
+#pdb-sites {
+    @include white-box;
+    padding: $padding;
+}
+
+#pdb-ngl {
+    @include white-box;
+    padding: $padding;
 }
 
 #pdb-info, #pdb-chains, #pdb-sites, #pdb-ngl {
-    margin-top: 20px;
-    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
-    font-size: 130%;
-    padding: 10px;
-    box-sizing: border-box;
+    @include white-box;
+    padding: $padding;
+    margin-top: 1rem;
+    font-size: 1.3em;
 }
 
 .pdb-info-columns {

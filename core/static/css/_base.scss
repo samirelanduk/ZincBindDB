@@ -1,0 +1,115 @@
+// The style for the base page
+
+html {
+    font-size: 62.5%;
+}
+
+body {
+    font-family: $font;
+    background-color: $back-gray;
+    margin: 0px;
+    color: $black;
+}
+
+nav {
+    background-color: $purple;
+    color: $white;
+    display: flex;
+    position: relative;
+    height: 5rem;
+    align-items: center;
+
+    #logo {
+        display: block;
+        color: inherit;
+        font-family: $logo-font;
+        font-size: 3.2em;
+        line-height: 2;
+        margin-left: $nav-margin;
+        padding-bottom: 4px;
+    }
+
+    #mobile-menu {
+        flex-grow: 5;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-right: $nav-margin;
+
+        #mobile-menu-icon {
+            cursor: pointer;
+
+            div {
+                width: 2.2rem;
+                height: 0.3rem;
+                background-color: $white;
+                margin: 0.4rem 0;
+            }
+        }
+    }
+
+    #nav-links {
+        display: none;
+        position: absolute;
+        width: 100%;
+        top: 100%;
+        padding-top: 1rem;
+        background-color: inherit;
+        font-size: 1.6em;
+
+        form {
+            display: inline;
+            padding: 0px;
+            margin: 0px;
+            background-color: inherit;
+            box-shadow: none;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            font-weight: bold;
+            padding: 1.2rem;
+            color: inherit;
+            border-top: 0.1px solid $border-gray;
+            @include margin-side(5rem);
+        }
+    }
+}
+
+main {
+    padding: $padding;
+    font-size: 1.6em;
+    max-width: $desktop-width;
+    @include margin-side(auto);
+}
+
+
+@mixin base--tablet() {
+    nav {
+        #mobile-menu {
+            display: none;
+        }
+
+        #nav-links {
+            display: flex;
+            position: inherit;
+            flex-grow: 5;
+            top: inherit;
+            justify-content: flex-end;
+            align-items: center;
+            margin-right: $nav-margin;
+            padding: 0px;
+
+            a {
+                display: inline;
+                border: none;
+                text-align: center;
+                padding: 0px;
+                font-size: 1.1em;
+                @include margin-side(2rem);
+                background-color: inherit;
+            }
+        }
+    }
+}

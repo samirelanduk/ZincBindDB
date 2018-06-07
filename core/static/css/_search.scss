@@ -1,0 +1,76 @@
+
+.search-info {
+    @include white-box;
+    font-size: 1.1em;
+    text-align: center;
+    margin-bottom: $padding;
+    padding: $padding;
+}
+
+.no-results {
+    font-size: 1.6em;
+    padding: 4rem;
+
+    .search-help {
+        margin-top: 3rem;
+        font-size: 0.6em;
+    }
+}
+
+
+.search-result {
+    @include white-box;
+    margin-bottom: $padding;
+
+    a {
+        color: inherit;
+    }
+
+    .pdb-result {
+
+        font-size: 0.8em;
+
+        .pdb-result-main {
+            border-bottom: 1px solid $border-gray;
+            display: flex;
+
+            div {
+                display: flex;
+                align-items: center;
+                padding: 5px;
+                border-right: 1px solid $border-gray;
+            }
+
+            div:last-child {
+                border-right-width: 0px;
+            }
+
+            .pdb-code {
+                font-size: 1.7em;
+            }
+        }
+
+        .pdb-title {
+            padding: $padding / 2;
+        }
+
+        .pdb-secondary {
+            padding: $padding / 2;
+        }
+
+
+    }
+}
+
+#search-nav {
+    @include white-box;
+    padding: $padding;
+    display: flex;
+    justify-content: center;
+}
+
+.next-page, .previous-page {
+    display: block;
+    text-align: center;
+    width: 50%;
+}

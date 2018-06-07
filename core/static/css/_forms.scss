@@ -1,0 +1,14 @@
+form {
+
+    input {
+        display: block;
+    }
+
+    input[type=text] {
+        padding: 1rem;
+        width: 100%;
+        border-radius: $curvature;
+        border: 1px solid $border-gray;
+        box-shadow: inset 0 1px 2px rgba(27,31,35,0.075);
+    }
+}

@@ -1,0 +1,57 @@
+$font: "Source Sans Pro";
+$logo-font: "Exo 2";
+
+$back-gray: #e6ecf0;
+$border-gray: #dddbef;
+$purple: #472b52;
+$pale-purple: #f1ecf0;
+$hyperlink-blue: #0074D9;
+$error-red: #a94442;
+$white: #ffffff;
+$black: #404040;
+
+$nav-margin: 2.5rem;
+$padding: 1.5rem;
+$curvature: 0.4rem;
+
+$tablet-width: 600px;
+$laptop-width: 900px;
+$desktop-width: 1200px;
+
+@mixin margin-side($val) {
+    margin: {left: $val; right: $val;}
+}
+
+@mixin non-left-margin($val) {
+    margin: $val;
+    margin-left: 0px;
+}
+
+@mixin white-box {
+    background-color: $white;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+}
+
+@import "base";
+@import "core";
+@import "containers";
+@import "home";
+@import "forms";
+@import "search";
+@import "data";
+
+
+
+@media (min-width: $tablet-width) {
+    @include base--tablet();
+    @include home--tablet();
+}
+
+@media (min-width: $laptop-width) {
+    @include containers--laptop();
+    @include home--laptop();
+}
+
+@media (min-width: $desktop-width) {
+    @include home--desktop();
+}

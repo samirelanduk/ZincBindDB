@@ -2,12 +2,10 @@
 
 {% block title %}Home{% endblock %}
 
-{% block css %}
-<link rel="stylesheet" type="text/css" href="/static/css/home.css">
-{% endblock %}
+{% block css %}<style>main {max-width: inherit; padding: 0px;}</style>{% endblock %}
 
 {% block main %}
-<div id="home-1" class="home-row">
+<div id="home-1" class="home-container">
     <div id="site-description">
         <h1>The Database of Zinc Binding Sites</h1>
         <p>ZincBind is a database of zinc binding sites, automatically generated

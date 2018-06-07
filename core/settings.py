@@ -16,6 +16,7 @@ ROOT_URLCONF = "core.urls"
 INSTALLED_APPS = [
  "django.contrib.contenttypes",
  "django.contrib.staticfiles",
+ "sass_processor",
  "core",
  "zinc"
 ]
@@ -27,6 +28,7 @@ MIDDLEWARE = [
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, "../static"))
+SASS_PROCESSOR_ROOT = os.path.abspath(os.path.join(BASE_DIR, "core", "static"))
 
 USE_TZ = False
 DATE_FORMAT = "j F, Y"

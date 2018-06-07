@@ -1,0 +1,22 @@
+// Top-level containers that nest immediately within <main></main>. Usually
+// just one per page, or one after the other in a column.
+
+.home-container {
+    display: grid;
+    grid-gap: 0px;
+    margin: -$padding;
+}
+
+
+@mixin containers--tablet() {
+
+}
+
+
+@mixin containers--laptop() {
+
+    .home-container {
+        grid-template-columns: 1fr 1fr;
+    }
+
+}

@@ -2,10 +2,6 @@
 
 {% block title %}Search Results: {{ request.GET.q }}{% endblock %}
 
-{% block css %}
-<link rel="stylesheet" type="text/css" href="/static/css/search.css">
-{% endblock %}
-
 {% block main %}
 {% if results.count %}
     <div class="search-info shadow">
