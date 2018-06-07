@@ -50,63 +50,66 @@ class SkeletonPdbTests(DjangoTest):
 
 
 
-class BindingAtomTests(DjangoTest):
+class BindingResidueTests(DjangoTest):
 
     def setUp(self):
         self.atom = Mock()
-        self.near = [Mock(element=e) for e in "CPSON"]
-        self.atom.nearby_atoms.return_value = set(self.near)
+        self.atoms = [Mock(), Mock(), Mock(), Mock()]
+        self.residues = [Mock(), Mock()]
+        self.residues[0].atoms.return_value = self.atoms[:2]
+        self.residues[1].atoms.return_value = self.atoms[2:]
+        self.atom.nearby_residues.return_value = self.residues
+        self.atom.nearby_atoms.return_value = self.atoms[::2]
 
 
     def test_can_get_nearby_to_zinc(self):
         self.atom.element = "ZN"
-        nearby = get_atom_binding_atoms(self.atom)
-        self.atom.nearby_atoms.assert_called_with(cutoff=3, metal=False)
-        self.assertEqual(set(nearby), set(self.near[2:]))
-        for atom in nearby: self.assertEqual(atom.liganding, True)
+        nearby = get_atom_binding_residues(self.atom)
+        self.atom.nearby_residues.assert_called_with(
+         cutoff=3, is_metal=False, element_regex="[NOS]", ligands=True
+        )
+        self.atom.nearby_atoms.assert_called_with(
+         cutoff=3, is_metal=False, element_regex="[NOS]"
+        )
+        self.assertTrue(self.atoms[0].liganding)
+        self.assertTrue(self.atoms[2].liganding)
+        self.assertFalse(self.atoms[1].liganding)
+        self.assertFalse(self.atoms[3].liganding)
 
 
     def test_can_get_nearby_to_other_metals(self):
         self.atom.element = "FE"
-        nearby = get_atom_binding_atoms(self.atom)
-        self.atom.nearby_atoms.assert_called_with(cutoff=3, metal=False)
-        self.assertEqual(set(nearby), set(self.near[1:]))
-        for atom in nearby: self.assertEqual(atom.liganding, True)
+        nearby = get_atom_binding_residues(self.atom)
+        self.atom.nearby_residues.assert_called_with(
+         cutoff=3, is_metal=False, element_regex="[^C]", ligands=True
+        )
+        self.atom.nearby_atoms.assert_called_with(
+         cutoff=3, is_metal=False, element_regex="[^C]"
+        )
+        self.assertTrue(self.atoms[0].liganding)
+        self.assertTrue(self.atoms[2].liganding)
+        self.assertFalse(self.atoms[1].liganding)
+        self.assertFalse(self.atoms[3].liganding)
 
 
 
-class AtomResidueTests(DjangoTest):
+class ClusterUniquenessChecking(DjangoTest):
 
     def setUp(self):
-        self.atoms = [Mock() for _ in range(5)]
-        self.residues = [Mock() for _ in range(3)]
-        self.atoms[0].residue = self.residues[0]
-        self.atoms[1].residue = self.residues[0]
-        self.atoms[2].residue = self.residues[1]
-        self.atoms[3].residue = self.residues[2]
-        self.atoms[4].residue = None
-        self.residues[0].atoms.return_value = self.atoms[:2]
-        self.residues[1].atoms.return_value = self.atoms[2:3]
-        self.residues[2].atoms.return_value = self.atoms[3:4]
-        chain = Mock(Chain)
-        for atom in self.atoms: atom.molecule = chain
+        self.clusters = [{"residues": {1, 2, 3}}, {"residues": {4, 5, 6}}]
 
 
-    def test_can_get_normal_residues(self):
-        residues = get_residues_from_atoms(self.atoms)
-        self.assertEqual(residues, set(self.residues))
+    def test_can_accept_uniqueness(self):
+        self.assertTrue(check_clusters_have_unique_residues(self.clusters))
 
 
-    def test_can_get_normal_residues_and_molecule(self):
-        water = Mock()
-        self.atoms[3].molecule = water
-        water.atoms.return_value = [water]
-        residues = get_residues_from_atoms(self.atoms)
-        self.assertEqual(residues, {self.residues[0], self.residues[1], water})
+    def test_can_reject_duplicates(self):
+        self.clusters[1]["residues"].add(1)
+        self.assertFalse(check_clusters_have_unique_residues(self.clusters))
 
 
 
-class MetalClusteringTests(DjangoTest):
+class MetalMergingTests(DjangoTest):
 
     def setUp(self):
         self.metals = [Mock() for _ in range(5)]
@@ -139,23 +142,6 @@ class MetalClusteringTests(DjangoTest):
         ])
 
 
-
-class ClusterUniquenessChecking(DjangoTest):
-
-    def setUp(self):
-        self.clusters = [{"residues": {1, 2, 3}}, {"residues": {4, 5, 6}}]
-
-
-    def test_can_accept_uniqueness(self):
-        self.assertTrue(check_clusters_have_unique_residues(self.clusters))
-
-
-    def test_can_reject_duplicates(self):
-        self.clusters[1]["residues"].add(1)
-        self.assertFalse(check_clusters_have_unique_residues(self.clusters))
-        
-
-
 class ZincClusteringTests(DjangoTest):
 
     def setUp(self):
@@ -166,20 +152,17 @@ class ZincClusteringTests(DjangoTest):
         self.metals[7].element = "FE"
 
 
-    @patch("zinc.utilities.get_atom_binding_atoms")
-    @patch("zinc.utilities.get_residues_from_atoms")
+    @patch("zinc.utilities.get_atom_binding_residues")
     @patch("zinc.utilities.merge_metal_groups")
-    def test_can_cluster_zinc_from_metals(self, mock_merge, mock_res, mock_atm):
-        mock_atm.side_effect = lambda a: [a, a]
-        mock_res.side_effect = lambda a: a * 2
+    def test_can_cluster_zinc_from_metals(self, mock_merge, mock_res):
+        mock_res.side_effect = lambda a: [a, a]
         mock_merge.return_value = [
          {"metals": set(self.metals[i * 2:(i + 1) * 2])} for i in range(4)
         ]
         clusters = cluster_zincs_with_residues(self.metals)
         for metal in self.metals:
-            mock_atm.assert_any_call(metal)
-            mock_res.assert_any_call([metal, metal])
-        mock_merge.assert_called_with({metal: [metal] * 4 for metal in self.metals})
+            mock_res.assert_any_call(metal)
+        mock_merge.assert_called_with({metal: [metal] * 2 for metal in self.metals})
         self.assertEqual(clusters, mock_merge.return_value[:3])
 
 

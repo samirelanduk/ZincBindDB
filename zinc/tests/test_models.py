@@ -123,9 +123,7 @@ class ChainTests(DjangoTest):
 
 
     def test_can_create_from_atomium_chain(self):
-        atomium_chain = Mock(id="B")
-        residues = [Mock(code="T"), Mock(code="M"), Mock(code="V")]
-        atomium_chain.residues.return_value = residues
+        atomium_chain = Mock(id="B", rep_sequence="TMV")
         pdb = mixer.blend(Pdb, id="1AAA")
         chain = Chain.create_from_atomium(atomium_chain, pdb)
         self.assertEqual(chain.id, "1AAAB")
@@ -285,7 +283,7 @@ class MetalTests(DjangoTest):
         self.kwargs = {
          "id": "1XXY401", "atom_pdb_identifier": 401, "name": "CA",
          "x": 1.4, "y": -0.4, "z": 0.0, "element": "C", "charge": 0.1,
-         "bfactor": 1.2, "residue": self.res, "site": self.site, "pdb": self.pdb
+         "bfactor": 1.2, "residue": self.res, "site": self.site
         }
 
 
@@ -310,7 +308,7 @@ class MetalTests(DjangoTest):
         atomium_atom.x, atomium_atom.y, atomium_atom.z = 1.1, 2.2, 3.3
         atomium_atom.charge, atomium_atom.bfactor = 0.5, 1.4
         atomium_atom.element, atomium_atom.name = "P", "PW"
-        atom = Metal.create_from_atomium(atomium_atom, self.pdb, self.site, self.chain)
+        atom = Metal.create_from_atomium(atomium_atom, self.site, self.chain)
         self.assertEqual(atom.id, "A100B10102")
         self.assertEqual(atom.x, 1.1)
         self.assertEqual(atom.y, 2.2)
@@ -322,5 +320,4 @@ class MetalTests(DjangoTest):
         self.assertEqual(atom.atom_pdb_identifier, 102)
         self.assertEqual(atom.residue, self.res)
         self.assertEqual(atom.site, self.site)
-        self.assertEqual(atom.pdb, self.pdb)
-        mock_create.assert_called_with(atomium_atom.molecule, self.chain)
+        mock_create.assert_called_with(atomium_atom.ligand, self.chain)

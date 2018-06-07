@@ -35,13 +35,16 @@ def main(reset=False):
             pdb_record = Pdb.create_from_atomium(pdb)
 
             # Get zincs and cluster
-            metals = pdb.model.atoms(metal=True) - pdb.model.atoms(metal=False)
+            metals = pdb.model.atoms(is_metal=True)
             zinc_clusters = cluster_zincs_with_residues(metals)
 
             # Create chains
             chains = {}
-            for chain in pdb.model.chains():
-                chains[chain.id] = Chain.create_from_atomium(chain, pdb_record)
+            for cluster in zinc_clusters:
+                for o in cluster["residues"].union(cluster["metals"]):
+                    chains[o.chain.id] = o.chain
+            for chain_id, chain in chains.items():
+                chains[chain_id] = Chain.create_from_atomium(chain, pdb_record)
 
             # Create binding sites
             for cluster in zinc_clusters:
@@ -51,20 +54,17 @@ def main(reset=False):
                  id=f"{pdb_record.id}{zinc_ids}", pdb=pdb_record
                 )
 
-                # Create zinc records and their residues
-                for metal in cluster["metals"]:
-                    chain = chains[metal.molecule.id[0]]
-                    Metal.create_from_atomium(metal, pdb_record, site, chain)
-
                 # Create residue records
                 for r in cluster["residues"]:
-                    chain = chains[r.id[0]]
+                    chain = chains[r.chain.id]
                     Residue.create_from_atomium(
                      r, chain, site
                     )
 
-            # Delete uneeded chains
-
+                # Create zinc records and their residues
+                for metal in cluster["metals"]:
+                    chain = chains[metal.chain.id]
+                    Metal.create_from_atomium(metal, site, chain)
 
 
 if __name__ == "__main__":

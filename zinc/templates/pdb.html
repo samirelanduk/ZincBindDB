@@ -26,8 +26,8 @@
     <div>
         {{ pdb.chain_set.count }} zinc-bearing chain{% if pdb.chain_set.count != 1 %}s{% endif %}
         ({% for chain in pdb.chain_set.all %}{{ chain.chain_pdb_identifier }}{% if not forloop.last %}, {% endif %}{% endfor %});
-        {{ pdb.metal_set.count }} zinc atom{% if pdb.metal_set.count != 1 %}s{% endif %}
-        ({% for atom in pdb.metal_set.all %}{{ atom.atom_pdb_identifier }}{% if not forloop.last %}, {% endif %}{% endfor %})
+        1000 zinc atoms
+
     </div>
 </div>
 
@@ -56,5 +56,5 @@
 {% block endjs %}
     <script src="https://unpkg.com/ngl"></script>
     <script src="/static/js/ngl.js"></script>
-    <script>drawWholePdb("{{ pdb.id }}", "{{ pdb.ngl_metals_sele }}"); setUpControls();</script>
+    <script>drawWholePdb("{{ pdb.id }}", ""); setUpControls();</script>
 {% endblock %}

@@ -39,41 +39,23 @@ def model_is_skeleton(model):
     return True
 
 
-def get_atom_binding_atoms(atom):
-    """Takes an atom and gets all non-metal atoms within 3Å. In the case of zinc
-    atoms, it will only take nitrogen, oxygen or sulphur atoms. For other atoms
-    it will take everything except carbons.
+def get_atom_binding_residues(metal):
+    """Takes an atom and gets all residues within 3Å - including ligands.
+    In the case of zinc atoms, it will only use nitrogen, oxygen or sulphur
+    atoms. For other atoms it will take everything except carbons.
 
-    It will also mark all the atoms it finds as 'liganding'."""
+    It will also mark atoms as 'liganding' or otherwise."""
 
-    nearby = atom.nearby_atoms(cutoff=3, metal=False)
-    if atom.element == "ZN":
-        nearby = [a for a in nearby if a.element in "NOS"]
-    else:
-        nearby = [a for a in nearby if a.element != "C"]
-    for atom in nearby: atom.liganding = True
-    return nearby
-
-
-def get_residues_from_atoms(atoms):
-    """Takes a collection of binding atoms and gets all the residues they are
-    part of. These can be protein residues or small molecules.
-
-    It will also go through every residue and, if it doesn't have a liganding
-    attribute, will create one and set it to False."""
-
-    residues = set()
-    for atom in atoms:
-        if not isinstance(atom.molecule, Chain):
-            residues.add(atom.molecule)
-        elif atom.residue:
-            residues.add(atom.residue)
-    for residue in residues:
+    kwargs = {
+     "cutoff": 3, "is_metal": False,
+     "element_regex": "[NOS]" if metal.element == "ZN" else "[^C]"
+    }
+    nearby_residues = metal.nearby_residues(ligands=True, **kwargs)
+    for residue in nearby_residues:
         for atom in residue.atoms():
-            try:
-                atom.liganding
-            except AttributeError: atom.liganding = False
-    return residues
+            atom.liganding = False
+    for atom in metal.nearby_atoms(**kwargs): atom.liganding = True
+    return nearby_residues
 
 
 def check_clusters_have_unique_residues(clusters):
@@ -114,8 +96,7 @@ def cluster_zincs_with_residues(metals):
 
     metals = {metal: [] for metal in metals}
     for metal in metals:
-        nearby = get_atom_binding_atoms(metal)
-        metals[metal] = get_residues_from_atoms(nearby)
+        metals[metal] = get_atom_binding_residues(metal)
     clusters = merge_metal_groups(metals)
     return [c for c in clusters if "ZN" in [a.element for a in c["metals"]]]
 

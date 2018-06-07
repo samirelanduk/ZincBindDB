@@ -100,8 +100,7 @@ class Chain(models.Model):
 
         return Chain.objects.create(
          id=f"{pdb.id}{chain.id}", pdb=pdb,
-         sequence = "".join([res.code for res in chain.residues()]),
-         chain_pdb_identifier=chain.id
+         sequence=chain.rep_sequence, chain_pdb_identifier=chain.id
         )
 
 
@@ -123,7 +122,7 @@ class Residue(models.Model):
 
     @staticmethod
     def create_from_atomium(residue, chain, site=None):
-        """Creates a residue record from an atomium Record object and existing
+        """Creates a residue record from an atomium Residue object and existing
         ZincSite and Chain records. You must specify the residue number."""
 
         numeric_id = int("".join(
@@ -208,68 +207,12 @@ class Metal(BaseAtom):
         db_table = "metals"
 
     site = models.ForeignKey(ZincSite, on_delete=models.CASCADE)
-    pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
 
 
     @staticmethod
-    def create_from_atomium(atom, pdb, site, chain):
-        residue = Residue.create_from_atomium(atom.molecule, chain)
+    def create_from_atomium(atom, site, chain):
+        residue = Residue.create_from_atomium(atom.ligand, chain)
         atom = BaseAtom.create_from_atomium(Metal, atom, residue)
-        atom.site, atom.pdb = site, pdb
+        atom.site = site
         atom.save()
         return atom
-
-
-
-
-
-'''class Pdb():
-
-
-
-
-
-class Atom(BaseAtom):
-
-    residue = models.ForeignKey(Residue, on_delete=models.CASCADE)
-
-
-    @staticmethod
-    def create_from_atomium(atom, residue):
-        """Creates an atom record from an atomium Atom object and an existing
-        Residue record. The atoms must have been given a liganding property at
-        some point, as atomium atoms don't usually have this property."""
-
-        return Atom.objects.create(
-         id=f"{residue.id}{atom.id}", atom_pdb_identifier=atom.id, name=atom.name,
-         x=atom.x, y=atom.y, z=atom.z, charge=atom.charge, bfactor=atom.bfactor,
-         residue=residue, liganding=atom.liganding, element=atom.element,
-        )
-
-
-
-class Metal(Atom):
-    """A metal atom in a PDB - usually zinc but ocasionally other metals are
-    cocatalytic with zinc."""
-
-    class Meta:
-        db_table = "metals"
-
-    site = models.ForeignKey(ZincSite, on_delete=models.CASCADE)
-    pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
-    residue_id = models.CharField(max_length=32)
-    chain_id = models.CharField(max_length=32)
-
-
-    @staticmethod
-    def create_from_atomium(atom, site):
-        """Creates a metal record from an atomium Atom object and an existing
-        ZincSite record."""
-
-        return Metal.objects.create(
-         id=f"{site.pdb.id}{atom.id}", atom_id=atom.id, x=atom.x, y=atom.y,
-         z=atom.z, charge=atom.charge, bfactor=atom.bfactor, residue=None,
-         liganding=atom.liganding, element=atom.element, name=atom.name,
-         site=site, pdb=site.pdb, residue_id=
-        )
-'''
