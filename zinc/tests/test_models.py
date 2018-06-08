@@ -187,7 +187,7 @@ class ResidueTests(DjangoTest):
         self.site = mixer.blend(ZincSite)
         self.chain = mixer.blend(Chain, chain_pdb_identifier="B")
         self.kwargs = {
-         "id": "1XXYA25", "site": self.site, "chain": self.chain, "name": "VAL",
+         "site": self.site, "chain": self.chain, "name": "VAL",
          "residue_pdb_identifier": 23, "insertion_pdb_identifier": "A"
         }
 
@@ -224,7 +224,6 @@ class ResidueTests(DjangoTest):
         atoms = [Mock(), Mock(), Mock()]
         atomium_residue.atoms.return_value = atoms
         res = Residue.create_from_atomium(atomium_residue, chain, site)
-        self.assertEqual(res.id, "A10023-45A-10BTYR")
         self.assertEqual(res.residue_pdb_identifier, -10)
         self.assertEqual(res.insertion_pdb_identifier, "B")
         self.assertEqual(res.site, site)
@@ -243,7 +242,6 @@ class ResidueTests(DjangoTest):
         atoms = [Mock(), Mock(), Mock()]
         atomium_residue.atoms.return_value = atoms
         res = Residue.create_from_atomium(atomium_residue, chain)
-        self.assertEqual(res.id, "A100CA-10BTYR")
         self.assertEqual(res.residue_pdb_identifier, -10)
         self.assertEqual(res.insertion_pdb_identifier, "B")
         self.assertEqual(res.site, None)
@@ -287,7 +285,7 @@ class AtomTests(DjangoTest):
     def setUp(self):
         self.res = mixer.blend(Residue)
         self.kwargs = {
-         "id": "1XXY401", "atom_pdb_identifier": 401, "name": "CA",
+         "atom_pdb_identifier": 401, "name": "CA",
          "x": 1.4, "y": -0.4, "z": 0.0, "element": "C", "charge": 0.1,
          "bfactor": 1.2, "residue": self.res, "liganding": True
         }
@@ -315,9 +313,8 @@ class AtomTests(DjangoTest):
         atomium_atom.x, atomium_atom.y, atomium_atom.z = 1.1, 2.2, 3.3
         atomium_atom.charge, atomium_atom.bfactor = 0.5, 1.4
         atomium_atom.element, atomium_atom.name = "P", "PW"
-        residue = mixer.blend(Residue, id="A100B10")
+        residue = mixer.blend(Residue)
         atom = Atom.create_from_atomium(atomium_atom, residue)
-        self.assertEqual(atom.id, "A100B10102")
         self.assertEqual(atom.x, 1.1)
         self.assertEqual(atom.y, 2.2)
         self.assertEqual(atom.z, 3.3)
@@ -339,7 +336,7 @@ class MetalTests(DjangoTest):
         self.pdb = mixer.blend(Pdb)
         self.chain = mixer.blend(Chain)
         self.kwargs = {
-         "id": "1XXY401", "atom_pdb_identifier": 401, "name": "CA",
+         "atom_pdb_identifier": 401, "name": "CA",
          "x": 1.4, "y": -0.4, "z": 0.0, "element": "C", "charge": 0.1,
          "bfactor": 1.2, "residue": self.res, "site": self.site
         }
@@ -361,13 +358,11 @@ class MetalTests(DjangoTest):
     @patch("zinc.models.Residue.create_from_atomium")
     def test_can_create_from_atomium_atom(self, mock_create):
         mock_create.return_value = self.res
-        self.res.id = "A100B10"
         atomium_atom = Mock(id=102)
         atomium_atom.x, atomium_atom.y, atomium_atom.z = 1.1, 2.2, 3.3
         atomium_atom.charge, atomium_atom.bfactor = 0.5, 1.4
         atomium_atom.element, atomium_atom.name = "P", "PW"
         atom = Metal.create_from_atomium(atomium_atom, self.site, self.chain)
-        self.assertEqual(atom.id, "A100B10102")
         self.assertEqual(atom.x, 1.1)
         self.assertEqual(atom.y, 2.2)
         self.assertEqual(atom.z, 3.3)

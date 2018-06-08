@@ -135,7 +135,6 @@ class Residue(models.Model):
         db_table = "residues"
         ordering = ["residue_pdb_identifier"]
 
-    id = models.CharField(primary_key=True, max_length=128)
     residue_pdb_identifier = models.IntegerField()
     insertion_pdb_identifier = models.CharField(max_length=128)
     name = models.CharField(max_length=128)
@@ -155,10 +154,7 @@ class Residue(models.Model):
         ))
         insertion = (residue.id[residue.id.find(str(numeric_id)) +
          len(str(numeric_id)):])
-        id = (f"{site.id}{residue.id}{residue.name}" if site else
-         f"{chain.id}{residue.id}{residue.name}")
         residue_record = Residue.objects.create(
-         id=id,
          residue_pdb_identifier=numeric_id,
          insertion_pdb_identifier=insertion,
          name=residue.name, chain=chain, site=site,
@@ -200,7 +196,6 @@ class BaseAtom(models.Model):
         abstract = True
 
 
-    id = models.TextField(primary_key=True)
     atom_pdb_identifier = models.IntegerField()
     name = models.CharField(max_length=32)
     x = models.FloatField()
@@ -214,7 +209,7 @@ class BaseAtom(models.Model):
     @staticmethod
     def create_from_atomium(cls, atom, residue):
         return cls(
-         id=f"{residue.id}{atom.id}", atom_pdb_identifier=atom.id,
+         atom_pdb_identifier=atom.id,
          name=atom.name, x=atom.x, y=atom.y, z=atom.z, charge=atom.charge,
          element=atom.element, bfactor=atom.bfactor, residue=residue
         )
