@@ -66,6 +66,9 @@ class ZincSitePageTests(FunctionalTest):
         self.check_title("A0014003")
         self.check_h1("A0014003")
 
+        # There is an info section
+        
+
 
     def test_404_on_no_site(self):
         self.get("/XXXXXXX/")

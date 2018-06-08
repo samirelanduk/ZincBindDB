@@ -275,6 +275,11 @@ class ResidueTests(DjangoTest):
         self.assertEqual(res.ngl_side_chain_sele, "(sidechain or .CA) and SELE")
 
 
+    def test_residue_atomium_id(self):
+        res = Residue(**self.kwargs)
+        self.assertEqual(res.atomium_id, "B23A")
+
+
 
 
 class AtomTests(DjangoTest):

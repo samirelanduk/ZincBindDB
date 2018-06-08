@@ -5,10 +5,23 @@ a {
     text-decoration: none;
 }
 
+h1, h2, h3 {
+    margin: 0px;
+}
+
 h1 {
     font-weight: normal;
-    margin: 0px;
     @include white-box;
     text-align: center;
     padding: 2 * $padding;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+h3 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
 }

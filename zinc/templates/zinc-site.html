@@ -4,10 +4,36 @@
 
 {% block main %}
 <h1>{{ site.id }}</h1>
+
+<div class="pdb-box" id="site-info">
+    <h2>BindSite Information</h2>
+    <div class="site-info-columns">
+        <div class="site-info-column">
+            <div>
+                <h3>PDB</h3>
+                <div><a href="/pdbs/{{ site.pdb.id }}/">{{ site.pdb.id }}</a></div>
+            </div>
+            <div>
+                <h3>Metals</h3>
+                {% for metal in site.metal_set.all %}
+                <div class="metal">{{ metal.atom_pdb_identifier }} ({{ metal.element }})</div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="site-info-column">
+            <h3>Liganding Residues</h3>
+            {% for residue in site.residue_set.all %}
+            <div class="residue">{{ residue.atomium_id }} ({{ residue.name }})</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
 {% include "ngl-pdb.html" %}
 
-
-
+{% with site.pdb as pdb %}
+{% include "pdb-info.html" %}
+{% endwith %}
 
 {% endblock %}
 

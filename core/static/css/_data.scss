@@ -134,10 +134,33 @@
     }
 }
 
+#site-info {
+    .site-info-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
 
 @mixin data--tablet() {
     .pdb-box {
         padding: 2 * $padding;
+    }
+
+    #site-info {
+        .site-info-columns {
+            grid-template-columns: 2fr 1fr;
+
+            .site-info-column {
+                text-align: center;
+            }
+
+            .site-info-column:first-child {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+
+        }
     }
 }
 

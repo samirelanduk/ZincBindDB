@@ -184,6 +184,14 @@ class Residue(models.Model):
         return f"(sidechain or .CA) and " + self.ngl_sele
 
 
+    @property
+    def atomium_id(self):
+        """Recreates the atomium ID of the residue."""
+
+        return (f"{self.chain.chain_pdb_identifier}" +
+        f"{self.residue_pdb_identifier}{self.insertion_pdb_identifier}")
+
+
 
 class BaseAtom(models.Model):
     """The base class for residue atoms and metal atoms."""
