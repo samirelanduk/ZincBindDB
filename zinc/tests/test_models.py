@@ -75,6 +75,24 @@ class PdbTests(DjangoTest):
         self.assertEqual(list(Pdb.search("fg")), [pdbs[1]])
 
 
+    def test_can_search_pdbs_by_classification(self):
+        pdbs = [mixer.blend(Pdb, classification=c) for c in ["ABCD", "EFGH", "CDEF"]]
+        self.assertEqual(list(Pdb.search("CD")), [pdbs[0], pdbs[2]])
+        self.assertEqual(list(Pdb.search("fg")), [pdbs[1]])
+
+
+    def test_can_search_pdbs_by_technique(self):
+        pdbs = [mixer.blend(Pdb, technique=t) for t in ["ABCD", "EFGH", "CDEF"]]
+        self.assertEqual(list(Pdb.search("CD")), [pdbs[0], pdbs[2]])
+        self.assertEqual(list(Pdb.search("fg")), [pdbs[1]])
+
+
+    def test_can_search_pdbs_by_organism(self):
+        pdbs = [mixer.blend(Pdb, organism=o) for o in ["ABCD", "EFGH", "CDEF"]]
+        self.assertEqual(list(Pdb.search("CD")), [pdbs[0], pdbs[2]])
+        self.assertEqual(list(Pdb.search("fg")), [pdbs[1]])
+
+
     @patch("zinc.models.Pdb.metals")
     def test_ngl_metals_sele(self, mock_metals):
         metals = [Mock(), Mock()]

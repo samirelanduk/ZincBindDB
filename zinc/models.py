@@ -40,6 +40,9 @@ class Pdb(models.Model):
 
         return Pdb.objects.filter(
          models.Q(id=term.upper()) | models.Q(title__contains=term.upper())
+         | models.Q(classification__contains=term.upper())
+         | models.Q(technique__contains=term.upper())
+         | models.Q(organism__contains=term.upper())
         ).order_by("-deposited")
 
 

@@ -26,6 +26,11 @@
         color: inherit;
     }
 
+    a:hover div, .pdb-site:hover {
+        background-color: $pale-purple;
+        cursor: pointer;
+    }
+
     .pdb-result {
 
         font-size: 0.8em;
@@ -56,9 +61,31 @@
 
         .pdb-secondary {
             padding: $padding / 2;
+            border-bottom: 1px solid $border-gray;
         }
 
 
+    }
+
+    .site-results {
+        margin-left: 10%;
+        border-left: 1px solid $border-gray;
+        box-sizing: border-box;
+
+        .pdb-site {
+            padding: $padding;
+            font-size: 0.8em;
+            border-bottom: 1px solid $border-gray;
+            box-sizing: border-box;
+
+            .pdb-site-id {
+                font-weight: bold;
+            }
+        }
+
+        .pdb-site:last-child {
+            border-bottom: none;
+        }
     }
 }
 

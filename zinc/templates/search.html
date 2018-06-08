@@ -4,13 +4,13 @@
 
 {% block main %}
 {% if results.count %}
-    <div class="search-info shadow">
+    <div class="search-info">
         <div>{{ results.count }} result{% if results.count != 1 %}s{% endif %}</div>
         {% if results.num_pages > 1 %}<div>Page {{ page.number }} of {{ results.num_pages }}</div>{% endif %}
     </div>
 
     {% for pdb in page %}
-    <div class="search-result shadow">
+    <div class="search-result">
         <div class="pdb-result"><a href="/pdbs/{{ pdb.id }}/">
             <div class="pdb-result-main">
                 <div class="pdb-code">PDB: {{ pdb.id }}</div>
@@ -24,22 +24,29 @@
                  {{ pdb.chain_set.count }} zinc-bearing chain{% if pdb.chain_set.count != 1 %}s{% endif %}
              </div>
         </a></div>
-    </a></div>
+
+        <div class="site-results">
+            {% for site in pdb.zincsite_set.all %}
+            {% include "zinc-site-summary.html" %}
+            {% endfor %}
+        </div>
+    </div>
     {% endfor %}
 
     {% if results.num_pages > 1 %}
-        <div id="search-nav" class="shadow">
+        <div id="search-nav">
             {% if page.has_previous %}<a class="previous-page" href="/search?q={{ request.GET.q }}&page={{ page.previous_page_number}}">Previous Page</a>{% endif %}
             {% if page.has_next %}<a class="next-page" href="/search?q={{ request.GET.q }}&page={{ page.next_page_number}}">Next Page</a>{% endif %}
         </div>
     {% endif %}
 {% else %}
 
-    <div class="search-info no-results shadow">
+    <div class="search-info no-results">
         <div>There were no results matching your query.</div>
         <div class="search-help">
             Search is case-insensitive, and searches PDB codes (for exact matches)
-            and PDB descriptions (for partial matches).
+            and PDB descriptions, classifications, organisms, and experimental
+            techniques (for partial matches).
         </div>
     </div>
 {% endif %}
