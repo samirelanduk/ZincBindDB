@@ -3,58 +3,61 @@
 {% block title %}{{ pdb.id }}{% endblock %}
 
 {% block main %}
-<h1>{{ pdb.title }}</h1>
+<div class="column-container">
+    <h1>{{ pdb.title }}</h1>
 
-<div id="pdb-info">
-    <div class="pdb-info-columns">
-        <div class="pdb-info-column">
-            <div class="pdb-info-row"><strong>Code: </strong><a href="https://www.rcsb.org/structure/{{ pdb.id }}" target="_blank">{{ pdb.id }}</a></div>
-            <div class="pdb-info-row"><strong>Classification: </strong> {{ pdb.classification }}</div>
-        </div>
-        <div class="pdb-info-column">
-            <div class="pdb-info-row"><strong>Resolution: </strong> {{ pdb.resolution|angstroms }}</div>
-            <div class="pdb-info-row"><strong>R-factor: </strong> {{ pdb.rfactor|angstroms }}</div>
-        </div>
-    </div>
-    <div class="pdb-info-row"><strong>Deposition Date: </strong> {{ pdb.deposited }}</div>
-    <div class="pdb-info-row"><strong>Experimental Technique: </strong> {{ pdb.technique }}</div>
-    <div class="pdb-info-row"><strong>Source Organism: </strong><em><script>document.write(formatSpecies("{{ pdb.organism }}"));</script></em></div>
-    <div class="pdb-info-row"><strong>Expression System: </strong><em><script>document.write(formatSpecies("{{ pdb.expression }}"));</script></em></div>
-</div>
-
-<div id="pdb-chains">
-    <div>
-        {{ pdb.chain_set.count }} zinc-bearing chain{% if pdb.chain_set.count != 1 %}s{% endif %}
-        ({% for chain in pdb.chain_set.all %}{{ chain.chain_pdb_identifier }}{% if not forloop.last %}, {% endif %}{% endfor %});
-        1000 zinc atoms
-
-    </div>
-</div>
-
-<div id="pdb-sites">
-    <div class="pdb-sites-count">{{ pdb.zincsite_set.count }} zinc binding site{% if pdb.zincsite_set.count != 1 %}s{% endif %}</div>
-
-    <div class="pdb-sites-list">
-        {% for site in pdb.zincsite_set.all %}
-        <div class="pdb-site"><a href="/{{ site.id }}/">
-            <div class="pdb-site-id">{{ site.id }}</div>
-            <div class="pdb-site-residues">
-                {{ site.residue_set.count }} residue{% if pdb.residue_set.count != 1 %}s{% endif %}
-                {% for residue in site.residue_set.all %}
-                <span class="pdb-site-residue">{{ residue.residue_id }} ({{ residue.name }}){% if not forloop.last %}, {% endif %}</span>
-                {% endfor %}
+    <div id="pdb-info" class="pdb-box">
+        <div class="pdb-info-columns">
+            <div class="pdb-info-column">
+                <div class="pdb-info-row"><strong>Code: </strong><a href="https://www.rcsb.org/structure/{{ pdb.id }}" target="_blank">{{ pdb.id }}</a></div>
+                <div class="pdb-info-row"><strong>Classification: </strong> {{ pdb.classification }}</div>
             </div>
-        </a></div>
-        {% endfor %}
+            <div class="pdb-info-column">
+                <div class="pdb-info-row"><strong>Resolution: </strong> {{ pdb.resolution|angstroms }}</div>
+                <div class="pdb-info-row"><strong>R-factor: </strong> {{ pdb.rfactor|angstroms }}</div>
+            </div>
+        </div>
+        <div class="pdb-info-row"><strong>Deposition Date: </strong> {{ pdb.deposited }}</div>
+        <div class="pdb-info-row"><strong>Experimental Technique: </strong> {{ pdb.technique }}</div>
+        <div class="pdb-info-row"><strong>Source Organism: </strong><em><script>document.write(formatSpecies("{{ pdb.organism }}"));</script></em></div>
+        <div class="pdb-info-row"><strong>Expression System: </strong><em><script>document.write(formatSpecies("{{ pdb.expression }}"));</script></em></div>
     </div>
-</div>
 
-{% include "ngl-pdb.html" %}
+    <div id="pdb-chains" class="pdb-box">
+        <div>
+            {{ pdb.chain_set.count }} zinc-bearing chain{{ pdb.chain_set.count|pluralize }}
+            ({% for chain in pdb.chain_set.all %}{{ chain.chain_pdb_identifier }}{% if not forloop.last %}, {% endif %}{% endfor %});
+            {{ pdb.metals.count }} zinc atom{{ pdb.metals.count|pluralize }}
+            ({% for metal in pdb.metals %}{{ metal.atom_pdb_identifier }}{% if not forloop.last %}, {% endif %}{% endfor %});
+
+        </div>
+    </div>
+
+    <div id="pdb-sites" class="pdb-box">
+        <div class="pdb-sites-count">{{ pdb.zincsite_set.count }} zinc binding site{% if pdb.zincsite_set.count != 1 %}s{% endif %}</div>
+
+        <div class="pdb-sites-list">
+            {% for site in pdb.zincsite_set.all %}
+            <div class="pdb-site"><a href="/{{ site.id }}/">
+                <div class="pdb-site-id">{{ site.id }}</div>
+                <div class="pdb-site-residues">
+                    {{ site.residue_set.count }} residue{% if pdb.residue_set.count != 1 %}s{% endif %}
+                    {% for residue in site.residue_set.all %}
+                    <span class="pdb-site-residue">{{residue.chain.chain_pdb_identifier }}{{ residue.residue_pdb_identifier }}{{residue.chain.insertion_pdb_identifier }} ({{ residue.name }}){% if not forloop.last %}, {% endif %}</span>
+                    {% endfor %}
+                </div>
+            </a></div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% include "ngl-pdb.html" %}
+</div>
 
 {% endblock %}
 
 {% block endjs %}
-    <script src="https://unpkg.com/ngl"></script>
+    <script src="https://cdn.rawgit.com/arose/ngl/v0.10.4-1/dist/ngl.js"></script>
     <script src="/static/js/ngl.js"></script>
-    <script>drawWholePdb("{{ pdb.id }}", ""); setUpControls();</script>
+    <script>drawWholePdb("{{ pdb.id }}", "{{ pdb.ngl_metals_sele }}", "{{ pdb.ngl_residues_sele }}"); setUpControls();</script>
 {% endblock %}

@@ -30,10 +30,10 @@ class PdbPageTests(FunctionalTest):
         self.assertEqual(len(sites), 2)
         self.assertIn("A0014003", sites[0].text)
         self.assertIn("3 residues", sites[0].text)
-        self.assertIn("A25 (VAL), A23 (TYR), A21 (TYR)", sites[0].text)
+        self.assertIn("A21 (TYR), A23 (TYR), A25 (VAL)", sites[0].text)
         self.assertIn("A0018003", sites[1].text)
         self.assertIn("3 residues", sites[1].text)
-        self.assertIn("B500 (HOH), B25 (VAL), B23 (TYR)", sites[1].text)
+        self.assertIn("B23 (TYR), B25 (VAL), B500 (HOH)", sites[1].text)
 
         # There is a 3D display
         ngl = self.browser.find_element_by_id("pdb-ngl")

@@ -21,31 +21,31 @@ class FunctionalTest(StaticLiveServerTestCase, BrowserTest):
          expression="ESCHERICHIA COLI BL21(DE3)", rfactor=4.5,
          classification="REDUCTASE", technique="X-RAY",
         )
-        chain1 = Chain.objects.create(
-         pdb=pdb1, id="A001B", sequence="MVTTYRLKSSSSWMDE"
-        )
         chain2 = Chain.objects.create(
-         pdb=pdb1, id="A001A", sequence="MVTTYRLKSSSSWMDE"
+         pdb=pdb1, id="A001B", sequence="MVTTYRLKSSSSWMDE", chain_pdb_identifier="B"
+        )
+        chain1 = Chain.objects.create(
+         pdb=pdb1, id="A001A", sequence="MVTTYRLKSSSSWMDE", chain_pdb_identifier="A"
         )
         site1 = mixer.blend(ZincSite, pdb=pdb1, id="A0014003")
         site2 = mixer.blend(ZincSite, pdb=pdb1, id="A0018003")
         res1 = mixer.blend(
-         Residue, site=site1, residue_id="A23", number=4, name="TYR"
+         Residue, site=site1, residue_pdb_identifier=23, insertion_pdb_identifier="", number=4, name="TYR", chain=chain1
         )
         res2 = mixer.blend(
-         Residue, site=site1, residue_id="A25", number=3, name="VAL"
+         Residue, site=site1, residue_pdb_identifier=25, insertion_pdb_identifier="", number=3, name="VAL", chain=chain1
         )
         res3 = mixer.blend(
-         Residue, site=site1, residue_id="A21", number=7, name="TYR"
+         Residue, site=site1, residue_pdb_identifier=21, insertion_pdb_identifier="", number=7, name="TYR", chain=chain1
         )
         res4 = mixer.blend(
-         Residue, site=site2, residue_id="B23", number=4, name="TYR"
+         Residue, site=site2, residue_pdb_identifier=23, insertion_pdb_identifier="", number=4, name="TYR", chain=chain2
         )
         res5 = mixer.blend(
-         Residue, site=site2, residue_id="B25", number=2, name="VAL"
+         Residue, site=site2, residue_pdb_identifier=25, insertion_pdb_identifier="", number=2, name="VAL", chain=chain2
         )
         res6 = mixer.blend(
-         Residue, site=site2, residue_id="B500", number=0, name="HOH"
+         Residue, site=site2, residue_pdb_identifier=500, insertion_pdb_identifier="", number=0, name="HOH", chain=chain2
         )
 
 

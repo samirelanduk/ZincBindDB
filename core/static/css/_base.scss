@@ -79,9 +79,9 @@ nav {
 
 main {
     padding: $padding;
-    font-size: 1.6em;
     max-width: $desktop-width;
     @include margin-side(auto);
+    font-size: 1.25em;
 }
 
 
@@ -111,5 +111,9 @@ main {
                 background-color: inherit;
             }
         }
+    }
+
+    main {
+        font-size: 1.5em;
     }
 }

@@ -1,6 +1,6 @@
 from datetime import date
 from mixer.backend.django import mixer
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock, PropertyMock
 from testarsenal import DjangoTest
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -75,6 +75,26 @@ class PdbTests(DjangoTest):
         self.assertEqual(list(Pdb.search("fg")), [pdbs[1]])
 
 
+    @patch("zinc.models.Pdb.metals")
+    def test_ngl_metals_sele(self, mock_metals):
+        metals = [Mock(), Mock()]
+        metals[0].residue.ngl_sele = "S1"
+        metals[1].residue.ngl_sele = "S2"
+        pdb = Pdb(**self.kwargs)
+        pdb.metals = metals
+        self.assertEqual(pdb.ngl_metals_sele, "S1 or S2")
+
+
+    @patch("zinc.models.Pdb.residues")
+    def test_ngl_residues_sele(self, mock_residues):
+        residues = [Mock(), Mock()]
+        residues[0].ngl_side_chain_sele = "S1"
+        residues[1].ngl_side_chain_sele = "S2"
+        pdb = Pdb(**self.kwargs)
+        pdb.residues = residues
+        self.assertEqual(pdb.ngl_residues_sele, "S1 or S2")
+
+
 
 class ZincSiteTests(DjangoTest):
 
@@ -96,6 +116,26 @@ class ZincSiteTests(DjangoTest):
             del kwargs[field]
             with self.assertRaises(ValidationError):
                 ZincSite(**kwargs).full_clean()
+
+
+    @patch("zinc.models.ZincSite.metal_set")
+    def test_ngl_metals_sele(self, mock_metals):
+        metals = [Mock(), Mock()]
+        metals[0].residue.ngl_sele = "S1"
+        metals[1].residue.ngl_sele = "S2"
+        mock_metals.all.return_value = metals
+        site = ZincSite(**self.kwargs)
+        self.assertEqual(site.ngl_metals_sele, "S1 or S2")
+
+
+    @patch("zinc.models.ZincSite.residue_set")
+    def test_ngl_residues_sele(self, mock_residues):
+        residues = [Mock(), Mock()]
+        residues[0].ngl_side_chain_sele = "S1"
+        residues[1].ngl_side_chain_sele = "S2"
+        mock_residues.all.return_value = residues
+        site = ZincSite(**self.kwargs)
+        self.assertEqual(site.ngl_residues_sele, "S1 or S2")
 
 
 
@@ -145,7 +185,7 @@ class ResidueTests(DjangoTest):
 
     def setUp(self):
         self.site = mixer.blend(ZincSite)
-        self.chain = mixer.blend(Chain)
+        self.chain = mixer.blend(Chain, chain_pdb_identifier="B")
         self.kwargs = {
          "id": "1XXYA25", "site": self.site, "chain": self.chain, "name": "VAL",
          "residue_pdb_identifier": 23, "insertion_pdb_identifier": "A"
@@ -221,6 +261,19 @@ class ResidueTests(DjangoTest):
          [r.residue_pdb_identifier for r in Residue.objects.all()],
          [4, 8, 15, 16, 23, 42]
         )
+
+
+    def test_residue_ngl_sele(self):
+        res = Residue(**self.kwargs)
+        self.assertEqual(res.ngl_sele, "23^A:B")
+
+
+    @patch("zinc.models.Residue.ngl_sele", new_callable=PropertyMock)
+    def test_residue_side_chain_sele(self, mock_sele):
+        mock_sele.return_value = "SELE"
+        res = Residue(**self.kwargs)
+        self.assertEqual(res.ngl_side_chain_sele, "(sidechain or .CA) and SELE")
+
 
 
 

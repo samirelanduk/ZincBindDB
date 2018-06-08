@@ -44,8 +44,33 @@ class Pdb(models.Model):
 
 
     @property
+    def metals(self):
+        """Gets all the metal objects in this Pdb."""
+
+        return Metal.objects.filter(residue__chain__pdb=self)
+
+
+    @property
+    def residues(self):
+        """Gets all the residue objects that provide liganding atoms that belong
+        to this Pdb (*not* those which are merely a container for a metal
+        ion)."""
+
+        return Residue.objects.filter(site__pdb=self)
+
+
+    @property
     def ngl_metals_sele(self):
-        return " or ".join([metal.residue.ngl_sele for metal in self.metal_set.all()])
+        """The NGL selector text needed to grab all metal atoms."""
+
+        return " or ".join([metal.residue.ngl_sele for metal in self.metals])
+
+
+    @property
+    def ngl_residues_sele(self):
+        """The NGL selector text needed to grab all binding residues."""
+
+        return " or ".join([res.ngl_side_chain_sele for res in self.residues])
 
 
 
@@ -60,23 +85,21 @@ class ZincSite(models.Model):
 
     @property
     def ngl_metals_sele(self):
-        selectors = []
-        for metal in self.metal_set.all():
-            res = metal.residue
-            selectors.append(
-             res.ngl_sele
-            )
-        return " or ".join(selectors)
+        """The NGL selector text needed to grab all metal atoms in a site."""
+
+        return " or ".join([
+         metal.residue.ngl_sele for metal in self.metal_set.all()
+        ])
 
 
     @property
     def ngl_residues_sele(self):
-        selectors = []
-        for res in self.residue_set.all():
-            selectors.append(
-             res.ngl_side_chain_sele
-            )
-        return " or ".join(selectors)
+        """The NGL selector text needed to grab all binding residues in a
+        site."""
+
+        return " or ".join([
+         res.ngl_side_chain_sele for res in self.residue_set.all()
+        ])
 
 
 
@@ -116,7 +139,9 @@ class Residue(models.Model):
     residue_pdb_identifier = models.IntegerField()
     insertion_pdb_identifier = models.CharField(max_length=128)
     name = models.CharField(max_length=128)
-    site = models.ForeignKey(ZincSite, on_delete=models.CASCADE, null=True, blank=True)
+    site = models.ForeignKey(
+     ZincSite, on_delete=models.CASCADE, null=True, blank=True
+    )
     chain = models.ForeignKey(Chain, on_delete=models.CASCADE)
 
 
@@ -128,8 +153,10 @@ class Residue(models.Model):
         numeric_id = int("".join(
          c for c in residue.id if c.isdigit() or c == "-"
         ))
-        insertion = residue.id[residue.id.find(str(numeric_id)) + len(str(numeric_id)):]
-        id = f"{site.id}{residue.id}{residue.name}" if site else f"{chain.id}{residue.id}{residue.name}"
+        insertion = (residue.id[residue.id.find(str(numeric_id)) +
+         len(str(numeric_id)):])
+        id = (f"{site.id}{residue.id}{residue.name}" if site else
+         f"{chain.id}{residue.id}{residue.name}")
         residue_record = Residue.objects.create(
          id=id,
          residue_pdb_identifier=numeric_id,
@@ -144,11 +171,16 @@ class Residue(models.Model):
 
     @property
     def ngl_sele(self):
-        return f"{self.residue_pdb_identifier}^{self.insertion_pdb_identifier}:{self.chain.chain_pdb_identifier}"
+        """The NGL selector text needed to select the residue."""
+
+        return (f"{self.residue_pdb_identifier}^" +
+        f"{self.insertion_pdb_identifier}:{self.chain.chain_pdb_identifier}")
 
 
     @property
     def ngl_side_chain_sele(self):
+        """The NGL selector text needed to select the residue side chain."""
+
         return f"(sidechain or .CA) and " + self.ngl_sele
 
 

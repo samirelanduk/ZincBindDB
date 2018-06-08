@@ -7,6 +7,12 @@
     margin: -$padding;
 }
 
+.column-container {
+    max-width: $laptop-width;
+    @include margin-side(auto);
+    grid-gap: $padding;
+}
+
 
 @mixin containers--tablet() {
 

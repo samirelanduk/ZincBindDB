@@ -1,4 +1,4 @@
-function drawNgl(code, representations) {
+function drawNgl(code, representations, zoom) {
     stage = new NGL.Stage("ngl-container", {backgroundColor: "#ffffff"});
     stage.viewer.container.addEventListener("dblclick", function () {
         stage.toggleFullscreen();
@@ -20,7 +20,7 @@ function drawNgl(code, representations) {
                 component.addRepresentation(representations[i][0], representations[i][1]);
             }
         }
-        if (representations.length > 1) {
+        if (zoom) {
             component.autoView(representations[1][1].sele);
         } else {
             component.autoView();
@@ -30,22 +30,23 @@ function drawNgl(code, representations) {
     return stage;
 }
 
-function drawWholePdb(code, metals) {
+function drawWholePdb(code, metals, residues) {
     drawNgl(code, [
-        ["ball+stick", {sele: metals, aspectRatio: 8}]
-    ]);
+        ["ball+stick", {sele: metals, aspectRatio: 8}],
+        ["licorice", {sele: residues}]
+    ], false);
 }
 
 function drawZincSite(code, metals, residues) {
     var stage = drawNgl(code, [
         ["ball+stick", {sele: metals, aspectRatio: 8}],
         ["licorice", {sele: residues}]
-    ]);
+    ], true);
 }
 
 function setUpControls() {
     $(".color-options").click(function(e) {
-        var color = $('input[name=color]:checked').val();
+        var color = $('input[name=color]:checked').css("background-color");
         $("canvas").css("background-color", color);
     })
 }

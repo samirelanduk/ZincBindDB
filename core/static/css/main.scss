@@ -1,7 +1,7 @@
 $font: "Source Sans Pro";
 $logo-font: "Exo 2";
 
-$back-gray: #e6ecf0;
+$back-gray: #eef2f5;
 $border-gray: #dddbef;
 $purple: #472b52;
 $pale-purple: #f1ecf0;
@@ -11,7 +11,7 @@ $white: #ffffff;
 $black: #404040;
 
 $nav-margin: 2.5rem;
-$padding: 1.5rem;
+$padding: 1.2rem;
 $curvature: 0.4rem;
 
 $tablet-width: 600px;
@@ -29,7 +29,7 @@ $desktop-width: 1200px;
 
 @mixin white-box {
     background-color: $white;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 3px 6px 0 rgba(0,0,0,0.2);
 }
 
 @import "base";
@@ -45,11 +45,13 @@ $desktop-width: 1200px;
 @media (min-width: $tablet-width) {
     @include base--tablet();
     @include home--tablet();
+    @include data--tablet();
 }
 
 @media (min-width: $laptop-width) {
     @include containers--laptop();
     @include home--laptop();
+    @include data--laptop();
 }
 
 @media (min-width: $desktop-width) {
