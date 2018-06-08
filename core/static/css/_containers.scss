@@ -13,6 +13,13 @@
     grid-gap: $padding;
 }
 
+.small-container {
+    display: grid;
+    max-width: $tablet-width;
+    @include margin-side(auto);
+    grid-gap: $padding;
+}
+
 
 @mixin containers--tablet() {
 

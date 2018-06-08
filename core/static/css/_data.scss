@@ -81,7 +81,7 @@
         }
 
         .pdb-site:hover {
-            background-color: $pale-purple;
+            background-color: $hover-color;
             transition: 0.4s;
         }
     }
@@ -99,7 +99,7 @@
     .ngl-controls {
         border-top: 1px solid $border-gray;
         padding: 1rem;
-        background-color: $pale-purple;
+        background-color: $hover-color;
         flex-grow: 5;
 
         .ngl-control {

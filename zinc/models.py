@@ -11,6 +11,7 @@ class Pdb(models.Model):
     id = models.CharField(primary_key=True, max_length=128)
     title = models.CharField(max_length=1024)
     classification = models.CharField(null=True, blank=True, max_length=1024)
+    keywords = models.CharField(null=True, blank=True, max_length=2048)
     deposited = models.DateField(null=True, blank=True)
     resolution = models.FloatField(null=True, blank=True)
     organism = models.CharField(null=True, blank=True, max_length=1024)
@@ -29,6 +30,7 @@ class Pdb(models.Model):
          id=pdb.code, rfactor=pdb.rfactor, classification=pdb.classification,
          deposited=pdb.deposition_date, organism=pdb.organism, title=pdb.title,
          expression=pdb.expression_system, technique=pdb.technique,
+         keywords=", ".join(pdb.keywords) if pdb.keywords else "",
          resolution=pdb.resolution, skeleton=model_is_skeleton(pdb.model),
         )
 
@@ -43,7 +45,36 @@ class Pdb(models.Model):
          | models.Q(classification__contains=term.upper())
          | models.Q(technique__contains=term.upper())
          | models.Q(organism__contains=term.upper())
+         | models.Q(keywords__contains=term.upper())
         ).order_by("-deposited")
+
+
+    @staticmethod
+    def advanced_search(GET_dict):
+        """Takes some GET data and uses it to search the PDBs."""
+
+        qs = []
+        string_terms = [
+         "title", "classification", "keywords",
+         "organism", "expression", "technique"
+        ]
+        for string_term in string_terms:
+            if string_term in GET_dict:
+                kwargs = {
+                 string_term + "__contains": GET_dict[string_term].upper()
+                }
+                qs.append(models.Q(**kwargs))
+        numeric_terms = [
+         "resolution_gt", "resolution_lt", "rfactor_gt", "rfactor_lt",
+         "deposited_gt", "deposited_lt"
+        ]
+        for numeric_term in numeric_terms:
+            if numeric_term in GET_dict:
+                kwargs = {
+                 numeric_term.replace("_", "__"): GET_dict[numeric_term].upper()
+                }
+                qs.append(models.Q(**kwargs))
+        return Pdb.objects.filter(*qs).order_by("-deposited")
 
 
     @property

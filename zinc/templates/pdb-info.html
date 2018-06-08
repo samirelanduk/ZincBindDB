@@ -10,6 +10,7 @@
 			<div class="pdb-info-row"><strong>R-factor: </strong> {{ pdb.rfactor|angstroms }}</div>
 		</div>
 	</div>
+	<div class="pdb-info-row"><strong>Keywords: </strong> {{ pdb.keywords }}</div>
 	<div class="pdb-info-row"><strong>Deposition Date: </strong> {{ pdb.deposited }}</div>
 	<div class="pdb-info-row"><strong>Experimental Technique: </strong> {{ pdb.technique }}</div>
 	<div class="pdb-info-row"><strong>Source Organism: </strong><em><script>document.write(formatSpecies("{{ pdb.organism }}"));</script></em></div>

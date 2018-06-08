@@ -6,6 +6,7 @@ $border-gray: #dddbef;
 $purple: #472b52;
 $pale-purple: #f1ecf0;
 $hyperlink-blue: #0074D9;
+$hover-color: #e3e2f5;
 $error-red: #a94442;
 $white: #ffffff;
 $black: #404040;
@@ -46,6 +47,7 @@ $desktop-width: 1200px;
     @include base--tablet();
     @include home--tablet();
     @include data--tablet();
+    @include forms--tablet();
 }
 
 @media (min-width: $laptop-width) {

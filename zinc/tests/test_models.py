@@ -2,6 +2,7 @@ from datetime import date
 from mixer.backend.django import mixer
 from unittest.mock import patch, Mock, MagicMock, PropertyMock
 from testarsenal import DjangoTest
+from django.http import QueryDict
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.utils import IntegrityError
@@ -14,7 +15,7 @@ class PdbTests(DjangoTest):
          "id": "1XXY", "title": "The PDB Title", "deposited": date(1990, 9, 28),
          "resolution": 4.5, "organism": "HOMO SAPIENS", "expression": "M MUS",
          "classification": "LYASE", "technique": "XRAY", "skeleton": False,
-         "rfactor": 4.5
+         "rfactor": 4.5, "keywords": "REPLICATION, ZINC"
         }
 
 
@@ -44,7 +45,8 @@ class PdbTests(DjangoTest):
         mock_is.return_value = True
         atomium_pdb = Mock(
          code="1AAA", title="T", classification="C", deposition_date=date(1, 1, 1),
-         organism="O", expression_system="E", technique="T", rfactor=1, resolution=2
+         organism="O", expression_system="E", technique="T", rfactor=1, resolution=2,
+         keywords=["AA", "BB"]
         )
         pdb = Pdb.create_from_atomium(atomium_pdb)
         self.assertEqual(pdb.id, atomium_pdb.code)
@@ -55,6 +57,7 @@ class PdbTests(DjangoTest):
         self.assertEqual(pdb.expression, atomium_pdb.expression_system)
         self.assertEqual(pdb.classification, atomium_pdb.classification)
         self.assertEqual(pdb.technique, atomium_pdb.technique)
+        self.assertEqual(pdb.keywords, "AA, BB")
         self.assertEqual(pdb.skeleton, True)
         self.assertEqual(pdb.rfactor, atomium_pdb.rfactor)
         mock_is.assert_called_with(atomium_pdb.model)
@@ -73,24 +76,64 @@ class PdbTests(DjangoTest):
         pdbs = [mixer.blend(Pdb, title=d) for d in ["ABCD", "EFGH", "CDEF"]]
         self.assertEqual(list(Pdb.search("CD")), [pdbs[0], pdbs[2]])
         self.assertEqual(list(Pdb.search("fg")), [pdbs[1]])
+        self.assertEqual(list(Pdb.advanced_search(QueryDict("title=CD"))), [pdbs[0], pdbs[2]])
+        self.assertEqual(list(Pdb.advanced_search(QueryDict("title=fg"))), [pdbs[1]])
 
 
     def test_can_search_pdbs_by_classification(self):
         pdbs = [mixer.blend(Pdb, classification=c) for c in ["ABCD", "EFGH", "CDEF"]]
         self.assertEqual(list(Pdb.search("CD")), [pdbs[0], pdbs[2]])
         self.assertEqual(list(Pdb.search("fg")), [pdbs[1]])
+        self.assertEqual(list(Pdb.advanced_search(QueryDict("classification=CD"))), [pdbs[0], pdbs[2]])
+        self.assertEqual(list(Pdb.advanced_search(QueryDict("classification=fg"))), [pdbs[1]])
 
 
     def test_can_search_pdbs_by_technique(self):
         pdbs = [mixer.blend(Pdb, technique=t) for t in ["ABCD", "EFGH", "CDEF"]]
         self.assertEqual(list(Pdb.search("CD")), [pdbs[0], pdbs[2]])
         self.assertEqual(list(Pdb.search("fg")), [pdbs[1]])
+        self.assertEqual(list(Pdb.advanced_search(QueryDict("technique=CD"))), [pdbs[0], pdbs[2]])
+        self.assertEqual(list(Pdb.advanced_search(QueryDict("technique=fg"))), [pdbs[1]])
 
 
     def test_can_search_pdbs_by_organism(self):
         pdbs = [mixer.blend(Pdb, organism=o) for o in ["ABCD", "EFGH", "CDEF"]]
         self.assertEqual(list(Pdb.search("CD")), [pdbs[0], pdbs[2]])
         self.assertEqual(list(Pdb.search("fg")), [pdbs[1]])
+        self.assertEqual(list(Pdb.advanced_search(QueryDict("organism=CD"))), [pdbs[0], pdbs[2]])
+        self.assertEqual(list(Pdb.advanced_search(QueryDict("organism=fg"))), [pdbs[1]])
+
+
+    def test_can_search_pdbs_by_expression(self):
+        pdbs = [mixer.blend(Pdb, expression=e) for e in ["ABCD", "EFGH", "CDEF"]]
+        self.assertEqual(list(Pdb.advanced_search(QueryDict("expression=CD"))), [pdbs[0], pdbs[2]])
+        self.assertEqual(list(Pdb.advanced_search(QueryDict("expression=fg"))), [pdbs[1]])
+
+
+    def test_can_search_pdbs_by_keywords(self):
+        pdbs = [mixer.blend(Pdb, keywords=k) for k in ["ABCD", "EFGH", "CDEF"]]
+        self.assertEqual(list(Pdb.search("CD")), [pdbs[0], pdbs[2]])
+        self.assertEqual(list(Pdb.search("fg")), [pdbs[1]])
+        self.assertEqual(list(Pdb.advanced_search(QueryDict("keywords=CD"))), [pdbs[0], pdbs[2]])
+        self.assertEqual(list(Pdb.advanced_search(QueryDict("keywords=fg"))), [pdbs[1]])
+
+
+    def test_can_search_pdbs_by_resolution(self):
+        pdbs = [mixer.blend(Pdb, resolution=r) for r in [0.9, 1.2, 1.8]]
+        self.assertEqual(list(Pdb.advanced_search(QueryDict("resolution_gt=1.1"))), [pdbs[1], pdbs[2]])
+        self.assertEqual(list(Pdb.advanced_search(QueryDict("resolution_lt=1"))), [pdbs[0]])
+
+
+    def test_can_search_pdbs_by_rfactor(self):
+        pdbs = [mixer.blend(Pdb, rfactor=r) for r in [0.9, 1.2, 1.8]]
+        self.assertEqual(list(Pdb.advanced_search(QueryDict("rfactor_gt=1.1"))), [pdbs[1], pdbs[2]])
+        self.assertEqual(list(Pdb.advanced_search(QueryDict("rfactor_lt=1"))), [pdbs[0]])
+
+
+    def test_can_search_pdbs_by_date(self):
+        pdbs = [mixer.blend(Pdb, deposited=date(2008, 1, d)) for d in [2, 4, 6]]
+        self.assertEqual(list(Pdb.advanced_search(QueryDict("deposited_gt=2008-01-03"))), [pdbs[2], pdbs[1]])
+        self.assertEqual(list(Pdb.advanced_search(QueryDict("deposited_lt=2008-01-03"))), [pdbs[0]])
 
 
     @patch("zinc.models.Pdb.metals")

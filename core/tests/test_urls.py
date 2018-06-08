@@ -10,6 +10,7 @@ class UrlTests(DjangoTest):
 
     def test_search_url(self):
         self.check_url_returns_view("/search", zinc_views.search)
+        self.check_url_returns_view("/search/", zinc_views.search)
 
 
     def test_pdb_url(self):
