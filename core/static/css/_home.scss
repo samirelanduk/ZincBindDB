@@ -91,6 +91,36 @@
     }
 
 }
+
+.release {
+    @include white-box;
+    padding: $padding;
+    margin-bottom: $padding;
+
+    h2 {
+        text-align: center;
+        margin-bottom: $padding / 2;
+
+        a {
+            color: darken($hyperlink-blue, 10);
+        }
+    }
+
+    .release-date {
+        font-size: 1.1em;
+        text-align: center;
+        margin-bottom: $padding * 1.5;
+    }
+
+    ul {
+        list-style: square;
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+    }
+}
+
 @mixin home--tablet() {
 }
 

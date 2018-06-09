@@ -7,3 +7,7 @@ def home(request):
      ZincSite.objects.count(),
      Pdb.objects.count()
     ]})
+
+
+def changelog(request):
+    return render(request, "changelog.html")
