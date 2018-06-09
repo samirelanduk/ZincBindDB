@@ -18,16 +18,9 @@
     }
 }
 
-.viewer-container {
-    background-color: $pale-purple;
-    @include margin-side(auto);
-}
 
-.sequence-viewer {
-    box-sizing: border-box;
-    display: block;
-    overflow-x:scroll;
-}
+
+
 
 
 
@@ -114,14 +107,22 @@
     .ngl-controls {
         border-top: 1px solid $border-gray;
         padding: 1rem;
-        background-color: $hover-color;
-        flex-grow: 5;
+        background-color: #fcfcfc;
+        flex-grow: 2;
+
 
         .ngl-control {
 
             display: flex;
             align-items: center;
-            justify-content: center;
+            margin-bottom: 2rem;
+
+            label {
+                margin-right: 1rem;
+                width: 10rem;
+                text-align: right;
+                display: block;
+            }
 
 
             .color-options {
@@ -147,6 +148,48 @@
             }
         }
     }
+}
+
+.toggle-switch, .toggle-switch .toggle-knob {
+    -moz-transition: all 0.2s ease-in;
+    -webkit-transition: all 0.2s ease-in;
+    -o-transition: all 0.2s ease-in;
+    transition: all 0.2s ease-in;
+}
+
+.toggle-switch {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    height: 30px;
+    width: 55px;
+    display: inline-block;
+    background-color: #ffffff;
+    margin: 2px;
+    margin-bottom: 5px;
+    border-radius: 30px;
+    cursor: pointer;
+    border: solid 1px #d2d6de;
+    box-shadow: inset 1px 1px 9px -3px rgba(4, 4, 4, 0.08), 1px 2px 6px -2px rgba(0, 0, 0, 0.01);
+}
+
+.toggle-switch .toggle-knob {
+    width: 28px;
+    height: 26px;
+    display: inline-block;
+    background-color: #ffffff;
+    border: solid 1px rgba(126, 126, 126, 0.07);
+    box-shadow: 0 1px 3px rgba(107, 106, 106, 0.26), 0 5px 1px rgba(107, 106, 106, 0.13);
+    border-radius: 26px;
+    margin: 1px 1px;
+}
+
+.toggle-switch.active {
+    background-color: #77e189;
+    border: solid 1px transparent;
+}
+
+.toggle-switch.active .toggle-knob {
+    margin-left: 24px;
 }
 
 #site-info {
@@ -177,6 +220,22 @@
 
         }
     }
+    #pdb-ngl {
+        .ngl-controls {
+
+            font-size: 0.9em;
+            justify-content: space-around;
+
+            .ngl-control {
+                label {
+                    display: inline;
+                    width: inherit;
+                }
+            }
+            display: flex;
+            align-items: center;
+        }
+    }
 }
 
 @mixin data--laptop() {
@@ -184,12 +243,13 @@
         display: flex;
 
         #ngl-container {
-            width: 50rem;
+            width: 75%;
         }
 
         .ngl-controls {
             border-left: 1px solid $border-gray;
             border-top: none;
+            flex-direction: column;
         }
     }
 }

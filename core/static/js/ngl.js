@@ -13,7 +13,7 @@ function drawNgl(code, representations, zoom) {
 
     stage.loadFile("rcsb://" + code + ".mmtf").then(function(component) {
 
-        component.addRepresentation("cartoon", {sele: "/0"});
+        stage.rep = component.addRepresentation("cartoon", {sele: "/0"});
 
         if (representations) {
             for (var i = 0; i < representations.length; i++) {
@@ -27,6 +27,8 @@ function drawNgl(code, representations, zoom) {
         }
 
     });
+    stage.metals = representations[0][1].sele;
+    stage.residues = representations[1][1].sele;
     return stage;
 }
 
@@ -48,5 +50,23 @@ function setUpControls() {
     $(".color-options").click(function(e) {
         var color = $('input[name=color]:checked').css("background-color");
         $("canvas").css("background-color", color);
+    })
+    var surface;
+    $(".toggle-switch").click(function(e) {
+        this.classList.toggle('active');
+
+        if ($(this).hasClass("active")) {
+            surface = stage.compList[0].addRepresentation("surface", {sele: stage.residues, probeRadius: 1});
+        } else {
+            surface.setVisibility(false)
+            stage.compList[0].addRepresentation("licorice", {sele: stage.residues});
+
+        }
+    })
+
+    $(".backbone").change(function(e) {
+        stage.rep.setVisibility(false);
+        stage.rep = stage.compList[0].addRepresentation(this.value, {sele: "/0"});
+        stage.rep.setVisibility(true);
     })
 }
