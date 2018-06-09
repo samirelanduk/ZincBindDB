@@ -29,6 +29,19 @@
     </div>
 </div>
 
+<div class="pdb-box scrollable" id="pdb-sites">
+    <div class="pdb-sites-count">{{ site.equivalent_sites.count }} equivalent site{{ site.equivalent_sites.count|pluralize }}.</div>
+    {% if site.equivalent_sites %}
+    <div class="pdb-sites-list">
+        {% for other_site in site.equivalent_sites %}
+        {% with other_site as site %}
+        {% include "zinc-site-summary.html" %}
+        {% endwith %}
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
 {% include "ngl-pdb.html" %}
 
 {% with site.pdb as pdb %}

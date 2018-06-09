@@ -87,6 +87,11 @@
     }
 }
 
+.scrollable {
+    overflow-y: scroll;
+    max-height: 50rem;
+}
+
 #pdb-ngl {
     padding: 0px;
     display: block;

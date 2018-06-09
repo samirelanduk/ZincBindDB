@@ -116,6 +116,12 @@ class ZincSite(models.Model):
 
     id = models.CharField(primary_key=True, max_length=128)
     pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
+    cluster = models.IntegerField(null=True, blank=True)
+
+    @property
+    def equivalent_sites(self):
+        return ZincSite.objects.filter(cluster=self.cluster).exclude(id=self.id)
+
 
     @property
     def ngl_metals_sele(self):
@@ -148,6 +154,7 @@ class Chain(models.Model):
     chain_pdb_identifier = models.CharField(max_length=128)
     sequence = models.TextField()
     pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
+    cluster = models.IntegerField(null=True, blank=True)
 
 
     @staticmethod

@@ -16,6 +16,7 @@ ROOT_URLCONF = "core.urls"
 INSTALLED_APPS = [
  "django.contrib.contenttypes",
  "django.contrib.staticfiles",
+ "django.contrib.humanize",
  "sass_processor",
  "core",
  "zinc"

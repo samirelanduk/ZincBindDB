@@ -1,16 +1,16 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block title %}Home{% endblock %}
 
 {% block css %}<style>main {max-width: inherit; padding: 0px;}</style>{% endblock %}
-
 {% block main %}
 <div id="home-1" class="home-container">
     <div id="site-description">
         <h1>The Database of Zinc Binding Sites</h1>
         <p>ZincBind is a database of zinc binding sites, automatically generated
-        from the Protein Data Bank. There are currently 109 unique sites, with
-        902 representatives across 2,403 PDB files.</p>
+        from the Protein Data Bank. There are currently {{ counts.0|intcomma }} unique sites, with
+        {{ counts.1|intcomma }} representatives across {{ counts.2|intcomma }} PDB files.</p>
     </div>
     <div id="site-search">
         <form action="/search">
