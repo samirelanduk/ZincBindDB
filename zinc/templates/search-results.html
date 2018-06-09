@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Search Results: {{ request.GET.q }}{% endblock %}
+{% block title %}Search Results: {% if request.GET.sequence %}BLAST{% elif request.GET.q %}{{ request.GET.q }}{% else %}Advanced {% endif %}{% endblock %}
 
 {% block main %}
-<script src="https://s3.eu-central-1.amazonaws.com/cdn.bio.sh/msa/latest/msa.min.gz.js"></script>
 {% if results.count %}
     <div class="search-info">
         <div>{{ results.count }} result{% if results.count != 1 %}s{% endif %}</div>
@@ -53,8 +52,8 @@
 
     {% if results.num_pages > 1 %}
         <div id="search-nav">
-            {% if page.has_previous %}<a class="previous-page" href="/search?q={{ request.GET.q }}&page={{ page.previous_page_number}}">Previous Page</a>{% endif %}
-            {% if page.has_next %}<a class="next-page" href="/search?q={{ request.GET.q }}&page={{ page.next_page_number}}">Next Page</a>{% endif %}
+            {% if page.has_previous %}<a class="previous-page" href="{{ request.get_full_path|pagify:page.previous_page_number }}">Previous Page</a>{% endif %}
+            {% if page.has_next %}<a class="next-page" href="{{ request.get_full_path|pagify:page.next_page_number }}">Next Page</a>{% endif %}
         </div>
     {% endif %}
 {% else %}

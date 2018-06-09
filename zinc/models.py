@@ -81,6 +81,7 @@ class Pdb(models.Model):
 
     @staticmethod
     def blast_search(sequence):
+        print(sequence)
         p = subprocess.Popen('echo "{}" | blastp -db data/chains.fasta -outfmt 15'.format(sequence), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out, err = p.communicate()
         print(err)
