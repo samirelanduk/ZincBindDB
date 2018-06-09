@@ -127,7 +127,6 @@
 
             .color-options {
                 display: inline-flex;
-                border: 1px solid #cccccc;
                 justify-content: center;
                 align-items: center;
                 width: auto;
@@ -137,6 +136,7 @@
                     width: 30px;
                     height: 30px;
                     -webkit-appearance: none;
+                    -moz-appearance: none;
                     margin: 0px;
                     margin-left: -1px;
                     cursor: pointer;

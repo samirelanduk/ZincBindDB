@@ -9,6 +9,7 @@ form {
         width: 100%;
         background-color: $white;
         -webkit-appearance: none;
+        -moz-appearance: none;
         border-radius: $curvature;
         border: 1px solid $border-gray;
         font-family: $font;
@@ -49,7 +50,7 @@ form {
         background-repeat: no-repeat;
         background-color: #fdfdfd;
         cursor: pointer;
-        width: auto;
+        width: fit-content;
         padding-right: 4rem;
     }
 
@@ -66,7 +67,7 @@ form {
     .search-term {
         display: flex;
         margin-bottom: 1rem;
-        height: 4rem;
+        height: 4.5rem;
 
         select {
             border-top-right-radius: 0px;

@@ -13,6 +13,8 @@
             line-height: 1.5;
             padding: 1rem;
             font-weight: bold;
+            box-shadow: none;
+            background-color: inherit;
         }
 
         p {
@@ -63,6 +65,32 @@
 }
 
 
+#home-2 {
+    background-color: #ffffff;
+
+    div {
+        padding: 2.5 * $padding;
+        text-align: center;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        p {
+            padding-left: 2rem;
+            padding-right: 2rem;
+            line-height: 2;
+        }
+    }
+
+    #home-picture img {
+        display: block;
+        width: 90%;
+        height: auto;
+        @include margin-side(auto);
+    }
+
+}
 @mixin home--tablet() {
 }
 
@@ -73,12 +101,12 @@
 @mixin home--desktop() {
     main {
 
-        #site-description {
+        #site-description, #home-picture {
             width: $desktop-width / 2;
-            margin-right: auto;
+            margin-left: auto;
         }
 
-        #site-search {
+        #site-search, #site-more-info {
             width: $desktop-width / 2;
             margin-right: auto;
         }
