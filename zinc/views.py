@@ -4,19 +4,25 @@ from django.http import Http404
 from zinc.models import Pdb, ZincSite
 
 def search(request):
+    results = []
     if request.GET:
         try:
             results = Pdb.search(request.GET["q"])
-        except:
-            results = Pdb.advanced_search(request.GET)
-        paginated_results = Paginator(results, 25)
-        try:
-            page = paginated_results.page(request.GET.get("page", 1))
-        except: raise Http404
-        return render(request, "search-results.html", {
-         "page": page, "results": paginated_results
-        })
-    return render(request, "advanced-search.html")
+        except KeyError:
+            try:
+                results = Pdb.blast_search(request.GET["sequence"])
+            except KeyError:
+                results = Pdb.advanced_search(request.GET)
+    else:
+        return render(request, "advanced-search.html")
+    paginated_results = Paginator(results, 25)
+    try:
+        page = paginated_results.page(request.GET.get("page", 1))
+    except: raise Http404
+    return render(request, "search-results.html", {
+     "page": page, "results": paginated_results, "chains": "sequence" in request.GET
+    })
+
 
 
 def pdb(request, code):

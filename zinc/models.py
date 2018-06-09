@@ -1,5 +1,7 @@
 """Zinc models."""
 
+import subprocess
+import json
 from django.db import models
 
 class Pdb(models.Model):
@@ -75,6 +77,19 @@ class Pdb(models.Model):
                 }
                 qs.append(models.Q(**kwargs))
         return Pdb.objects.filter(*qs).order_by("-deposited")
+
+
+    @staticmethod
+    def blast_search(sequence):
+        p = subprocess.Popen('echo "{}" | blastp -db data/chains.fasta -outfmt 15'.format(sequence), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        out, err = p.communicate()
+        print(err)
+        results = json.loads(out)["BlastOutput2"][0]["report"]["results"]["search"]["hits"]
+        chain_ids = [r["description"][0]["title"].split("|")[1] for r in results]
+        chains = sorted(Chain.objects.filter(id__in=chain_ids), key=lambda c: chain_ids.index(c.id))
+        for chain, result in zip(chains, results):
+            chain.blast_data = result["hsps"][0]
+        return chains
 
 
     @property
@@ -155,6 +170,13 @@ class Chain(models.Model):
     sequence = models.TextField()
     pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
     cluster = models.IntegerField(null=True, blank=True)
+
+
+    @property
+    def zincsites(self):
+        residues = self.residue_set.all()
+        sites = set(res.site for res in residues)
+        return filter(bool, sites)
 
 
     @staticmethod

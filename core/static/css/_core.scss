@@ -7,10 +7,10 @@ a {
 
 h1, h2, h3 {
     margin: 0px;
+    font-weight: normal;
 }
 
 h1 {
-    font-weight: normal;
     @include white-box;
     text-align: center;
     padding: 2 * $padding;

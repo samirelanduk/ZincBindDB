@@ -2,7 +2,7 @@ form {
 
     box-sizing: border-box;
 
-    input, select, button {
+    input, select, button, textarea {
         display: block;
         box-sizing: border-box;
         padding: 1rem;
@@ -16,6 +16,12 @@ form {
 
     input[type=text], input[type=date] {
         box-shadow: inset 0 1px 2px rgba(27,31,35,0.075);
+    }
+
+    textarea {
+        height: 25rem;
+        font-family: monospace;
+        margin-bottom: $padding;
     }
 
     input[type=submit], button {

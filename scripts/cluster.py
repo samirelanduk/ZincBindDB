@@ -28,26 +28,26 @@ try:
     print("Creating FASTA file with {} chains...".format(Chain.objects.count()))
     lines = []
     for chain in Chain.objects.all():
-        lines.append(">" + chain.id)
+        lines.append(">lcl|" + chain.id)
         sequence = chain.sequence
         while sequence:
             lines.append(sequence[:80])
             sequence = sequence[80:]
-    with open("temp.fasta", "w") as f:
+    with open("data/chains.fasta", "w") as f:
         f.write("\n".join(lines))
     size = sum([len(line) for line in lines]) / 1024
     print("Saved to temp.fasta ({:.2f} KB)".format(size))
 
     print("Running job...")
     subprocess.call(
-     "cd-hit -i temp.fasta -d 0 -o temp -c {} -n 5 -G 1 -g 1 -b 20 -s 0.0 -aL "
+     "cd-hit -i data/chains.fasta -d 0 -o temp -c {} -n 5 -G 1 -g 1 -b 20 -s 0.0 -aL "
      "0.0 -aS 0.0 -T 4 -M 32000".format(SEQUENCE_IDENTITY),
      shell=True, stdout=subprocess.PIPE
     )
 
     with open("temp.clstr") as f:
         data = f.read()
-    clusters = data.split(">Cluster ")[1:]
+    clusters = data.split(">Cluster lcl|")[1:]
     clusters = [re.compile(r">(.+?)\.\.\.").findall(c) for c in clusters]
     print("There are {} clusters".format(len(clusters)))
 

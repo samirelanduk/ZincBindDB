@@ -3,32 +3,50 @@
 {% block title %}Search Results: {{ request.GET.q }}{% endblock %}
 
 {% block main %}
+<script src="https://s3.eu-central-1.amazonaws.com/cdn.bio.sh/msa/latest/msa.min.gz.js"></script>
 {% if results.count %}
     <div class="search-info">
         <div>{{ results.count }} result{% if results.count != 1 %}s{% endif %}</div>
         {% if results.num_pages > 1 %}<div>Page {{ page.number }} of {{ results.num_pages }}</div>{% endif %}
     </div>
 
-    {% for pdb in page %}
+    {% for object in page %}
     <div class="search-result">
-        <div class="pdb-result"><a href="/pdbs/{{ pdb.id }}/">
+        {% if chains %}
+        <div class="pdb-result">
             <div class="pdb-result-main">
-                <div class="pdb-code">PDB: {{ pdb.id }}</div>
-                <div class="pdb-deposited">{{ pdb.deposited }}</div>
-                <div class="pdb-species"><script>document.write(formatSpecies("{{ pdb.organism }}"));</script></div>
+                <div class="pdb-code">Chain {{ object.chain_pdb_identifier }} ({{ object.pdb.id }})</div>
+                <div class="pdb-deposited">Score: {{ object.blast_data.score }}</div>
+                <div class="pdb-species">E-value: {{ object.blast_data.evalue }}</div>
+                <div class="pdb-deposited">{{ object.pdb.title }}</div>
             </div>
-            <div class="pdb-title">{{ pdb.title|truncatewords:20 }}</div>
+        </div>
+        {% else %}
+        <div class="pdb-result"><a href="/pdbs/{{ object.id }}/">
+            <div class="pdb-result-main">
+                <div class="pdb-code">PDB: {{ object.id }}</div>
+                <div class="pdb-deposited">{{ object.deposited }}</div>
+                <div class="pdb-species"><script>document.write(formatSpecies("{{ object.organism }}"));</script></div>
+            </div>
+            <div class="pdb-title">{{ object.title|truncatewords:20 }}</div>
             <div class="pdb-secondary">
-                 {{ pdb.classification}} |
-                 {{ pdb.technique }}{% if pdb.resolution %} ({{ pdb.resolution }} Å){% endif %} |
-                 {{ pdb.chain_set.count }} zinc-bearing chain{% if pdb.chain_set.count != 1 %}s{% endif %}
+                 {{ object.classification}} |
+                 {{ object.technique }}{% if object.resolution %} ({{ object.resolution }} Å){% endif %} |
+                 {{ object.chain_set.count }} zinc-bearing chain{% if object.chain_set.count != 1 %}s{% endif %}
              </div>
         </a></div>
+        {% endif %}
 
         <div class="site-results">
-            {% for site in pdb.zincsite_set.all %}
+            {% if chains %}
+            {% for site in object.zincsites %}
             {% include "zinc-site-summary.html" %}
             {% endfor %}
+            {% else %}
+            {% for site in object.zincsite_set.all %}
+            {% include "zinc-site-summary.html" %}
+            {% endfor %}
+            {% endif %}
         </div>
     </div>
     {% endfor %}

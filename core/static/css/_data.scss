@@ -18,6 +18,16 @@
     }
 }
 
+.viewer-container {
+    background-color: $pale-purple;
+    @include margin-side(auto);
+}
+
+.sequence-viewer {
+    box-sizing: border-box;
+    display: block;
+    overflow-x:scroll;
+}
 
 
 

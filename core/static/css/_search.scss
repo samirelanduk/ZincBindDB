@@ -17,6 +17,9 @@
     }
 }
 
+.search-box {
+    margin-bottom: $padding;
+}
 
 .search-result {
     @include white-box;

@@ -30,5 +30,14 @@
 			<input type="submit" value="Search" onclick="return validateSearch();">
 		</form>
 	</div>
+
+	<div class="search-box">
+		<h2>BLAST Search</h2>
+		<form method="GET" action="/search">
+			<textarea name="sequence"></textarea>
+			{% csrf_token %}
+			<input type="submit" value="BLAST">
+		</form>
+	</div>
 </div>
 {% endblock %}
