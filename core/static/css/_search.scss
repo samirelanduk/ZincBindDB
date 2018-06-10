@@ -104,3 +104,16 @@
     text-align: center;
     width: 50%;
 }
+
+.sequence-alignment {
+    padding: $padding;
+    overflow-y: scroll;
+    border-bottom: 1px solid $border-gray;
+
+    .alignment-row {
+        font-family: monospace;
+        white-space: pre;
+        width: fit-content;
+        @include margin-side(auto);
+    }
+}

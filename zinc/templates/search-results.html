@@ -19,6 +19,11 @@
                 <div class="pdb-species">E-value: {{ object.blast_data.evalue }}</div>
                 <div class="pdb-deposited">{{ object.pdb.title }}</div>
             </div>
+            <div class="sequence-alignment">
+                <div class="alignment-row">Query: {{ object.blast_data.qseq }}</div>
+                <div class="alignment-row">       {{ object.blast_data.midline }}</div>
+                <div class="alignment-row">Match: {{ object.blast_data.hseq }}</div>
+            </div>
         </div>
         {% else %}
         <div class="pdb-result"><a href="/pdbs/{{ object.id }}/">

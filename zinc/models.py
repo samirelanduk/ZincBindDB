@@ -2,6 +2,7 @@
 
 import subprocess
 import json
+from atomium.models.data import CODES
 from django.db import models
 
 class Pdb(models.Model):
@@ -241,7 +242,7 @@ class Residue(models.Model):
     def ngl_side_chain_sele(self):
         """The NGL selector text needed to select the residue side chain."""
 
-        if self.name in ["HOH", "WAT"]:
+        if self.name not in CODES:
             return self.ngl_sele
         return f"(sidechain or .CA) and " + self.ngl_sele
 
