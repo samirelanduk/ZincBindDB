@@ -35,14 +35,16 @@ function drawNgl(code, representations, zoom) {
 function drawWholePdb(code, metals, residues) {
     drawNgl(code, [
         ["ball+stick", {sele: metals, aspectRatio: 8}],
-        ["licorice", {sele: residues}]
+        ["licorice", {sele: residues}],
+        ["contact", {sele: metals + " or " + residues}]
     ], false);
 }
 
 function drawZincSite(code, metals, residues) {
     var stage = drawNgl(code, [
         ["ball+stick", {sele: metals, aspectRatio: 8}],
-        ["licorice", {sele: residues}]
+        ["licorice", {sele: residues}],
+        ["contact", {sele: metals + " or " + residues}]
     ], true);
 }
 

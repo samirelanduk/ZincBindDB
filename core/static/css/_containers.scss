@@ -31,4 +31,14 @@
         grid-template-columns: 1fr 1fr;
     }
 
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-column-gap: $padding;
+
+        div {
+            margin-top: 0px;
+        }
+    }
+
 }

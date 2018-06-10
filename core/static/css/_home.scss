@@ -152,11 +152,13 @@
     main {
 
         #site-description, #home-picture {
+            box-sizing: border-box;
             width: $desktop-width / 2;
             margin-left: auto;
         }
 
         #site-search, #site-more-info {
+            box-sizing: border-box;
             width: $desktop-width / 2;
             margin-right: auto;
         }

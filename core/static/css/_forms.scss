@@ -13,6 +13,7 @@ form {
         border-radius: $curvature;
         border: 1px solid $border-gray;
         font-family: $font;
+        margin: 0px;
     }
 
     input[type=text], input[type=date] {

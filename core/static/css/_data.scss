@@ -3,6 +3,10 @@
     @include white-box;
     padding: $padding;
     margin-top: $padding;
+
+    h3 + div {
+        margin-bottom: 2 * $padding;
+    }
 }
 
 #pdb-info {
@@ -18,11 +22,14 @@
     }
 }
 
-
-
-
-
-
+#site-info {
+    .metal, .residue {
+        border: 1px solid $border-gray;
+        display: inline-block;
+        padding: $padding;
+        box-shadow: 0 2px 4px 0 rgba(0,0,0,0.2);
+    }
+}
 
 #pdb-chains {
     .chain {
@@ -92,7 +99,7 @@
 
 .scrollable {
     overflow-y: scroll;
-    max-height: 50rem;
+    max-height: 35rem;
 }
 
 #pdb-ngl {
@@ -103,6 +110,9 @@
 
     #ngl-container {
         height: 350px;
+        background-image: url(/static/images/loading.gif);
+        background-repeat: no-repeat;
+        background-position: center;
     }
 
     .ngl-controls {
@@ -224,6 +234,17 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
     }
+}
+
+.no-sites {
+    display: flex;
+    align-items:center;
+    justify-content: space-around;
+    font-size: 1.1em;
+    text-align: center;
+    vertical-align: middle;
+    height: 100%;
+    box-sizing: border-box;
 }
 
 
