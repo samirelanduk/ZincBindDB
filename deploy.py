@@ -8,63 +8,83 @@ if len(sys.argv) < 2:
     sys.exit()
 sitename = sys.argv[1]
 
-# Remove contents of remote source directory
-subprocess.call(
- "ssh %s 'rm -r ~/%s/source/*'" % (sitename, sitename), shell=True
-)
-
-# What branch are we on?
-branch = subprocess.check_output("git branch", shell=True).decode()
-branch = [line for line in branch.split("\n") if "*" in line][0]
-branch = branch.split()[1]
-
-# What files is git tracking?
-tracked_files = subprocess.check_output(
- "git ls-tree %s --name-only" % branch, shell=True
-).decode()
-tracked_files = filter(bool, tracked_files.split("\n"))
-
-# Push source code to remote
-for tracked_file in tracked_files:
+if len(sys.argv) < 3 or sys.argv[2] != "nofiles":
+    # Remove contents of remote source directory
     subprocess.call(
-     "scp -r ./%s %s:~/%s/source/" % (tracked_file, sitename, sitename), shell=True
+     "ssh {} 'rm -r ~/{}/source/* >& /dev/null'".format(sitename, sitename), shell=True
     )
+
+    # What files are being tracked by git?
+    tracked_files = subprocess.check_output("git ls-files", shell=True).decode()
+    tracked_files = list(filter(bool, tracked_files.split("\n")))
+
+    # Push source code to remote
+    commands = []
+    for file_ in tracked_files:
+        directory = "/".join(file_.split("/")[:-1])
+        commands.append("mkdir -p ~/{}/source/{}".format(sitename, directory))
+    commands = set(commands)
+    subprocess.call(
+     "ssh {} '{}'".format(sitename, ";".join(commands)), shell=True
+    )
+    files = []
+    for file_ in tracked_files:
+        subprocess.call(
+         "scp -r ./{} {}:~/{}/source/{}".format(file_, sitename, sitename, file_), shell=True
+        )
 
 # Turn off Debug
 subprocess.call(
- "ssh %s 'sed -i s/\"DEBUG = True\"/\"DEBUG = False\"/g ~/%s/source/zincbind/settings.py'" % (sitename, sitename),
+ "ssh {} 'sed -i s/\"DEBUG = True\"/\"DEBUG = False\"/g ~/{}/source/core/settings.py'".format(sitename, sitename),
  shell=True
 )
 
 # Add allowed hosts
 subprocess.call(
- "ssh %s 'sed -i s/\"ALLOWED_HOSTS = \[\]\"/\"ALLOWED_HOSTS = \[£'%s£', £'www.%s£'\]\"/g ~/%s/source/zincbind/settings.py'" % (sitename, sitename, sitename, sitename),
+ "ssh {} 'sed -i s/\"ALLOWED_HOSTS = \[\]\"/\"ALLOWED_HOSTS = \[£'{}£', £'www.{}£'\]\"/g ~/{}/source/core/settings.py'".format(sitename, sitename, sitename, sitename),
  shell=True
 )
 subprocess.call(
- "ssh %s 'sed -i s/£/\\\"/g ~/%s/source/zincbind/settings.py'" % (sitename, sitename),
+ "ssh {} 'sed -i s/£/\\\"/g ~/{}/source/core/settings.py'".format(sitename, sitename),
  shell=True
 )
 
-# Upload the secret settings
+# Add google analytics
 subprocess.call(
- "scp -r ./zincbind/secrets.py %s:~/%s/source/zincbind/secrets.py" % (sitename, sitename), shell=True
+ "ssh {} 'sed -i s/\"<!--analytics-->\"/\"\{{% include \\\"analytics.html\\\" %\}}\"/g ~/{}/source/core/templates/base.html'".format(sitename, sitename),
+ shell=True
 )
+
+'''# Switch to postgres database remotely
+if sitename == "pontefract.io":
+    subprocess.call(
+     "ssh {} 'sed -i s/\"= local\"/\"= pontefract\"/g ~/{}/source/core/secrets.py'".format(sitename, sitename),
+     shell=True
+    )
+else:
+    subprocess.call(
+     "ssh {} 'sed -i s/\"= local\"/\"= pomfret\"/g ~/{}/source/core/secrets.py'".format(sitename, sitename),
+     shell=True
+    )'''
 
 # Install pip packages
 subprocess.call(
- "ssh %s '~/%s/env/bin/pip install -r ~/%s/source/requirements.txt'" % (sitename, sitename, sitename),
+ "ssh {} '~/{}/env/bin/pip install -r ~/{}/source/requirements.txt -r ~/{}/source/requirements-live.txt'".format(sitename, sitename, sitename, sitename),
  shell=True
 )
 
 # Apply migrations
 subprocess.call(
- "ssh %s '~/%s/env/bin/python ~/%s/source/manage.py migrate'" % (sitename, sitename, sitename),
+ "ssh {} '~/{}/env/bin/python ~/{}/source/manage.py migrate'".format(sitename, sitename, sitename),
  shell=True
 )
 
 # Deploy static files
 subprocess.call(
- "ssh %s 'cd ~/%s/source && ../env/bin/python manage.py collectstatic --noinput'" % (sitename, sitename),
+ "ssh {} 'cd ~/{}/source && ../env/bin/python manage.py compilescss'".format(sitename, sitename),
+ shell=True
+)
+subprocess.call(
+ "ssh {} 'cd ~/{}/source && ../env/bin/python manage.py collectstatic --noinput'".format(sitename, sitename),
  shell=True
 )
