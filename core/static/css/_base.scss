@@ -52,6 +52,7 @@ nav {
     #nav-links {
         display: none;
         position: absolute;
+        z-index: 1000;
         width: 100%;
         top: 100%;
         padding-top: 1rem;
@@ -96,10 +97,10 @@ footer {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    color: #ddd;
 
     .footer-column {
         text-align: center;
-        color: #bbb;
 
         h3 {
             font-size: 1.4em;
@@ -108,7 +109,7 @@ footer {
         a {
             display: block;
             line-height: 1.8;
-            color: #bbb;
+            color: #ddd;
             text-decoration: underline;
         }
     }

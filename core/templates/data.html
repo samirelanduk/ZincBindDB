@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Data{% endblock %}
+
+{% block main %}
+    <h1>ZincBind Data</h1>
+
+    <div class="charts">
+        <div class="chart-container"><div class="chart" id="residue-chart"></div>
+    </div><div class="chart-container"><div class="chart" id="technique-chart"></div></div>
+        <div class="chart-container"><div class="chart" id="species-chart"></div>
+    </div><div class="chart-container"><div class="chart" id="classification-chart">s</div></div>
+    </div>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script>
+    var divs = ["residue-chart", "technique-chart", "species-chart", "classification-chart"];
+    var titles = ["Residues", "Techniques", "Species", "Classifications"];
+    var colors = ["#4A9586", "#2980b9", "#e67e22", "#8e44ad"];
+    </script>
+    {% for data in bar_data %}
+    <script>
+    var residueChart = Highcharts.chart(divs[{{ forloop.counter0 }}], {
+        chart: {
+            plotBorderWidth: 1,
+            marginLeft: 50
+        },
+        title: {
+            text: titles[{{ forloop.counter0 }}]
+        },
+        credits: {
+            enabled: false
+        },
+        series: [{
+            name: titles[{{ forloop.counter0 }}],
+            data: {{ data.1 }},
+            type: "column",
+            color: colors[{{ forloop.counter0 }}]
+        }],
+        xAxis: {
+            categories: {{ data.0|safe }},
+            lineWidth: 0,
+            tickWidth: 0,
+            labels: {
+                autoRotation: false
+            }
+        },
+        yAxis: {
+            title: {
+                enabled: false
+            },
+            lineWidth: 0
+        },
+        legend: {
+            enabled: false
+        }
+    });
+    </script>
+    {% endfor %}
+{% endblock %}

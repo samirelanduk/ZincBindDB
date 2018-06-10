@@ -150,6 +150,22 @@
     }
 }
 
+.charts {
+
+    .chart-container {
+        margin: 0px;
+        box-sizing: border-box;
+
+        .chart {
+            @include white-box;
+            box-sizing: border-box;
+            width: 100%;
+            margin-bottom: $padding;
+            padding: 2 * $padding;
+        }
+    }
+}
+
 .toggle-switch, .toggle-switch .toggle-knob {
     -moz-transition: all 0.2s ease-in;
     -webkit-transition: all 0.2s ease-in;
@@ -250,6 +266,30 @@
             border-left: 1px solid $border-gray;
             border-top: none;
             flex-direction: column;
+        }
+    }
+
+    .charts {
+
+        .chart-container {
+            display: inline-block;
+            width: 50%;
+
+            .chart {
+                margin: 0px;
+            }
+        }
+
+        .chart-container:nth-child(odd) {
+            padding-right: $padding / 2
+        }
+
+        .chart-container:nth-child(even) {
+            padding-left: $padding / 2
+        }
+
+        .chart-container:nth-child(1), .chart-container:nth-child(2) {
+            padding-bottom: $padding;
         }
     }
 }

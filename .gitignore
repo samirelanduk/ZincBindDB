@@ -11,3 +11,4 @@ log.txt
 *.pdb
 data/*
 *.css*
+*.sh
