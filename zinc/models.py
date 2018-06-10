@@ -234,13 +234,15 @@ class Residue(models.Model):
         """The NGL selector text needed to select the residue."""
 
         return (f"{self.residue_pdb_identifier}^" +
-        f"{self.insertion_pdb_identifier}:{self.chain.chain_pdb_identifier}")
+        f"{self.insertion_pdb_identifier}:{self.chain.chain_pdb_identifier}/0")
 
 
     @property
     def ngl_side_chain_sele(self):
         """The NGL selector text needed to select the residue side chain."""
 
+        if self.name in ["HOH", "WAT"]:
+            return self.ngl_sele
         return f"(sidechain or .CA) and " + self.ngl_sele
 
 
