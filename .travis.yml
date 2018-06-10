@@ -8,7 +8,7 @@ install:
     - pip install -r requirements.txt
 
 script:
-    - djangovar=headless coverage run --source=core,zinc,scripts `which django-admin.py` test --pythonpath=. --settings=core.settings
+    - djangovar=headless coverage run --source=core,zinc,scripts `which django-admin.py` test core zinc--pythonpath=. --settings=core.settings
 
 after_success:
   - coveralls
