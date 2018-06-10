@@ -61,9 +61,16 @@
     <div class="search-info no-results">
         <div>There were no results matching your query.</div>
         <div class="search-help">
+            {% if chains %}
+            BLAST search currently requires peptide sequences only - did you
+            submit a nucleotide sequence?
+            {% elif request.GET.q %}
             Search is case-insensitive, and searches PDB codes (for exact matches)
             and PDB descriptions, classifications, organisms, and experimental
             techniques (for partial matches).
+            {% else %}
+            Perhaps try a more vague search?
+            {% endif %}
         </div>
     </div>
 {% endif %}
