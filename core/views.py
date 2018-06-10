@@ -15,6 +15,10 @@ def changelog(request):
     return render(request, "changelog.html")
 
 
+def about(request):
+    return render(request, "about.html")
+
+
 def data(request):
     residues = Residue.objects.exclude(site=None)
     residue_counts = Counter([res.name for res in residues]).most_common()

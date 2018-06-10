@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}About the Database{% endblock %}
+
+{% block main %}
+<div class="column-container">
+    <h1>About the Database</h1>
+
+    <div class="about-box">
+        <p>ZincBind is a database of zinc binding site structures, automatically
+        generated from the <a href="https://rcsb.org/" target="_blank">Protein
+        Data Bank</a>.</p>
+
+        <p>For every PDB structure which contains at least one zinc atom,
+        ZincBind identifies the liganding residues and creates a binding site
+        for the zinc - with liganding residues defined as those with a nitrogen,
+        oxygen or sulphur atom within 3 Angstroms of the zinc.</p>
+
+        <p>If two zinc atoms share a liganding residue, or if a zinc atom shares
+        a liganding residue with some other metal ion, these are clustered
+        together into a single multi-metal site.</p>
+
+        <p>The chains associated with each zinc site are stored, and clustered
+        on 90% sequence identity. These clusters are then used to cluster the
+        Zinc Sites themselves - where two sites belong to the same cluster if
+        they are associated with the same chain cluster(s) and have the same
+        binding residue identifiers.</p>
+    </div>
+</div>
+{% endblock %}

@@ -121,10 +121,30 @@
     }
 }
 
+.about-box {
+    @include white-box;
+    padding: 2 * $padding;
+    text-align: center;
+
+    p {
+        line-height: 2;
+        margin: 0px;
+        margin-bottom: $padding;
+    }
+}
+
 @mixin home--tablet() {
+
+    .about-box {
+        padding: 4 * $padding;
+    }
 }
 
 @mixin home--laptop() {
+    .about-box {
+        padding-left: 6 * $padding;
+        padding-right: 6 * $padding;
+    }
 }
 
 
