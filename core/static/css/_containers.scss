@@ -1,27 +1,37 @@
-// Top-level containers that nest immediately within <main></main>. Usually
-// just one per page, or one after the other in a column.
+.column-container {
+    max-width: $laptop-width;
+    @include margin-side(auto);
+    grid-gap: $gap;
+	display: grid;
+
+	h1 {
+		margin: 0px;
+	}
+}
+
+.non-grid-column-container {
+    max-width: $laptop-width;
+    @include margin-side(auto);
+
+    .box, #pdb-ngl {
+        margin-bottom: 1rem;
+    }
+}
+
+.small-column-container {
+	max-width: $tablet-width;
+    @include margin-side(auto);
+    grid-gap: $gap;
+	display: grid;
+
+	h1 {
+		margin: 0px;
+	}
+}
 
 .home-container {
     display: grid;
     grid-gap: 0px;
-}
-
-.column-container {
-    max-width: $laptop-width;
-    @include margin-side(auto);
-    grid-gap: $padding;
-}
-
-.small-container {
-    display: grid;
-    max-width: $tablet-width;
-    @include margin-side(auto);
-    grid-gap: $padding;
-}
-
-
-@mixin containers--tablet() {
-
 }
 
 
@@ -34,10 +44,17 @@
     .grid-2 {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        grid-column-gap: $padding;
+        grid-column-gap: $gap;
 
         div {
             margin-top: 0px;
+        }
+
+        #pdb-sites {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
         }
     }
 

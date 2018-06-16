@@ -3,12 +3,12 @@
 {% block title %}{{ pdb.id }}{% endblock %}
 
 {% block main %}
-<div class="column-container">
+<div class="non-grid-column-container">
     <h1>{{ pdb.title }}</h1>
 
     {% include "pdb-info.html" %}
 
-    <div id="pdb-chains" class="pdb-box">
+    <div id="pdb-chains" class="box">
         <div>
             {{ pdb.chain_set.count }} zinc-bearing chain{{ pdb.chain_set.count|pluralize }}
             ({% for chain in pdb.chain_set.all %}{{ chain.chain_pdb_identifier }}{% if not forloop.last %}, {% endif %}{% endfor %});
@@ -18,7 +18,7 @@
         </div>
     </div>
 
-    <div id="pdb-sites" class="pdb-box">
+    <div id="pdb-sites" class="box">
         <div class="pdb-sites-count">{{ pdb.zincsite_set.count }} zinc binding site{% if pdb.zincsite_set.count != 1 %}s{% endif %}</div>
 
         <div class="pdb-sites-list">

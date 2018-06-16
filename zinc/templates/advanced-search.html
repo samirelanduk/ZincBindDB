@@ -6,37 +6,33 @@
 <div class="column-container">
 	<h1>Advanced Search</h1>
 
-	<div class="search-box">
-		<form method="GET" action="/search">
-			<div class="error-message"></div>
-			<div class="search-term">
-				<select onchange="updateSearchTerm(this);">
-					<option value="title">Title contains</option>
-					<option value="classification">Classification contains</option>
-					<option value="keywords">Keywords contain</option>
-					<option value="organism">Organism contains</option>
-					<option value="expression">Expression System contains</option>
-					<option value="technique">Technique contains</option>
-					<option value="resolution_gt">Resolution greater than</option>
-					<option value="resolution_lt">Resolution less than</option>
-					<option value="rfactor_gt">Rfactor greater than</option>
-					<option value="rfactor_lt">Rfactor less than</option>
-					<option value="deposited_gt">Deposited since</option>
-					<option value="deposited_lt">Deposited before</option>
-				</select>
-				<input type="text" name="title" autocomplete="off">
-			</div>
-			<button type="button" id="new-term" onclick="addTerm(this);">New Term</button>
-			<input type="submit" value="Search" onclick="return validateSearch();">
-		</form>
-	</div>
+	<form method="GET" action="/search" class="box advanced-searcher">
+		<div class="error-message"></div>
+		<div class="search-term">
+			<select onchange="updateSearchTerm(this);">
+				<option value="title">Title contains</option>
+				<option value="classification">Classification contains</option>
+				<option value="keywords">Keywords contain</option>
+				<option value="organism">Organism contains</option>
+				<option value="expression">Expression System contains</option>
+				<option value="technique">Technique contains</option>
+				<option value="resolution_gt">Resolution greater than</option>
+				<option value="resolution_lt">Resolution less than</option>
+				<option value="rfactor_gt">Rfactor greater than</option>
+				<option value="rfactor_lt">Rfactor less than</option>
+				<option value="deposited_gt">Deposited since</option>
+				<option value="deposited_lt">Deposited before</option>
+			</select>
+			<input type="text" name="title" autocomplete="off">
+		</div>
+		<button type="button" id="new-term" onclick="addTerm(this);">New Term</button>
+		<input type="submit" value="Search" onclick="return validateSearch();">
+	</form>
 
-	<div class="search-box">
+	<form method="GET" action="/search" class="box">
 		<h2>BLAST Search</h2>
-		<form method="GET" action="/search">
-			<textarea name="sequence"></textarea>
-			<input type="submit" value="BLAST">
-		</form>
-	</div>
+		<textarea name="sequence"></textarea>
+		<input type="submit" value="BLAST">
+	</form>
 </div>
 {% endblock %}

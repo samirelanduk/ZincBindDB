@@ -49,8 +49,8 @@ function drawZincSite(code, metals, residues) {
 }
 
 function setUpControls() {
-    $(".color-options").click(function(e) {
-        var color = $('input[name=color]:checked').css("background-color");
+    $("#colorPicker").change(function(e) {
+        var color = $('input[type=color]').val();
         $("canvas").css("background-color", color);
     })
     var surface;

@@ -1,41 +1,26 @@
-// The style for the base page
-
-html {
-    font-size: 62.5%;
-}
-
-body {
-    font-family: $font;
-    background-color: $back-gray;
-    margin: 0px;
-    color: $black;
-    flex-direction: column;
-}
-
 nav {
-    background-color: $purple;
-    color: $white;
-    display: flex;
-    position: relative;
-    height: 5rem;
-    align-items: center;
+	background-color: $purple;
+	color: $white;
+	display: flex;
+	position: relative;
+	height: $nav-height;
+	align-items: center;
+	padding-left: $nav-margin;
+	padding-right: $nav-margin;
 
-    #logo {
-        display: block;
-        color: inherit;
-        font-family: $logo-font;
-        font-size: 3.2em;
-        line-height: 2;
-        margin-left: $nav-margin;
-        padding-bottom: 4px;
-    }
+	#logo {
+		display: block;
+		color: inherit;
+		font-family: $logo-font;
+		font-size: 3.2em;
+		padding-bottom: 0.4rem;
+	}
 
-    #mobile-menu {
+	#mobile-menu {
         flex-grow: 5;
         display: flex;
         justify-content: flex-end;
         align-items: center;
-        margin-right: $nav-margin;
 
         #mobile-menu-icon {
             cursor: pointer;
@@ -49,10 +34,10 @@ nav {
         }
     }
 
-    #nav-links {
-        display: none;
-        position: absolute;
-        z-index: 1000;
+	#nav-links {
+		display: none;
+		position: absolute;
+        z-index: 100;
         width: 100%;
         top: 100%;
         padding-top: 1rem;
@@ -60,12 +45,9 @@ nav {
         font-size: 1.6em;
         left: 0;
 
-        form {
+		form {
             display: inline;
-            padding: 0px;
-            margin: 0px;
             background-color: inherit;
-            box-shadow: none;
         }
 
         a {
@@ -73,93 +55,81 @@ nav {
             text-align: center;
             padding: 1.2rem;
             color: inherit;
-            border-top: 0.1px solid $border-gray;
+            border-top: 1px solid $border-gray;
             @include margin-side(5rem);
         }
-    }
+	}
 }
 
 main {
-    padding: $padding;
-    max-width: $desktop-width;
-    @include margin-side(auto);
-    font-size: 1.25em;
-    min-height: calc(100vh - 32rem);
-    box-sizing: border-box;
+	padding: $gap;
+	max-width: $desktop-width;
+	@include margin-side(auto);
+	font-size: 1.25em;
+	min-height: calc(100vh - #{$footer-height + $nav-height});
 }
 
 footer {
-    background-color: #201425;
-    padding: 2 * $padding;
-    font-size: 1.2em;
-    height: 27rem;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    color: #ddd;
+	height: $footer-height;
+	background-color: $dark-purple;
+	padding: 2 * $gap;
+	font-size: 1.2em;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	color: $border-gray;
 
-    .footer-column {
-        text-align: center;
+	.footer-column {
+		text-align: center;
 
-        h3 {
-            font-size: 1.4em;
-        }
+		h3 {
+			margin-bottom: $gap / 2;
+		}
 
-        a {
-            display: block;
-            line-height: 1.8;
-            color: #ddd;
-            text-decoration: underline;
-        }
-    }
+		a {
+			display: block;
+			line-height: 1.8;
+			color: inherit;
+			text-decoration: underline;
+		}
+	}
 }
 
 
 @mixin base--tablet() {
-    nav {
-        #mobile-menu {
-            display: none;
-        }
+	nav {
+		#mobile-menu {
+			display: none;
+		}
 
-        #nav-links {
-            display: flex;
-            position: inherit;
-            flex-grow: 5;
-            top: inherit;
-            justify-content: flex-end;
+		#nav-links {
+			display: flex;
+			position: inherit;
+			flex-grow: 5;
+			top: inherit;
+			justify-content: flex-end;
             align-items: center;
-            margin-right: $nav-margin;
-            padding: 0px;
+			padding: 0px;
 
-            a {
-                display: inline;
-                border: none;
-                text-align: center;
-                padding: 0px;
-                font-size: 1.1em;
-                @include margin-side(2rem);
-                background-color: inherit;
-            }
-        }
-    }
+			a {
+				display: inline;
+				padding: 0px;
+				@include margin-side(2rem);
+				font-size: 1.1em;
+				border: none;
+			}
+		}
+	}
 
-    main {
-        font-size: 1.5em;
-        min-height: calc(100vh - 20rem);
-    }
+	main {
+		font-size: 1.5em;
+		min-height: calc(100vh - #{($footer-height * 0.6 )+ $nav-height});
+	}
 
-    footer {
-        display: grid;
-        height: 15rem;
-        grid-template-columns: 1fr 1fr;
-        align-content: center;
-
-        .footer-column {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-    }
+	footer {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		align-content: center;
+		height: $footer-height * 0.6;
+	}
 }

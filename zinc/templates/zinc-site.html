@@ -3,47 +3,51 @@
 {% block title %}{{ site.id }}{% endblock %}
 
 {% block main %}
-<h1>{{ site.id }}</h1>
 
-<div class="grid-2">
-    <div class="pdb-box" id="site-info">
-        <h3>PDB</h3>
-        <div><a href="/pdbs/{{ site.pdb.id }}/">{{ site.pdb.id }}</a> ({{ site.pdb.title }})</div>
+<div class="non-grid-column-container">
+    <h1>{{ site.id }}</h1>
 
-        <h3>Metals</h3>
-        {% for metal in site.metal_set.all %}
-        <div class="metal">{{ metal.atom_pdb_identifier }} ({{ metal.element }})</div>
-        {% endfor %}
+    <div class="grid-2">
+        <div class="box" id="site-info">
+            <h3>PDB</h3>
+            <div><a href="/pdbs/{{ site.pdb.id }}/">{{ site.pdb.id }}</a> ({{ site.pdb.title }})</div>
 
-        <h3>Liganding Residues</h3>
-        {% for residue in site.residue_set.all %}
-        <div class="residue">{{ residue.atomium_id }} ({{ residue.name }})</div>
-        {% endfor %}
-    </div>
+            <h3>Metals</h3>
+            {% for metal in site.metal_set.all %}
+            <div class="metal">{{ metal.atom_pdb_identifier }} ({{ metal.element }})</div>
+            {% endfor %}
 
-    <div class="pdb-box scrollable" id="pdb-sites">
-        {% if site.equivalent_sites %}
-        <div class="pdb-sites-count">{{ site.equivalent_sites.count }} equivalent site{{ site.equivalent_sites.count|pluralize }}.</div>
-        <div class="pdb-sites-list">
-            {% for other_site in site.equivalent_sites %}
-            {% with other_site as site %}
-            {% include "zinc-site-summary.html" %}
-            {% endwith %}
+            <h3>Liganding Residues</h3>
+            {% for residue in site.residue_set.all %}
+            <div class="residue">{{ residue.atomium_id }} ({{ residue.name }})</div>
             {% endfor %}
         </div>
-        {% else %}
-        <div class="no-sites"><p>There are no equivalent sites - this zinc site is
-            unique in the database.</p></div>
-        {% endif %}
+
+        <div id="pdb-sites">
+            <div class="scrollable box">
+                {% if site.equivalent_sites %}
+                <div class="pdb-sites-count">{{ site.equivalent_sites.count }} equivalent site{{ site.equivalent_sites.count|pluralize }}.</div>
+                <div class="pdb-sites-list">
+                    {% for other_site in site.equivalent_sites %}
+                    {% with other_site as site %}
+                    {% include "zinc-site-summary.html" %}
+                    {% endwith %}
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="no-sites"><p>There are no equivalent sites - this zinc site is
+                    unique in the database.</p></div>
+                {% endif %}
+            </div>
+        </div>
     </div>
+
+    {% include "ngl-pdb.html" %}
+
+    {% with site.pdb as pdb %}
+    {% include "pdb-info.html" %}
+    {% endwith %}
 </div>
-
-{% include "ngl-pdb.html" %}
-
-{% with site.pdb as pdb %}
-{% include "pdb-info.html" %}
-{% endwith %}
-
 {% endblock %}
 
 {% block endjs %}

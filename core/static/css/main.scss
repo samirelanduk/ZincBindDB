@@ -1,26 +1,40 @@
+// Fonts
 $font: "Source Sans Pro";
 $logo-font: "Exo 2";
 
+// Colors
 $back-gray: #eef2f5;
 $border-gray: #dddbef;
 $purple: #472b52;
 $pale-purple: #f1ecf0;
+$dark-purple: #201425;
 $hyperlink-blue: #0074D9;
+$button-color: #a29bfe;
 $hover-color: #e3e2f5;
 $error-red: #a94442;
 $white: #ffffff;
+$cream: #fdfdfd;
 $black: #404040;
 
+// Spacing
 $nav-margin: 2.5rem;
-$padding: 1.2rem;
+$gap: 1.2rem;
 $curvature: 0.4rem;
+$nav-height: 5rem;
+$footer-height: 27rem;
 
+// Widths
 $tablet-width: 600px;
 $laptop-width: 900px;
 $desktop-width: 1200px;
 
+// Useful mixins
 @mixin margin-side($val) {
     margin: {left: $val; right: $val;}
+}
+
+@mixin margin-vert($val) {
+    margin: {top: $val; bottom: $val;}
 }
 
 @mixin non-left-margin($val) {
@@ -33,29 +47,52 @@ $desktop-width: 1200px;
     box-shadow: 0 3px 6px 0 rgba(0,0,0,0.2);
 }
 
-@import "base";
+@mixin depressed-shadow {
+    box-shadow: inset 0 1px 2px rgba(27,31,35,0.075);
+}
+// Reset
+* {
+	margin: 0;
+	padding: 0;
+    box-sizing: border-box;
+	font-size: 100%;
+	font-weight: normal;
+	text-decoration: none;
+	background-color: inherit;
+    background-image: none;
+    list-style: inherit;
+	color: inherit;
+	font-family: $font;
+	border: 0;
+	outline: 0;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+}
+
+html {
+    font-size: 62.5%;
+    color: $black;
+    background-color: $back-gray;
+}
+
+// Style
 @import "core";
+@import "base";
 @import "containers";
-@import "home";
-@import "forms";
-@import "search";
-@import "data";
+@import "components";
 
-
-
+// Bigger screens
 @media (min-width: $tablet-width) {
-    @include base--tablet();
-    @include home--tablet();
-    @include data--tablet();
-    @include forms--tablet();
+    @include base--tablet;
+    @include core--tablet;
+    @include components--tablet;
 }
 
 @media (min-width: $laptop-width) {
-    @include containers--laptop();
-    @include home--laptop();
-    @include data--laptop();
+    @include components--laptop;
+    @include containers--laptop;
 }
 
 @media (min-width: $desktop-width) {
-    @include home--desktop();
+    @include components--desktop;
 }

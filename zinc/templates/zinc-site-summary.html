@@ -1,4 +1,4 @@
-<div class="pdb-site"><a href="/{{ site.id }}/">
+<a class="pdb-site" href="/{{ site.id }}/">
 	<div class="pdb-site-id">{{ site.id }}</div>
 	<div class="pdb-site-residues">
 		{{ site.residue_set.count }} residue{% if pdb.residue_set.count != 1 %}s{% endif %}
@@ -6,4 +6,4 @@
 		<span class="pdb-site-residue">{{residue.chain.chain_pdb_identifier }}{{ residue.residue_pdb_identifier }}{{residue.chain.insertion_pdb_identifier }} ({{ residue.name }}){% if not forloop.last %}, {% endif %}</span>
 		{% endfor %}
 	</div>
-</a></div>
+</a>

@@ -4,9 +4,9 @@
 
 {% block main %}
 {% if results.count %}
-    <div class="search-info">
-        <div>{{ results.count }} result{% if results.count != 1 %}s{% endif %}</div>
-        {% if results.num_pages > 1 %}<div>Page {{ page.number }} of {{ results.num_pages }}</div>{% endif %}
+    <div class="box">
+        <h2>{{ results.count }} result{% if results.count != 1 %}s{% endif %}</h2>
+        {% if results.num_pages > 1 %}<p>Page {{ page.number }} of {{ results.num_pages }}</p>{% endif %}
     </div>
 
     {% for object in page %}
@@ -26,7 +26,7 @@
             </div>
         </div>
         {% else %}
-        <div class="pdb-result"><a href="/pdbs/{{ object.id }}/">
+        <a class="pdb-result" href="/pdbs/{{ object.id }}/">
             <div class="pdb-result-main">
                 <div class="pdb-code">PDB: {{ object.id }}</div>
                 <div class="pdb-deposited">{{ object.deposited }}</div>
@@ -38,7 +38,7 @@
                  {{ object.technique }}{% if object.resolution %} ({{ object.resolution }} Å){% endif %} |
                  {{ object.chain_set.count }} zinc-bearing chain{% if object.chain_set.count != 1 %}s{% endif %}
              </div>
-        </a></div>
+        </a>
         {% endif %}
 
         <div class="site-results">
@@ -56,16 +56,15 @@
     {% endfor %}
 
     {% if results.num_pages > 1 %}
-        <div id="search-nav">
+        <div id="search-nav" class="box">
             {% if page.has_previous %}<a class="previous-page" href="{{ request.get_full_path|pagify:page.previous_page_number }}">Previous Page</a>{% endif %}
             {% if page.has_next %}<a class="next-page" href="{{ request.get_full_path|pagify:page.next_page_number }}">Next Page</a>{% endif %}
         </div>
     {% endif %}
 {% else %}
-
-    <div class="search-info no-results">
-        <div>There were no results matching your query.</div>
-        <div class="search-help">
+    <div class="box no-results">
+        <h2>There were no results matching your query.</h2>
+        <p>
             {% if chains %}
             BLAST search currently requires peptide sequences only - did you
             submit a nucleotide sequence?
@@ -76,7 +75,7 @@
             {% else %}
             Perhaps try a more vague search?
             {% endif %}
-        </div>
+        </p>
     </div>
 {% endif %}
 {% endblock %}
