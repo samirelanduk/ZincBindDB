@@ -8,6 +8,18 @@ class UrlTests(DjangoTest):
         self.check_url_returns_view("/", core_views.home)
 
 
+    def test_data_url(self):
+        self.check_url_returns_view("/data/", core_views.data)
+
+
+    def test_about_url(self):
+        self.check_url_returns_view("/about/", core_views.about)
+
+
+    def test_changelog_url(self):
+        self.check_url_returns_view("/changelog/", core_views.changelog)
+
+
     def test_search_url(self):
         self.check_url_returns_view("/search", zinc_views.search)
         self.check_url_returns_view("/search/", zinc_views.search)

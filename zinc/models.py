@@ -82,13 +82,20 @@ class Pdb(models.Model):
 
     @staticmethod
     def blast_search(sequence):
-        print(sequence)
-        p = subprocess.Popen('echo "{}" | blastp -db data/chains.fasta -outfmt 15'.format(sequence), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        """BLAST searches the PDB chains using a sequence. There must be a
+        blastp program in the PATH for this to work."""
+
+        p = subprocess.Popen(
+         'echo "{}" | blastp -db data/chains.fasta -outfmt 15'.format(sequence),
+         stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+        )
         out, err = p.communicate()
-        print(err)
-        results = json.loads(out)["BlastOutput2"][0]["report"]["results"]["search"]["hits"]
-        chain_ids = [r["description"][0]["title"].split("|")[1] for r in results]
-        chains = sorted(Chain.objects.filter(id__in=chain_ids), key=lambda c: chain_ids.index(c.id))
+        results = json.loads(out
+         )["BlastOutput2"][0]["report"]["results"]["search"]["hits"]
+        ids = [r["description"][0]["title"].split("|")[1] for r in results]
+        chains = sorted(
+         Chain.objects.filter(id__in=ids), key=lambda c: ids.index(c.id)
+        )
         for chain, result in zip(chains, results):
             chain.blast_data = result["hsps"][0]
         return chains
@@ -137,6 +144,9 @@ class ZincSite(models.Model):
 
     @property
     def equivalent_sites(self):
+        """Returns those zinc sites that belong to the same cluster (excluding
+        this one.)"""
+
         return ZincSite.objects.filter(cluster=self.cluster).exclude(id=self.id)
 
 
@@ -176,6 +186,8 @@ class Chain(models.Model):
 
     @property
     def zincsites(self):
+        """Returns all the ZincSite objects that have residues in this chain."""
+        
         residues = self.residue_set.all()
         sites = set(res.site for res in residues)
         return filter(bool, sites)

@@ -1,4 +1,5 @@
 from datetime import date
+import json
 from mixer.backend.django import mixer
 from unittest.mock import patch, Mock, MagicMock, PropertyMock
 from testarsenal import DjangoTest
@@ -136,6 +137,43 @@ class PdbTests(DjangoTest):
         self.assertEqual(list(Pdb.advanced_search(QueryDict("deposited_lt=2008-01-03"))), [pdbs[0]])
 
 
+    @patch("subprocess.Popen")
+    @patch("zinc.models.Chain.objects.filter")
+    def test_can_blast_search(self, mock_filter, mock_popen):
+        results = {"BlastOutput2": [{"report": {"results": {"search": {"hits": [
+         {"description": [{"title": "xx|chain1"}], "hsps": [100]},
+         {"description": [{"title": "xx|chain2"}], "hsps": [200]}
+        ]}}}}]}
+        mock_popen.return_value.communicate.return_value = [json.dumps(results), ""]
+        chains = [Mock(id="chain2"), Mock(id="chain1")]
+        mock_filter.return_value = chains
+        results = Pdb.blast_search("ABCDE")
+        self.assertEqual(results, chains[::-1])
+        self.assertEqual(chains[1].blast_data, 100)
+        self.assertEqual(chains[0].blast_data, 200)
+
+
+    def test_can_get_metals(self):
+        pdb = Pdb(**self.kwargs)
+        chain = mixer.blend(Chain, pdb=pdb)
+        res1 = mixer.blend(Residue, chain=chain)
+        res2 = mixer.blend(Residue)
+        res3 = mixer.blend(Residue, chain=chain)
+        metal1 = mixer.blend(Metal, residue=res1)
+        metal2 = mixer.blend(Metal, residue=res2)
+        metal3 = mixer.blend(Metal, residue=res3)
+        self.assertEqual(list(pdb.metals), [metal1, metal3])
+
+
+    def test_can_get_residues(self):
+        pdb = Pdb(**self.kwargs)
+        site = mixer.blend(ZincSite, pdb=pdb)
+        res1 = mixer.blend(Residue, site=site, residue_pdb_identifier=1)
+        res2 = mixer.blend(Residue)
+        res3 = mixer.blend(Residue, site=site, residue_pdb_identifier=3)
+        self.assertEqual(list(pdb.residues), [res1, res3])
+
+
     @patch("zinc.models.Pdb.metals")
     def test_ngl_metals_sele(self, mock_metals):
         metals = [Mock(), Mock()]
@@ -162,7 +200,7 @@ class ZincSiteTests(DjangoTest):
     def setUp(self):
         self.pdb = mixer.blend(Pdb)
         self.kwargs = {
-         "id": "1XXY457-458", "pdb": self.pdb
+         "id": "1XXY457-458", "cluster": 10, "pdb": self.pdb
         }
 
 
@@ -173,10 +211,19 @@ class ZincSiteTests(DjangoTest):
 
     def test_db_fields_required(self):
         for field in self.kwargs:
-            kwargs = self.kwargs.copy()
-            del kwargs[field]
-            with self.assertRaises(ValidationError):
-                ZincSite(**kwargs).full_clean()
+            if field not in ["cluster"]:
+                kwargs = self.kwargs.copy()
+                del kwargs[field]
+                with self.assertRaises(ValidationError):
+                    ZincSite(**kwargs).full_clean()
+
+
+    def test_can_get_other_sites(self):
+        site = ZincSite(**self.kwargs)
+        site2 = mixer.blend(ZincSite, cluster=10)
+        site3 = mixer.blend(ZincSite, cluster=10)
+        site4 = mixer.blend(ZincSite, cluster=12)
+        self.assertEqual(list(site.equivalent_sites), [site2, site3])
 
 
     @patch("zinc.models.ZincSite.metal_set")
@@ -206,7 +253,7 @@ class ChainTests(DjangoTest):
         self.pdb = mixer.blend(Pdb)
         self.kwargs = {
          "id": "1XXYB", "sequence": "MLLYTCDDWATTY", "pdb": self.pdb,
-         "chain_pdb_identifier": "A"
+         "chain_pdb_identifier": "A", "cluster": 10
         }
 
 
@@ -217,10 +264,22 @@ class ChainTests(DjangoTest):
 
     def test_db_fields_required(self):
         for field in self.kwargs:
-            kwargs = self.kwargs.copy()
-            del kwargs[field]
-            with self.assertRaises(ValidationError):
-                Chain(**kwargs).full_clean()
+            if field not in ["cluster"]:
+                kwargs = self.kwargs.copy()
+                del kwargs[field]
+                with self.assertRaises(ValidationError):
+                    Chain(**kwargs).full_clean()
+
+
+    def test_can_get_chain_sites(self):
+        chain = Chain(**self.kwargs)
+        site1 = mixer.blend(ZincSite)
+        site2 = mixer.blend(ZincSite)
+        site3 = mixer.blend(ZincSite)
+        res1 = mixer.blend(Residue, chain=chain, site=site1)
+        res2 = mixer.blend(Residue, chain=chain, site=site2)
+        res3 = mixer.blend(Residue, chain=chain, site=None)
+        self.assertEqual(set(chain.zincsites), {site1, site2})
 
 
     def test_can_create_from_atomium_chain(self):
@@ -324,7 +383,7 @@ class ResidueTests(DjangoTest):
 
     def test_residue_ngl_sele(self):
         res = Residue(**self.kwargs)
-        self.assertEqual(res.ngl_sele, "23^A:B")
+        self.assertEqual(res.ngl_sele, "23^A:B/0")
 
 
     @patch("zinc.models.Residue.ngl_sele", new_callable=PropertyMock)

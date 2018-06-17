@@ -16,12 +16,16 @@ class SearchViewTests(DjangoTest):
         self.patch3 = patch("zinc.views.Pdb.advanced_search")
         self.mock_advanced = self.patch3.start()
         self.mock_advanced.return_value = "!RESULTS"
+        self.patch4 = patch("zinc.views.Pdb.blast_search")
+        self.mock_blast = self.patch4.start()
+        self.mock_blast.return_value = "BRESULTS"
 
 
     def tearDown(self):
         self.patch1.stop()
         self.patch2.stop()
         self.patch3.stop()
+        self.patch4.stop()
 
 
     def test_search_view_uses_template_with_no_search_terms(self):
@@ -44,7 +48,7 @@ class SearchViewTests(DjangoTest):
         self.pag.page.assert_called_with(1)
         request = self.make_request("---", data={"q": "X", "page": 3})
         self.check_view_has_context(
-         search, request, {"results": self.pag, "page": self.pag.page()}
+         search, request, {"results": self.pag, "page": self.pag.page(), "chains": False}
         )
         self.pag.page.assert_called_with("3")
 
@@ -59,7 +63,22 @@ class SearchViewTests(DjangoTest):
         self.pag.page.assert_called_with(1)
         request = self.make_request("---", data={"title": "X", "page": 3})
         self.check_view_has_context(
+         search, request, {"results": self.pag, "page": self.pag.page(), "chains": False}
+        )
+        self.pag.page.assert_called_with("3")
+
+
+    def test_search_view_sends_blast_search_results_and_page(self):
+        request = self.make_request("---", data={"sequence": "ABC"})
+        self.check_view_has_context(
          search, request, {"results": self.pag, "page": self.pag.page()}
+        )
+        self.mock_blast.assert_called_with("ABC")
+        self.mock_paginate.assert_called_with("BRESULTS", 25)
+        self.pag.page.assert_called_with(1)
+        request = self.make_request("---", data={"sequence": "ABC", "page": 3})
+        self.check_view_has_context(
+         search, request, {"results": self.pag, "page": self.pag.page(), "chains": True}
         )
         self.pag.page.assert_called_with("3")
 

@@ -1,3 +1,4 @@
+import re
 from django import template
 
 register = template.Library()
@@ -14,4 +15,6 @@ def angstroms(value):
 def pagify(url, page):
     """Takes a URL and adds a page number to it"""
 
-    return url[:-1] + str(page) if "page" in url else url + f"&page={page}"
+    return re.sub(
+     r"\&page=(\d+)", f"&page={page}", url
+    ) if "page" in url else url + f"&page={page}"

@@ -4,6 +4,8 @@ from django.db.models import F
 from zinc.models import ZincSite, Pdb, Residue
 
 def home(request):
+    """Returns the home page, along with some object counts."""
+
     return render(request, "home.html", {"counts": [
      len(set(ZincSite.objects.values_list("cluster", flat=True))),
      ZincSite.objects.count(),
@@ -12,10 +14,14 @@ def home(request):
 
 
 def changelog(request):
+    """Returns the changelog page."""
+
     return render(request, "changelog.html")
 
 
 def about(request):
+    """Returns the about page."""
+
     return render(request, "about.html")
 
 
