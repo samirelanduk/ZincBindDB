@@ -9,9 +9,11 @@ def search(request):
         try:
             results = Pdb.search(request.GET["q"])
         except KeyError:
-            try:
-                results = Pdb.blast_search(request.GET["sequence"])
-            except KeyError:
+            if "sequence" in request.GET:
+                try:
+                    results = Pdb.blast_search(request.GET["sequence"])
+                except: results = []
+            else:
                 results = Pdb.advanced_search(request.GET)
     else:
         return render(request, "advanced-search.html")
@@ -27,7 +29,7 @@ def search(request):
 
 def pdb(request, code):
     """Returns a particular Pdb's page."""
-    
+
     pdb = get_object_or_404(Pdb, id=code)
     return render(request, "pdb.html", {"pdb": pdb})
 
