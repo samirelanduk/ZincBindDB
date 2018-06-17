@@ -29,6 +29,7 @@ function drawNgl(code, representations, zoom) {
     });
     stage.metals = representations[0][1].sele;
     stage.residues = representations[1][1].sele;
+    stage.residueColors = {};
     return stage;
 }
 
@@ -71,4 +72,28 @@ function setUpControls() {
         stage.rep = stage.compList[0].addRepresentation(this.value, {sele: "/0"});
         stage.rep.setVisibility(true);
     })
+
+    $(".residue").each(function(i) {
+        $(this).click(function(e) {
+            if ($(this).hasClass("active")) {
+                $(this).removeClass("active");
+                stage.residueColors[$(this).attr("data-ngl")].setVisibility(false);
+            } else {
+                $(this).addClass("active");
+                stage.residueColors[$(this).attr("data-ngl")] = stage.compList[0].addRepresentation("licorice", {color: "#16a085", sele: $(this).attr("data-ngl")});
+            }
+        });
+    });
+
+    $(".metal").each(function(i) {
+        $(this).click(function(e) {
+            if ($(this).hasClass("active")) {
+                $(this).removeClass("active");
+                stage.residueColors[$(this).attr("data-ngl")].setVisibility(false);
+            } else {
+                $(this).addClass("active");
+                stage.residueColors[$(this).attr("data-ngl")] = stage.compList[0].addRepresentation("ball+stick", {color: "#16a085", aspectRatio: 8, sele: $(this).attr("data-ngl")});
+            }
+        });
+    });
 }
