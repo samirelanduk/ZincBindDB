@@ -460,6 +460,18 @@
 
 }
 
+.thanks-grid {
+    display: grid;
+    margin-bottom: 2 * $gap;
+
+    .thanks {
+        width: 60%;
+        @include margin-side(auto);
+        @include margin-vert(2 * $gap);
+    }
+}
+
+
 
 @mixin components--tablet() {
 	.about-box {
@@ -480,6 +492,14 @@
             }
             display: flex;
             align-items: center;
+        }
+    }
+
+    .thanks-grid {
+        grid-template-columns: 1fr 1fr;
+
+        .thanks {
+            width: 60%;
         }
     }
 }
@@ -533,6 +553,17 @@
             bottom: $gap;
             right: $gap;
             font-size: 0.6em;
+        }
+    }
+
+    .thanks-grid {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+
+        .thanks {
+            width: 70%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
     }
 }
