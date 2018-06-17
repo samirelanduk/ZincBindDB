@@ -79,7 +79,7 @@ function setUpControls() {
 
     $(".backbone").change(function(e) {
         stage.rep.setVisibility(false);
-        stage.rep = stage.compList[0].addRepresentation(this.value, {sele: "/0"});
+        stage.rep = stage.compList[0].addRepresentation(this.value, {sele: "/0 and (not water)"});
         stage.rep.setVisibility(true);
     })
 
