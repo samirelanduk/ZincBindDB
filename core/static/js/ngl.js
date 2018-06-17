@@ -55,15 +55,25 @@ function setUpControls() {
         $("canvas").css("background-color", color);
     })
     var surface;
-    $(".toggle-switch").click(function(e) {
+    $("#surfaceToggle").click(function(e) {
         this.classList.toggle('active');
 
         if ($(this).hasClass("active")) {
-            surface = stage.compList[0].addRepresentation("surface", {sele: stage.residues, probeRadius: 1});
+            surface = stage.compList[0].addRepresentation("surface", {sele: stage.residues, probeRadius: 0.75});
         } else {
             surface.setVisibility(false)
             stage.compList[0].addRepresentation("licorice", {sele: stage.residues});
 
+        }
+    })
+
+    $("#spinToggle").click(function(e) {
+        this.classList.toggle('active');
+
+        if ($(this).hasClass("active")) {
+            stage.setSpin(true);
+        } else {
+            stage.setSpin(false);
         }
     })
 
