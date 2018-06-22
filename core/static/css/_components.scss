@@ -284,7 +284,7 @@
 
             label {
                 margin-right: 1rem;
-                width: 10rem;
+                width: 50%;
                 text-align: right;
                 display: block;
             }
@@ -544,14 +544,22 @@
             border-left: 1px solid $border-gray;
             border-top: none;
             flex-direction: column;
+
+            .ngl-control {
+                width: 100%;
+
+                label {
+                    width: 35%;
+                }
+            }
         }
 
         .info {
             position: absolute;
             background-color: #ffffff;
             border: 1px solid black;
-            bottom: $gap;
-            right: $gap;
+            bottom: $gap * 0.6;
+            right: $gap * 0.6;
             font-size: 0.6em;
         }
     }
