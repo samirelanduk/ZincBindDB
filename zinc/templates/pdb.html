@@ -36,5 +36,5 @@
 {% block endjs %}
     <script src="https://unpkg.com/ngl@2.0.0-dev.32"></script>
     <script src="/static/js/ngl.js"></script>
-    <script>drawWholePdb("{{ pdb.id }}", "{{ pdb.ngl_metals_sele }}", "{{ pdb.ngl_residues_sele }}"); setUpControls();</script>
+    <script>drawNgl("{{ pdb.id }}", "{{ pdb.ngl_metals_sele }}", "{{ pdb.ngl_residues_sele }}", [{% for site in pdb.zincsite_set.all %}{% for residue in site.residue_set.all %}"{{ residue.ngl_side_chain_sele }}", {% endfor %}{% endfor %}], false); setUpControls();</script>
 {% endblock %}

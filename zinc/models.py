@@ -247,7 +247,7 @@ class Residue(models.Model):
         """The NGL selector text needed to select the residue."""
 
         return (f"{self.residue_pdb_identifier}^" +
-        f"{self.insertion_pdb_identifier}:{self.chain.chain_pdb_identifier}/0")
+        f"{self.insertion_pdb_identifier}:{self.chain.chain_pdb_identifier}/0 and (%A or %)")
 
 
     @property
