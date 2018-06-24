@@ -67,7 +67,13 @@ class ZincSitePageTests(FunctionalTest):
         self.check_h1("A0014003")
 
         # There is an info section
-        
+        info = self.browser.find_element_by_id("site-info")
+        metals = info.find_elements_by_class_name("metal")
+        self.assertEqual(len(metals), 1)
+        residues = info.find_elements_by_class_name("residue")
+        self.assertEqual(len(residues), 3)
+        self.assertIn("A21 (TYR) A23 (TYR) A25 (VAL)", info.text)
+        self.assertIn("ZN", info.text)
 
 
     def test_404_on_no_site(self):

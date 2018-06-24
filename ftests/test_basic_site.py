@@ -34,6 +34,10 @@ class HomePageTests(FunctionalTest):
         with self.assertRaises(StaleElementReferenceException):
             nav.find_element_by_tag_name("a")
 
+        # There is a footer
+        footer = self.browser.find_element_by_tag_name("footer")
+        self.assertEqual(len(footer.find_elements_by_tag_name("a")), 6)
+
 
 
 class AboutPageTests(FunctionalTest):

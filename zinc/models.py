@@ -291,6 +291,7 @@ class Residue(models.Model):
         return [list(l) for l in zip(*counts)]
 
 
+
 class BaseAtom(models.Model):
     """The base class for residue atoms and metal atoms."""
 
