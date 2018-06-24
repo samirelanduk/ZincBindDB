@@ -164,17 +164,3 @@ class ZincClusteringTests(DjangoTest):
             mock_res.assert_any_call(metal)
         mock_merge.assert_called_with({metal: [metal] * 2 for metal in self.metals})
         self.assertEqual(clusters, mock_merge.return_value[:3])
-
-
-
-class ChainsFromClustersTests(DjangoTest):
-
-    def test_can_get_chains_from_clusters(self):
-        chains = [Mock() for _ in range(4)]
-        residues = [Mock(Residue) for _ in range(10)]
-        residues += [Mock(), Mock()]
-        for i, res in enumerate(residues): res.chain=chains[i // 3]
-        clusters = [{
-         "metals": {}, "residues": set(residues[i * 3: (i + 1) * 3])
-        } for i in range(4)]
-        self.assertEqual(get_chains_from_clusters(clusters), set(chains))

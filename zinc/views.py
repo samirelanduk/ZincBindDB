@@ -4,6 +4,10 @@ from django.http import Http404
 from zinc.models import Pdb, ZincSite
 
 def search(request):
+    """The search view - it returns the advanced search page if no query is sent
+    and otherwise uses the query to search the database. The exact search
+    function used depends on the exact query sent."""
+
     results = []
     if request.GET:
         try:
@@ -22,7 +26,8 @@ def search(request):
         page = paginated_results.page(request.GET.get("page", 1))
     except: raise Http404
     return render(request, "search-results.html", {
-     "page": page, "results": paginated_results, "chains": "sequence" in request.GET
+     "page": page, "results": paginated_results,
+     "chains": "sequence" in request.GET
     })
 
 

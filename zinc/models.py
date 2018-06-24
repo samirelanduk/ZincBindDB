@@ -2,6 +2,7 @@
 
 import subprocess
 import json
+from collections import Counter
 from atomium.models.data import CODES
 from django.db import models
 
@@ -169,6 +170,16 @@ class ZincSite(models.Model):
         ])
 
 
+    @staticmethod
+    def property_counts(sites, property, cutoff=None):
+        counts = Counter([site.__dict__[property] for site in sites]).most_common()
+        if cutoff:
+            counts = counts[:cutoff] + [
+             ["other", sum(n[1] for n in counts[cutoff:])]
+            ]
+        return [list(l) for l in zip(*counts)]
+
+
 
 class Chain(models.Model):
     """A chain of residues in a PDB."""
@@ -266,6 +277,18 @@ class Residue(models.Model):
         return (f"{self.chain.chain_pdb_identifier}" +
         f"{self.residue_pdb_identifier}{self.insertion_pdb_identifier}")
 
+
+    @staticmethod
+    def name_counts(cutoff=None):
+        """Returns the number of residues of each name in the database."""
+
+        names = Residue.objects.exclude(site=None).values_list("name")
+        counts = [[n[0], c] for n, c in Counter(names).most_common()]
+        if cutoff:
+            counts = counts[:cutoff] + [
+             ["other", sum(n[1] for n in counts[cutoff:])]
+            ]
+        return [list(l) for l in zip(*counts)]
 
 
 class BaseAtom(models.Model):

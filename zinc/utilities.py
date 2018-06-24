@@ -99,14 +99,3 @@ def cluster_zincs_with_residues(metals):
         metals[metal] = get_atom_binding_residues(metal)
     clusters = merge_metal_groups(metals)
     return [c for c in clusters if "ZN" in [a.element for a in c["metals"]]]
-
-
-def get_chains_from_clusters(clusters):
-    """Gets all the atomium chains represented in a cluster of zinc sites."""
-
-    chains = set()
-    for cluster in clusters:
-        for residue in cluster["residues"]:
-            if isinstance(residue, Residue):
-                chains.add(residue.chain)
-    return chains

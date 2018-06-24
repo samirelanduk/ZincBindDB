@@ -6,6 +6,7 @@ from testarsenal import DjangoTest
 from django.http import QueryDict
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import F
 from django.db.utils import IntegrityError
 from zinc.models import *
 
@@ -246,6 +247,31 @@ class ZincSiteTests(DjangoTest):
         self.assertEqual(site.ngl_residues_sele, "S1 or S2")
 
 
+    def test_can_get_property_counts(self):
+        pdb1 = mixer.blend(Pdb, technique="X")
+        pdb2 = mixer.blend(Pdb, technique="X")
+        pdb3 = mixer.blend(Pdb, technique="X")
+        pdb4 = mixer.blend(Pdb, technique="Y")
+        pdb5 = mixer.blend(Pdb, technique="Z")
+        pdb6 = mixer.blend(Pdb, technique="Z")
+        mixer.blend(ZincSite, pdb=pdb1)
+        mixer.blend(ZincSite, pdb=pdb2)
+        mixer.blend(ZincSite, pdb=pdb2)
+        mixer.blend(ZincSite, pdb=pdb3)
+        mixer.blend(ZincSite, pdb=pdb4)
+        mixer.blend(ZincSite, pdb=pdb5)
+        mixer.blend(ZincSite, pdb=pdb6)
+        mixer.blend(ZincSite, pdb=pdb6)
+        mixer.blend(ZincSite, pdb=pdb6)
+        mixer.blend(ZincSite, pdb=pdb6)
+        self.assertEqual(ZincSite.property_counts(
+         ZincSite.objects.all().annotate(technique=F("pdb__technique")), "technique"
+        ), [["Z", "X", "Y"], [5, 4, 1]])
+        self.assertEqual(ZincSite.property_counts(
+         ZincSite.objects.all().annotate(technique=F("pdb__technique")), "technique", 1
+        ), [["Z", "other"], [5, 5]])
+
+
 
 class ChainTests(DjangoTest):
 
@@ -383,7 +409,7 @@ class ResidueTests(DjangoTest):
 
     def test_residue_ngl_sele(self):
         res = Residue(**self.kwargs)
-        self.assertEqual(res.ngl_sele, "23^A:B/0")
+        self.assertEqual(res.ngl_sele, "23^A:B/0 and (%A or %)")
 
 
     @patch("zinc.models.Residue.ngl_sele", new_callable=PropertyMock)
@@ -396,6 +422,13 @@ class ResidueTests(DjangoTest):
     def test_residue_atomium_id(self):
         res = Residue(**self.kwargs)
         self.assertEqual(res.atomium_id, "B23A")
+
+
+    def test_can_get_residue_counts(self):
+        for res in ["A", "Z", "A", "B", "A", "C", "C", "A", "B", "C", "A", "A"]:
+            mixer.blend(Residue, name=res, site=mixer.blend(ZincSite))
+        self.assertEqual(Residue.name_counts(), [["A", "C", "B", "Z"], [6, 3, 2, 1]])
+        self.assertEqual(Residue.name_counts(2), [["A", "C", "other"], [6, 3, 3]])
 
 
 
