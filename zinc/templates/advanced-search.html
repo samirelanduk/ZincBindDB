@@ -10,20 +10,20 @@
 		<div class="error-message"></div>
 		<div class="search-term">
 			<select onchange="updateSearchTerm(this);">
-				<option value="title">Title contains</option>
-				<option value="classification">Classification contains</option>
-				<option value="keywords">Keywords contain</option>
-				<option value="organism">Organism contains</option>
-				<option value="expression">Expression System contains</option>
-				<option value="technique">Technique contains</option>
-				<option value="resolution_gt">Resolution greater than</option>
-				<option value="resolution_lt">Resolution less than</option>
-				<option value="rfactor_gt">Rfactor greater than</option>
-				<option value="rfactor_lt">Rfactor less than</option>
-				<option value="deposited_gt">Deposited since</option>
-				<option value="deposited_lt">Deposited before</option>
+				<option value="title" data-placeholder="e.g. antibody, carbonic anhydrase">Title contains</option>
+				<option value="classification" data-placeholder="e.g. oxidoreductase, membrane">Classification contains</option>
+				<option value="keywords" data-placeholder="e.g. ion channel, zinc finger">Keywords contain</option>
+				<option value="organism" data-placeholder="e.g. homo sapiens">Organism contains</option>
+				<option value="expression" data-placeholder="e.g. saccharomyces">Expression System contains</option>
+				<option value="technique" data-placeholder="e.g. NMR">Technique contains</option>
+				<option value="resolution_lt" data-placeholder="e.g. 2.5">Resolution better than</option>
+				<option value="resolution_gt" data-placeholder="e.g. 10">Resolution worse than</option>
+				<option value="rfactor_lt" data-placeholder="e.g. 0.2">Rfactor less than</option>
+				<option value="rfactor_gt" data-placeholder="e.g. 0.3">Rfactor greater than</option>
+				<option value="deposited_gt" data-placeholder="e.g. 2017-01-01">Deposited since</option>
+				<option value="deposited_lt" data-placeholder="e.g. 2000-01-01">Deposited before</option>
 			</select>
-			<input type="text" name="title" autocomplete="off">
+			<input type="text" name="title" autocomplete="off" placeholder="e.g. antibody, carbonic anhydrase">
 		</div>
 		<button type="button" id="new-term" onclick="addTerm(this);">New Term</button>
 		<input type="submit" value="Search" onclick="return validateSearch();">
