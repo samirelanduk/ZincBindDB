@@ -22,6 +22,7 @@ class Pdb(models.Model):
     expression = models.CharField(null=True, blank=True, max_length=1024)
     technique = models.CharField(null=True, blank=True, max_length=1024)
     rfactor = models.FloatField(null=True, blank=True)
+    assembly = models.IntegerField(null=True, blank=True)
     skeleton = models.BooleanField()
 
 
@@ -36,6 +37,7 @@ class Pdb(models.Model):
          expression=pdb.expression_system, technique=pdb.technique,
          keywords=", ".join(pdb.keywords) if pdb.keywords else "",
          resolution=pdb.resolution, skeleton=model_is_skeleton(pdb.model),
+         assembly=pdb.best_assembly["id"] if pdb.best_assembly else None
         )
 
 
@@ -238,7 +240,7 @@ class Residue(models.Model):
         ZincSite and Chain records. You must specify the residue number."""
 
         numeric_id = int("".join(
-         c for c in residue.id if c.isdigit() or c == "-"
+         c for c in residue.id[1:] if c.isdigit() or c == "-"
         ))
         insertion = (residue.id[residue.id.find(str(numeric_id)) +
          len(str(numeric_id)):])

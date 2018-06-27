@@ -17,7 +17,7 @@ class PdbTests(DjangoTest):
          "id": "1XXY", "title": "The PDB Title", "deposited": date(1990, 9, 28),
          "resolution": 4.5, "organism": "HOMO SAPIENS", "expression": "M MUS",
          "classification": "LYASE", "technique": "XRAY", "skeleton": False,
-         "rfactor": 4.5, "keywords": "REPLICATION, ZINC"
+         "rfactor": 4.5, "keywords": "REPLICATION, ZINC", "assembly": 3
         }
 
 

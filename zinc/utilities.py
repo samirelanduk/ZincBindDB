@@ -62,6 +62,8 @@ def check_clusters_have_unique_residues(clusters):
     """Takes a list of clusters and returns True if they don't share any
     residues in common."""
 
+    print(clusters)
+
     residue_count = sum([len(cluster["residues"]) for cluster in clusters])
     unique_residue_count = len(set.union(
      *[cluster["residues"] for cluster in clusters]
@@ -77,8 +79,10 @@ def merge_metal_groups(metals):
     object with metals and residues. Two metals and their residues will be
     merged together if they share residues."""
 
+    print(metals)
     clusters = [{"metals": {metal}, "residues": residues}
      for metal, residues in metals.items()]
+    print(clusters)
     while not check_clusters_have_unique_residues(clusters):
         for cluster1, cluster2 in combinations(clusters, 2):
             if cluster1["residues"].intersection(cluster2["residues"]):
@@ -87,6 +91,17 @@ def merge_metal_groups(metals):
                 clusters.remove(cluster2)
                 break
     return clusters
+
+
+def remove_duplicates_from_cluster(cluster):
+    identifiers = set([m.id for m in cluster["metals"]])
+    new_metals = set()
+    for id_ in identifiers:
+        for metal in cluster["metals"]:
+            if metal.id == id_:
+                new_metals.add(metal)
+                break
+    cluster["metals"] = new_metals
 
 
 def cluster_zincs_with_residues(metals):
@@ -98,4 +113,5 @@ def cluster_zincs_with_residues(metals):
     for metal in metals:
         metals[metal] = get_atom_binding_residues(metal)
     clusters = merge_metal_groups(metals)
+    for cluster in clusters: remove_duplicates_from_cluster(cluster)
     return [c for c in clusters if "ZN" in [a.element for a in c["metals"]]]

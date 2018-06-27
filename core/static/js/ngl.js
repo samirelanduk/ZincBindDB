@@ -1,6 +1,9 @@
-function drawNgl(code, metals, residues, individual_residues, zoom) {
+function drawNgl(code, assembly, metals, residues, individual_residues, zoom) {
     // Make a stage
     stage = new NGL.Stage("ngl-container", {backgroundColor: "#ffffff"});
+
+    // What assembly should be used?
+    stage.assembly = assembly == "None" ? "AU" : "BU" + assembly;
 
     // If the user double clicks, make it full screen
     stage.viewer.container.addEventListener("dblclick", function () {
@@ -19,18 +22,18 @@ function drawNgl(code, metals, residues, individual_residues, zoom) {
     if (load) stage.loadFile(load, );
     stage.loadFile("rcsb://" + code + ".mmtf").then(function(component) {
         // Make the whole thing a cartoon representation
-        stage.rep = component.addRepresentation("cartoon", {sele: "/0"});
+        stage.rep = component.addRepresentation("cartoon", {sele: "/0", assembly: stage.assembly});
 
         // Make metals appear as spheres
-        component.addRepresentation("ball+stick", {sele: metals, aspectRatio: 8});
+        component.addRepresentation("ball+stick", {sele: metals, aspectRatio: 8, assembly: stage.assembly});
 
         // Make residue side chains appear as sticks
-        component.addRepresentation("licorice", {sele: residues});
+        component.addRepresentation("licorice", {sele: residues, assembly: stage.assembly});
 
         // Add distance lines where appropriate
         for (var r = 0; r < individual_residues.length; r++) {
             var selector = individual_residues[r] + " or " + metals;
-            component.addRepresentation("contact", {sele: selector});
+            component.addRepresentation("contact", {sele: selector, assembly: stage.assembly});
         }
 
         // Store the representations
@@ -65,7 +68,7 @@ function setUpControls() {
                 } else {
                     $(this).addClass("active");
                     var r = stage.compList[0].addRepresentation(rep, {
-                     color: "#16a085", aspectRatio: 8, sele: selector
+                     color: "#16a085", aspectRatio: 8, sele: selector, assembly: stage.assembly
                     });
                     stage.residueColors[selector] = r;
                 }
@@ -85,12 +88,12 @@ function setUpControls() {
         this.classList.toggle('active');
         if ($(this).hasClass("active")) {
             surface = stage.compList[0].addRepresentation("surface", {
-             sele: stage.residues, probeRadius: 0.75
+             sele: stage.residues, probeRadius: 0.75, assembly: stage.assembly
             });
         } else {
             surface.setVisibility(false)
             stage.compList[0].addRepresentation(
-             "licorice", {sele: stage.residues}
+             "licorice", {sele: stage.residues, assembly: stage.assembly}
             );
         }
     })
@@ -109,7 +112,7 @@ function setUpControls() {
     $(".backbone").change(function(e) {
         stage.rep.setVisibility(false);
         stage.rep = stage.compList[0].addRepresentation(
-         this.value, {sele: "/0 and (not water)"}
+         this.value, {sele: "/0 and (not water)", assembly: stage.assembly}
         );
         stage.rep.setVisibility(true);
     })

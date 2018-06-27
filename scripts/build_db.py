@@ -27,6 +27,7 @@ def main(reset=False):
 
     # Go through each PDB
     for code in tqdm(codes):
+        print(code)
     #for code in codes:
         with transaction.atomic():
             # Create the PDB record
@@ -35,7 +36,9 @@ def main(reset=False):
             pdb_record = Pdb.create_from_atomium(pdb)
 
             # Get zincs and cluster
-            metals = pdb.model.atoms(is_metal=True)
+            model = pdb.generate_best_assembly()
+            metals = model.atoms(is_metal=True)
+            print(metals)
             zinc_clusters = cluster_zincs_with_residues(metals)
 
             # Create chains
@@ -47,11 +50,10 @@ def main(reset=False):
                 chains[chain_id] = Chain.create_from_atomium(chain, pdb_record)
 
             # Create binding sites
-            for cluster in zinc_clusters:
+            for index, cluster in enumerate(zinc_clusters, start=1):
                 # Create site record itself
-                zinc_ids = "-".join(str(zinc.id) for zinc in cluster["metals"])
                 site = ZincSite.objects.create(
-                 id=f"{pdb_record.id}{zinc_ids}", pdb=pdb_record
+                 id=f"{pdb_record.id}-{index}", pdb=pdb_record,
                 )
 
                 # Create residue records
