@@ -25,9 +25,15 @@ def about(request):
     return render(request, "about.html")
 
 
+def help(request):
+    """Returns the help page."""
+
+    return render(request, "help.html")
+
+
 def data(request):
     """Returns the data page and the relevant values needed for its charts."""
-    
+
     residue_counts = Residue.name_counts(5)
     sites = ZincSite.objects.all().annotate(
      organism=F("pdb__organism"),

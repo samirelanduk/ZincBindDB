@@ -7,6 +7,7 @@ urlpatterns = [
  path(r"search/", zinc_views.search),
  path(r"data/", core_views.data),
  path(r"about/", core_views.about),
+ path(r"help/", core_views.help),
  path(r"changelog/", core_views.changelog),
  path(r"pdbs/<slug:code>/", zinc_views.pdb),
  path(r"<slug:pk>/", zinc_views.zinc_site),

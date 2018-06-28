@@ -43,6 +43,14 @@ class AboutPageTests(DjangoTest):
 
 
 
+class HelpPageTests(DjangoTest):
+
+    def test_help_view_uses_help_template(self):
+        request = self.make_request("---")
+        self.check_view_uses_template(help, request, "help.html")
+
+
+
 class DataPageTests(DjangoTest):
 
     def setUp(self):

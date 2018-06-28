@@ -16,6 +16,10 @@ class UrlTests(DjangoTest):
         self.check_url_returns_view("/about/", core_views.about)
 
 
+    def test_help_url(self):
+        self.check_url_returns_view("/help/", core_views.help)
+
+
     def test_changelog_url(self):
         self.check_url_returns_view("/changelog/", core_views.changelog)
 
