@@ -69,7 +69,8 @@ function removeRow(button) {
 function updateSearchTerm(select) {
     var input = $(select).parent().find("input");
     input.attr("name", $(select).val());
-    input.attr("placeholder", $("option:selected").attr("data-placeholder"));
+    var selectedOption = $(select).find(":selected").attr("data-placeholder");
+    input.attr("placeholder", selectedOption);
     if ($(select).val().includes("deposited")) {
         input.attr("type", "date");
     } else {
