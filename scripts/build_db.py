@@ -27,7 +27,6 @@ def main(reset=False):
 
     # Go through each PDB
     for code in tqdm(codes):
-        print(code)
     #for code in codes:
         with transaction.atomic():
             # Create the PDB record
@@ -38,7 +37,10 @@ def main(reset=False):
             # Get zincs and cluster
             model = pdb.generate_best_assembly()
             metals = model.atoms(is_metal=True)
-            print(metals)
+            while not metals:
+                pdb.biomolecules.remove(pdb.best_assembly)
+                model = pdb.generate_best_assembly()
+                metals = model.atoms(is_metal=True)
             zinc_clusters = cluster_zincs_with_residues(metals)
 
             # Create chains

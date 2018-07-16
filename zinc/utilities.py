@@ -62,8 +62,6 @@ def check_clusters_have_unique_residues(clusters):
     """Takes a list of clusters and returns True if they don't share any
     residues in common."""
 
-    print(clusters)
-
     residue_count = sum([len(cluster["residues"]) for cluster in clusters])
     unique_residue_count = len(set.union(
      *[cluster["residues"] for cluster in clusters]
@@ -79,10 +77,8 @@ def merge_metal_groups(metals):
     object with metals and residues. Two metals and their residues will be
     merged together if they share residues."""
 
-    print(metals)
     clusters = [{"metals": {metal}, "residues": residues}
      for metal, residues in metals.items()]
-    print(clusters)
     while not check_clusters_have_unique_residues(clusters):
         for cluster1, cluster2 in combinations(clusters, 2):
             if cluster1["residues"].intersection(cluster2["residues"]):
