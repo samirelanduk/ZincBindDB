@@ -17,11 +17,11 @@ from tqdm import tqdm
 
 def main(reset=False):
     # Get all PDBs which contain zinc
-    codes = get_zinc_pdb_codes()
+    codes = get_zinc_pdb_codes()[:20]
     print(f"There are {len(codes)} PDBs with zinc")
     if not reset:
         checked = [p.id for p in Pdb.objects.all()]
-        print(f"{len(checked)} have already beed checked")
+        print(f"{len(checked)} have already been checked")
         codes = [code for code in codes if code not in checked]
 
 

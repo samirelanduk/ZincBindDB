@@ -10,7 +10,7 @@ import django; django.setup()
 from django.db import transaction
 import subprocess
 import re
-from zinc.models import Chain, ZincSite
+from zinc.models import *
 from tqdm import tqdm
 print("")
 
@@ -36,7 +36,7 @@ try:
     with open("data/chains.fasta", "w") as f:
         f.write("\n".join(lines))
     size = sum([len(line) for line in lines]) / 1024
-    print("Saved to temp.fasta ({:.2f} KB)".format(size))
+    print("Saved to chains.fasta ({:.2f} KB)".format(size))
 
     print("Running job...")
     subprocess.call(
@@ -47,16 +47,18 @@ try:
 
     with open("temp.clstr") as f:
         data = f.read()
-    clusters = data.split(">Cluster lcl|")[1:]
+    clusters = data.split(">Cluster ")[1:]
     clusters = [re.compile(r">(.+?)\.\.\.").findall(c) for c in clusters]
+    clusters = [[chain.split("|")[1] for chain in cluster] for cluster in clusters]
     print("There are {} clusters".format(len(clusters)))
 
     print("Writing Chain clusters to database...")
     with transaction.atomic():
-        for index_cluster in enumerate(tqdm(clusters)):
-            for chain_id in index_cluster[1]:
+        for cluster in tqdm(clusters):
+            cluster_object = ChainCluster.objects.create()
+            for chain_id in cluster:
                 chain = Chain.objects.get(id=chain_id)
-                chain.cluster = index_cluster[0]
+                chain.cluster = cluster_object
                 chain.save()
 
     print("Assigning Zinc Sites to clusters...")
@@ -78,8 +80,9 @@ try:
     print("Writing ZincSite clusters to database...\n")
     with transaction.atomic():
         for index, fingerprint in enumerate(tqdm(unique_sites)):
+            cluster = ZincSiteCluster.objects.create()
             for site in unique_sites[fingerprint]:
-                site.cluster = index
+                site.cluster = cluster
                 site.save()
 finally:
     subprocess.call("rm temp*", shell=True)

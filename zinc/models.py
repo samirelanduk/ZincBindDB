@@ -135,6 +135,14 @@ class Pdb(models.Model):
 
 
 
+class ZincSiteCluster(models.Model):
+    """A collection of equivalent zinc sites."""
+
+    class Meta:
+        db_table = "zincsite_clusters"
+
+
+
 class ZincSite(models.Model):
     """A zinc binding site, with one or more zinc atoms in it."""
 
@@ -143,7 +151,9 @@ class ZincSite(models.Model):
 
     id = models.CharField(primary_key=True, max_length=128)
     pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
-    cluster = models.IntegerField(null=True, blank=True)
+    cluster = models.ForeignKey(
+     ZincSiteCluster, on_delete=models.SET_NULL, null=True, blank=True
+    )
 
     @property
     def equivalent_sites(self):
@@ -183,6 +193,14 @@ class ZincSite(models.Model):
 
 
 
+class ChainCluster(models.Model):
+    """A collection of chains with similar sequence."""
+
+    class Meta:
+        db_table = "chain_clusters"
+
+
+
 class Chain(models.Model):
     """A chain of residues in a PDB."""
 
@@ -194,7 +212,9 @@ class Chain(models.Model):
     chain_pdb_identifier = models.CharField(max_length=128)
     sequence = models.TextField()
     pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
-    cluster = models.IntegerField(null=True, blank=True)
+    cluster = models.ForeignKey(
+     ChainCluster, on_delete=models.SET_NULL, null=True, blank=True
+    )
 
 
     @property
