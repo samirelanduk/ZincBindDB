@@ -23,7 +23,7 @@ class QuickSearchTests(FunctionalTest):
         self.check_title("Search Results: PlibblePlebblePlunk")
 
         # The search information is there
-        info = self.browser.find_element_by_class_name("search-info")
+        info = self.browser.find_element_by_class_name("box")
         self.assertIn("no results", info.text)
         self.assertIn("PDB codes", info.text)
         self.assertIn("PDB descriptions", info.text)
@@ -43,7 +43,7 @@ class QuickSearchTests(FunctionalTest):
         self.check_title("Search Results: a001")
 
         # The search information is there.
-        info = self.browser.find_element_by_class_name("search-info")
+        info = self.browser.find_element_by_class_name("box")
         self.assertIn("1 result", info.text)
 
         # There is one result
@@ -65,7 +65,6 @@ class QuickSearchTests(FunctionalTest):
             self.browser.find_element_by_id("search-nav")
 
 
-
     def test_can_search_pdb_titles(self):
         # User searches for PDB code
         self.get("/")
@@ -76,7 +75,7 @@ class QuickSearchTests(FunctionalTest):
         self.check_title("Search Results: PDB file")
 
         # The search information is there.
-        info = self.browser.find_element_by_class_name("search-info")
+        info = self.browser.find_element_by_class_name("box")
         self.assertIn("2 results", info.text)
 
         # There are two results
@@ -106,7 +105,7 @@ class QuickSearchTests(FunctionalTest):
         self.check_title("Search Results: filler")
 
         # The search information is there.
-        info = self.browser.find_element_by_class_name("search-info")
+        info = self.browser.find_element_by_class_name("box")
         self.assertIn("105 results", info.text)
         self.assertIn("Page 1 of 5", info.text)
 
@@ -125,7 +124,7 @@ class QuickSearchTests(FunctionalTest):
         self.check_page("/search?q=filler&page=2")
 
         # The second page is correct
-        info = self.browser.find_element_by_class_name("search-info")
+        info = self.browser.find_element_by_class_name("box")
         self.assertIn("105 results", info.text)
         self.assertIn("Page 2 of 5", info.text)
         results = self.browser.find_elements_by_class_name("pdb-result")
@@ -136,7 +135,7 @@ class QuickSearchTests(FunctionalTest):
         # They keep going to the end
         for page in (2, 3, 4):
             self.check_page(f"/search?q=filler&page={page}")
-            info = self.browser.find_element_by_class_name("search-info")
+            info = self.browser.find_element_by_class_name("box")
             self.assertIn(f"Page {page} of 5", info.text)
             results = self.browser.find_elements_by_class_name("pdb-result")
             self.assertEqual(len(results), 25)
@@ -146,7 +145,7 @@ class QuickSearchTests(FunctionalTest):
 
         # The last page is correct
         self.check_page("/search?q=filler&page=5")
-        info = self.browser.find_element_by_class_name("search-info")
+        info = self.browser.find_element_by_class_name("box")
         self.assertIn("105 results", info.text)
         self.assertIn("Page 5 of 5", info.text)
         results = self.browser.find_elements_by_class_name("pdb-result")
@@ -161,13 +160,13 @@ class QuickSearchTests(FunctionalTest):
         # They can go back
         for page in (5, 4, 3, 2):
             self.check_page(f"/search?q=filler&page={page}")
-            info = self.browser.find_element_by_class_name("search-info")
+            info = self.browser.find_element_by_class_name("box")
             self.assertIn(f"Page {page} of 5", info.text)
             search_nav = self.browser.find_element_by_id("search-nav")
             previous_ = search_nav.find_element_by_class_name("previous-page")
             self.click(previous_)
         self.check_page("/search?q=filler&page=1")
-        info = self.browser.find_element_by_class_name("search-info")
+        info = self.browser.find_element_by_class_name("box")
         self.assertIn("105 results", info.text)
         self.assertIn("Page 1 of 5", info.text)
         results = self.browser.find_elements_by_class_name("pdb-result")

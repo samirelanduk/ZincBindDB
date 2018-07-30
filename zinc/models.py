@@ -105,26 +105,18 @@ class Pdb(models.Model):
 
 
     @property
-    def metals(self):
-        """Gets all the metal objects in this Pdb."""
-
-        return Metal.objects.filter(residue__chain__pdb=self)
-
-
-    @property
     def residues(self):
         """Gets all the residue objects that provide liganding atoms that belong
-        to this Pdb (*not* those which are merely a container for a metal
-        ion)."""
+        to this Pdb."""
 
         return Residue.objects.filter(site__pdb=self)
 
 
     @property
     def ngl_metals_sele(self):
-        """The NGL selector text needed to grab all metal atoms."""
+        """The NGL selector text needed to grab all metal atoms in the PDB."""
 
-        return " or ".join([metal.residue.ngl_sele for metal in self.metals])
+        return " or ".join([metal.ngl_sele for metal in self.metal_set.all()])
 
 
     @property
@@ -132,64 +124,6 @@ class Pdb(models.Model):
         """The NGL selector text needed to grab all binding residues."""
 
         return " or ".join([res.ngl_side_chain_sele for res in self.residues])
-
-
-
-class ZincSiteCluster(models.Model):
-    """A collection of equivalent zinc sites."""
-
-    class Meta:
-        db_table = "zincsite_clusters"
-
-
-
-class ZincSite(models.Model):
-    """A zinc binding site, with one or more zinc atoms in it."""
-
-    class Meta:
-        db_table = "zinc_sites"
-
-    id = models.CharField(primary_key=True, max_length=128)
-    pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
-    cluster = models.ForeignKey(
-     ZincSiteCluster, on_delete=models.SET_NULL, null=True, blank=True
-    )
-
-    @property
-    def equivalent_sites(self):
-        """Returns those zinc sites that belong to the same cluster (excluding
-        this one.)"""
-
-        return ZincSite.objects.filter(cluster=self.cluster).exclude(id=self.id)
-
-
-    @property
-    def ngl_metals_sele(self):
-        """The NGL selector text needed to grab all metal atoms in a site."""
-
-        return " or ".join([
-         metal.residue.ngl_sele for metal in self.metal_set.all()
-        ])
-
-
-    @property
-    def ngl_residues_sele(self):
-        """The NGL selector text needed to grab all binding residues in a
-        site."""
-
-        return " or ".join([
-         res.ngl_side_chain_sele for res in self.residue_set.all()
-        ])
-
-
-    @staticmethod
-    def property_counts(sites, property, cutoff=None):
-        counts = Counter([site.__dict__[property] for site in sites]).most_common()
-        if cutoff:
-            counts = counts[:cutoff] + [
-             ["other", sum(n[1] for n in counts[cutoff:])]
-            ]
-        return [list(l) for l in zip(*counts)]
 
 
 
@@ -216,16 +150,6 @@ class Chain(models.Model):
      ChainCluster, on_delete=models.SET_NULL, null=True, blank=True
     )
 
-
-    @property
-    def zincsites(self):
-        """Returns all the ZincSite objects that have residues in this chain."""
-
-        residues = self.residue_set.all()
-        sites = set(res.site for res in residues)
-        return filter(bool, sites)
-
-
     @staticmethod
     def create_from_atomium(chain, pdb):
         """Creates a chain record from an atomium Chain object and an existing
@@ -235,6 +159,119 @@ class Chain(models.Model):
          id=f"{pdb.id}{chain.id}", pdb=pdb,
          sequence=chain.rep_sequence, chain_pdb_identifier=chain.id
         )
+
+
+
+class ZincSiteCluster(models.Model):
+    """A collection of equivalent zinc sites."""
+
+    class Meta:
+        db_table = "zincsite_clusters"
+
+
+
+class ZincSite(models.Model):
+    """A zinc binding site, with one or more zinc atoms in it."""
+
+    class Meta:
+        db_table = "zinc_sites"
+
+    id = models.CharField(primary_key=True, max_length=128)
+    pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
+    copies = models.IntegerField()
+    cluster = models.ForeignKey(
+     ZincSiteCluster, on_delete=models.SET_NULL, null=True, blank=True
+    )
+
+
+    @property
+    def equivalent_sites(self):
+        """Returns other ZincSites in this cluster, or None if there aren't
+        any."""
+
+        if self.cluster:
+            return self.cluster.zincsite_set.exclude(id=self.id)
+
+
+    @property
+    def ngl_metals_sele(self):
+        """The NGL selector text needed to grab all metal atoms in a site."""
+
+        return " or ".join([
+         metal.ngl_sele for metal in self.metal_set.all()
+        ])
+
+
+    @property
+    def ngl_residues_sele(self):
+        """The NGL selector text needed to grab all binding residues in a
+        site."""
+
+        return " or ".join([
+         res.ngl_side_chain_sele for res in self.residue_set.all()
+        ])
+
+
+    @staticmethod
+    def property_counts(sites, property, cutoff=None):
+        """Takes a series of sites and a property name, and returns a sort of
+        histogram of the different values."""
+
+        counts = Counter([site.__dict__[property] for site in sites]).most_common()
+        if cutoff:
+            counts = counts[:cutoff] + [
+             ["other", sum(n[1] for n in counts[cutoff:])]
+            ]
+        return [list(l) for l in zip(*counts)]
+
+
+
+class Metal(models.Model):
+    """A metal atom - usually zinc."""
+
+    class Meta:
+        db_table = "metals"
+
+    atom_pdb_identifier = models.IntegerField()
+    name = models.CharField(max_length=32)
+    x = models.FloatField()
+    y = models.FloatField()
+    z = models.FloatField()
+    element = models.CharField(max_length=8)
+    residue_name = models.CharField(max_length=32)
+    residue_pdb_identifier = models.IntegerField()
+    insertion_pdb_identifier = models.CharField(max_length=128)
+    chain_pdb_identifier = models.CharField(max_length=128)
+    omission = models.TextField(blank=True, null=True)
+    pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
+    site = models.ForeignKey(ZincSite, on_delete=models.CASCADE, blank=True, null=True)
+
+
+    @staticmethod
+    def create_from_atomium(atom, pdb, site=None, omission=None):
+        """Creates a Metal record from an atomium atom."""
+
+        residue = atom.ligand if atom.ligand else atom.residue
+        numeric_id = int("".join(
+         c for c in residue.id[1:] if c.isdigit() or c == "-"
+        ))
+        insertion = (residue.id[residue.id.find(str(numeric_id)) +
+         len(str(numeric_id)):])
+        return Metal.objects.create(
+         atom_pdb_identifier=atom.id, element=atom.element,
+         name=atom.name, x=atom.x, y=atom.y, z=atom.z,
+         residue_pdb_identifier=numeric_id, insertion_pdb_identifier=insertion,
+         chain_pdb_identifier=atom.chain.id, residue_name=residue.name,
+         pdb=pdb, omission=omission, site=site
+        )
+
+
+    @property
+    def ngl_sele(self):
+        """The NGL selector text needed to select the metal."""
+
+        return (f"{self.residue_pdb_identifier}^" +
+        f"{self.insertion_pdb_identifier}:{self.chain_pdb_identifier}/0 and (%A or %)")
 
 
 
@@ -248,14 +285,12 @@ class Residue(models.Model):
     residue_pdb_identifier = models.IntegerField()
     insertion_pdb_identifier = models.CharField(max_length=128)
     name = models.CharField(max_length=128)
-    site = models.ForeignKey(
-     ZincSite, on_delete=models.CASCADE, null=True, blank=True
-    )
+    site = models.ForeignKey(ZincSite, on_delete=models.CASCADE)
     chain = models.ForeignKey(Chain, on_delete=models.CASCADE)
 
 
     @staticmethod
-    def create_from_atomium(residue, chain, site=None):
+    def create_from_atomium(residue, chain, site):
         """Creates a residue record from an atomium Residue object and existing
         ZincSite and Chain records. You must specify the residue number."""
 
@@ -269,9 +304,8 @@ class Residue(models.Model):
          insertion_pdb_identifier=insertion,
          name=residue.name, chain=chain, site=site,
         )
-        if site:
-            for atom in residue.atoms():
-                Atom.create_from_atomium(atom, residue_record)
+        for atom in residue.atoms():
+            Atom.create_from_atomium(atom, residue_record)
         return residue_record
 
 
@@ -314,12 +348,11 @@ class Residue(models.Model):
 
 
 
-class BaseAtom(models.Model):
-    """The base class for residue atoms and metal atoms."""
+class Atom(models.Model):
+    """An atom in a liganding residue."""
 
     class Meta:
-        abstract = True
-
+        db_table = "atoms"
 
     atom_pdb_identifier = models.IntegerField()
     name = models.CharField(max_length=32)
@@ -327,52 +360,14 @@ class BaseAtom(models.Model):
     y = models.FloatField()
     z = models.FloatField()
     element = models.CharField(max_length=8)
-    charge = models.FloatField()
-    bfactor = models.FloatField()
-    residue = models.ForeignKey(Residue, on_delete=models.CASCADE)
-
-    @staticmethod
-    def create_from_atomium(cls, atom, residue):
-        return cls(
-         atom_pdb_identifier=atom.id,
-         name=atom.name, x=atom.x, y=atom.y, z=atom.z, charge=atom.charge,
-         element=atom.element, bfactor=atom.bfactor, residue=residue
-        )
-
-
-
-class Atom(BaseAtom):
-    """An atom belonging to some Residue."""
-
-    class Meta:
-        db_table = "atoms"
-
     liganding = models.BooleanField()
+    residue = models.ForeignKey(Residue, on_delete=models.CASCADE)
 
 
     @staticmethod
     def create_from_atomium(atom, residue):
-        atom_record = BaseAtom.create_from_atomium(Atom, atom, residue)
-        atom_record.liganding = atom.liganding
-        atom_record.save()
-        return atom_record
-
-
-
-class Metal(BaseAtom):
-    """A metal atom in a PDB - usually zinc but ocasionally other metals are
-    cocatalytic with zinc."""
-
-    class Meta:
-        db_table = "metals"
-
-    site = models.ForeignKey(ZincSite, on_delete=models.CASCADE)
-
-
-    @staticmethod
-    def create_from_atomium(atom, site, chain):
-        residue = Residue.create_from_atomium(atom.ligand, chain)
-        atom = BaseAtom.create_from_atomium(Metal, atom, residue)
-        atom.site = site
-        atom.save()
-        return atom
+        return Atom.objects.create(
+         atom_pdb_identifier=atom.id,
+         name=atom.name, x=atom.x, y=atom.y, z=atom.z,
+         element=atom.element, residue=residue, liganding=atom.liganding
+        )

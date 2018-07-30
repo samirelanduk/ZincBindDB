@@ -28,10 +28,10 @@ class PdbPageTests(FunctionalTest):
         self.assertIn("2 zinc binding sites", site_information.text)
         sites = site_information.find_elements_by_class_name("pdb-site")
         self.assertEqual(len(sites), 2)
-        self.assertIn("A0014003", sites[0].text)
+        self.assertIn("A001-1", sites[0].text)
         self.assertIn("3 residues", sites[0].text)
         self.assertIn("A21 (TYR), A23 (TYR), A25 (VAL)", sites[0].text)
-        self.assertIn("A0018003", sites[1].text)
+        self.assertIn("A001-2", sites[1].text)
         self.assertIn("3 residues", sites[1].text)
         self.assertIn("B23 (TYR), B25 (VAL), B500 (HOH)", sites[1].text)
 
@@ -60,11 +60,11 @@ class PdbPageTests(FunctionalTest):
 
 class ZincSitePageTests(FunctionalTest):
 
-    def test_pdb_page_layout(self):
+    def test_zincsite_page_layout(self):
         # User goes to site page
-        self.get("/A0014003/")
-        self.check_title("A0014003")
-        self.check_h1("A0014003")
+        self.get("/A001-1/")
+        self.check_title("A001-1")
+        self.check_h1("A001-1")
 
         # There is an info section
         info = self.browser.find_element_by_id("site-info")

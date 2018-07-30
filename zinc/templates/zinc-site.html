@@ -14,7 +14,7 @@
 
             <h3>Metals</h3>
             {% for metal in site.metal_set.all %}
-            <div class="metal" data-ngl="{{ metal.residue.ngl_sele }}">{{ metal.atom_pdb_identifier }} ({{ metal.element }})</div>
+            <div class="metal" data-ngl="{{ metal.ngl_sele }}">{{ metal.atom_pdb_identifier }} ({{ metal.element }})</div>
             {% endfor %}
 
             <h3>Liganding Residues</h3>

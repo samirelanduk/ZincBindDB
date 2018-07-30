@@ -12,8 +12,8 @@
         <div>
             {{ pdb.chain_set.count }} zinc-bearing chain{{ pdb.chain_set.count|pluralize }}
             ({% for chain in pdb.chain_set.all %}{{ chain.chain_pdb_identifier }}{% if not forloop.last %}, {% endif %}{% endfor %});
-            {{ pdb.metals.count }} zinc atom{{ pdb.metals.count|pluralize }}
-            ({% for metal in pdb.metals %}{{ metal.atom_pdb_identifier }}{% if not forloop.last %}, {% endif %}{% endfor %});
+            {{ pdb.metal_set.count }} zinc atom{{ pdb.metal_set.count|pluralize }}
+            ({% for metal in pdb.metal_set.all %}{{ metal.atom_pdb_identifier }}{% if not forloop.last %}, {% endif %}{% endfor %});
 
         </div>
     </div>

@@ -1,13 +1,13 @@
 from collections import Counter
 from django.shortcuts import render
 from django.db.models import F
-from zinc.models import ZincSite, Pdb, Residue
+from zinc.models import ZincSite, Pdb, Residue, ZincSiteCluster
 
 def home(request):
     """Returns the home page, along with some object counts."""
 
     return render(request, "home.html", {"counts": [
-     len(set(ZincSite.objects.values_list("cluster", flat=True))),
+     ZincSiteCluster.objects.count(),
      ZincSite.objects.count(),
      Pdb.objects.count()
     ]})

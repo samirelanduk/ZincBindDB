@@ -12,9 +12,9 @@ class HomeViewTests(DjangoTest):
         self.patch2 = patch("core.views.ZincSite.objects.count")
         self.mock_zinc_count = self.patch2.start()
         self.mock_zinc_count.return_value = 120
-        self.patch3 = patch("core.views.ZincSite.objects.values_list")
+        self.patch3 = patch("core.views.ZincSiteCluster.objects.count")
         self.mock_unique_zinc_count = self.patch3.start()
-        self.mock_unique_zinc_count.return_value = [1, 2, 1, 4, 3, 2, 1]
+        self.mock_unique_zinc_count.return_value = 4
 
 
     def tearDown(self):
@@ -31,7 +31,6 @@ class HomeViewTests(DjangoTest):
     def test_home_view_sends_counts(self):
         request = self.make_request("---")
         self.check_view_has_context(home, request, {"counts": [4, 120, 169]})
-        self.mock_unique_zinc_count.assert_called_with("cluster", flat=True)
 
 
 

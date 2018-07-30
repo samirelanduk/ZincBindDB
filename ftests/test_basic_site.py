@@ -19,8 +19,8 @@ class HomePageTests(FunctionalTest):
         description = self.browser.find_element_by_id("site-description")
         self.assertIn("database of zinc binding sites", description.text.lower())
         self.assertIn("2 PDB files", description.text)
-        self.assertIn("1 unique", description.text)
-        self.assertIn("2 representative", description.text)
+        self.assertIn("3 unique", description.text)
+        self.assertIn("4 representative", description.text)
 
         # There is a search bar
         search = self.browser.find_element_by_id("site-search")
@@ -59,7 +59,7 @@ class AboutPageTests(FunctionalTest):
 
 class ChangelogPageTests(FunctionalTest):
 
-    def test_about_page_layout(self):
+    def test_changelog_page_layout(self):
         # They go to the changelog page
         self.get("/")
         footer = self.browser.find_element_by_tag_name("footer")
@@ -70,4 +70,22 @@ class ChangelogPageTests(FunctionalTest):
         # There are multiple releases
         self.assertGreaterEqual(
          len(self.browser.find_elements_by_class_name("release")), 3
+        )
+
+
+
+class HelpPageTests(FunctionalTest):
+
+    def test_help_page_layout(self):
+        # They go to the help page
+        self.get("/")
+        nav = self.browser.find_element_by_tag_name("nav")
+        nav_links = nav.find_element_by_id("nav-links")
+        self.click(nav_links.find_element_by_link_text("Help"))
+        self.check_title("Help")
+        self.check_h1("How to use")
+
+        # There are multiple help scenarios
+        self.assertGreaterEqual(
+         len(self.browser.find_elements_by_class_name("about-box")), 3
         )

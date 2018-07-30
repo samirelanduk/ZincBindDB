@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.http import Http404
-from zinc.models import Pdb, ZincSite
+from zinc.models import *
 
 def search(request):
     """The search view - it returns the advanced search page if no query is sent

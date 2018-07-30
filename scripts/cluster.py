@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-""""""
+"""Takes a database created by build_db.py and clusters chains and zincsites."""
 
 import sys
 import os

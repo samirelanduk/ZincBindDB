@@ -25,8 +25,14 @@ class FunctionalTest(StaticLiveServerTestCase, BrowserTest):
          title="A FINE PDB FILE", deposited=date(1992, 9, 28),
         )
 
-        site1 = mixer.blend(ZincSite, pdb=pdb1, id="A0014003")
-        site2 = mixer.blend(ZincSite, pdb=pdb1, id="A0018003")
+        cluster1 = mixer.blend(ZincSiteCluster)
+        cluster2 = mixer.blend(ZincSiteCluster)
+        cluster3 = mixer.blend(ZincSiteCluster)
+
+        site1 = mixer.blend(ZincSite, pdb=pdb1, id="A001-1", cluster=cluster1)
+        site2 = mixer.blend(ZincSite, pdb=pdb1, id="A001-2", cluster=cluster2)
+        site3 = mixer.blend(ZincSite, pdb=pdb2, id="A002-1", cluster=cluster1)
+        site4 = mixer.blend(ZincSite, pdb=pdb2, id="A002-2", cluster=cluster3)
 
         chain2 = mixer.blend(
          Chain, pdb=pdb1, id="A001B", chain_pdb_identifier="B"
@@ -60,19 +66,7 @@ class FunctionalTest(StaticLiveServerTestCase, BrowserTest):
          insertion_pdb_identifier="", number=0, name="HOH", chain=chain2
         )
 
-        zincres1 = mixer.blend(
-         Residue, site=None, residue_pdb_identifier=1000,
-         insertion_pdb_identifier="", number=0, name="ZN", chain=chain1
-        )
-        metal1 = mixer.blend(
-         Metal, site=site1, element="ZN"
-        )
-
-
-
-
-
-
+        metal1 = mixer.blend(Metal, site=site1, element="ZN", pdb=pdb1)
 
 
     def tearDown(self):

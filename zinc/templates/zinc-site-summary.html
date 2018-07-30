@@ -1,5 +1,5 @@
 <a class="pdb-site" href="/{{ site.id }}/">
-	<div class="pdb-site-id">{{ site.id }}</div>
+	<div class="pdb-site-id">{{ site.id }} {% if site.copies > 1 %}<span class="pdb-site-residue">({{ site.copies }} copies)</span>{% endif %}</div>
 	<div class="pdb-site-residues">
 		{{ site.residue_set.count }} residue{% if pdb.residue_set.count != 1 %}s{% endif %}
 		{% for residue in site.residue_set.all %}
