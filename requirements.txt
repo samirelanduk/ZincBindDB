@@ -1,6 +1,7 @@
 django==2.0.2
 requests==2.18.4
 atomium==0.10.0
+djangorestframework==3.8.2
 tqdm==4.23.3
 django==2.0.2
 rjsmin==1.0.12 --install-option="--without-c-extensions"

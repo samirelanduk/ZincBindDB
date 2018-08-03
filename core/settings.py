@@ -18,6 +18,7 @@ INSTALLED_APPS = [
  "django.contrib.staticfiles",
  "django.contrib.humanize",
  "sass_processor",
+ "rest_framework",
  "core",
  "zinc"
 ]
@@ -49,3 +50,11 @@ DATABASES = {"default": {
  "ENGINE": "django.db.backends.sqlite3",
  "NAME": os.path.join(BASE_DIR, "data", "zinc.sqlite3")
 }}
+
+REST_FRAMEWORK = {
+ "DEFAULT_AUTHENTICATION_CLASSES": [],
+ "DEFAULT_PERMISSION_CLASSES": [],
+ "UNAUTHENTICATED_USER": None,
+ "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+ "PAGE_SIZE": 5
+}

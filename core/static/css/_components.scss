@@ -31,18 +31,40 @@
     }
 }
 
-.chart-container {
-    margin: 0px;
-    box-sizing: border-box;
+table.api-table {
+	width: fit-content;
+	@include margin-side(auto);
 
-    .chart {
-        @include white-box;
-        box-sizing: border-box;
-        width: 100%;
-        margin-bottom: $gap;
-        padding: 2 * $gap;
-    }
+	td {
+		padding: 0.25rem;
+	}
+
+	td:first-child {
+		text-align: right;
+	}
+
+	td:last-child {
+		text-align: left;
+	}
 }
+
+.charts {
+	margin-top: 1rem;
+
+	.chart-container {
+	    margin: 0px;
+	    box-sizing: border-box;
+
+	    .chart {
+	        @include white-box;
+	        box-sizing: border-box;
+	        width: 100%;
+	        margin-bottom: $gap;
+	        padding: 2 * $gap;
+	    }
+	}
+}
+
 
 .advanced-searcher {
 
@@ -588,6 +610,10 @@
             align-items: center;
         }
     }
+
+	.thanks-grid-5 {
+		grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+	}
 }
 
 @mixin components--desktop() {

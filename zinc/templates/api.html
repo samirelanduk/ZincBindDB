@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}ZincBind REST API{% endblock %}
+
+{% block main %}
+<div class="column-container">
+    <h1>ZincBind REST API</h1>
+
+    <div class="box about-box">
+		<p>The REST API allows access to all objects in the ZincBind database as
+		JSON objects. You may also use the API to browse lists of PDB, zinc
+		site, chain cluster and zinc site cluster objects. These results will
+		be paginated, as the JSON objects can be quite large.</p>
+		<p>The ZincBind REST API is
+		<a href="http://www.django-rest-framework.org/topics/browsable-api/"
+		target="_blank">web browsable</a> - HTML responses will be returned if
+		requests are made from a browser, otherwise the raw JSON itself will be
+		sent back.</p>
+    </div>
+
+	<div class="box about-box">
+		<h2>URLs</h2>
+		<table class="api-table">
+			<tr><td><a href="/api/pdbs/">/api/pdbs/</a></td><td>all PDB objects.</td></tr>
+			<tr><td><a href="/api/sites/">/api/sites/</a></td><td>all ZincSite objects.</td></tr>
+			<tr><td><a href="/api/chain-clusters/">/api/chain-clusters/</a></td><td>all Chain Cluster objects.</td></tr>
+			<tr><td><a href="/api/site-clusters/">/api/site-clusters/</a></td><td>all ZincSite Cluster objects.</td></tr>
+			<tr><td></td><td></td></tr>
+			<tr><td><a href="/api/pdbs/6FHQ/">/api/pdbs/6FHQ/</a></td><td>specific PDB object.</td></tr>
+			<tr><td><a href="/api/metals/41443/">/api/metals/41443/</a></td><td>specific Metal object.</td></tr>
+			<tr><td><a href="/api/sites/6FHQ-1/">/api/sites/6FHQ-1/</a></td><td>specific ZincSite object.</td></tr>
+			<tr><td><a href="/api/residues/114804/">/api/residues/114804/</a></td><td>specific Residue object.</td></tr>
+			<tr><td><a href="/api/atoms/906555/">/api/atoms/906555/</a></td><td>specific Atom object.</td></tr>
+			<tr><td><a href="/api/chains/6FHQA/">/api/chains/6FHQA/</a></td><td>specific Chain object.</td></tr>
+			<tr><td><a href="/api/chain-clusters/3727/">/api/chain-clusters/3727/</a></td><td>specific Chain Cluster object.</td></tr>
+			<tr><td><a href="/api/site-clusters/11486/">/api/site-clusters/11486/</a></td><td>specific ZincSite Cluster object.</td></tr>
+		</table>
+	</div>
+</div>
+{% endblock %}

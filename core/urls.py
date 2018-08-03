@@ -3,6 +3,12 @@ import core.views as core_views
 import zinc.views as zinc_views
 
 urlpatterns = [
+ path("api/<slug:type>/<slug:pk>/", zinc_views.api_object),
+ path("api/pdbs/", zinc_views.PdbViewSet.as_view({"get": "list"})),
+ path("api/sites/", zinc_views.ZincSiteViewSet.as_view({"get": "list"})),
+ path("api/chain-clusters/", zinc_views.ChainClusterViewSet.as_view({"get": "list"})),
+ path("api/site-clusters/", zinc_views.ZincSiteClusterViewSet.as_view({"get": "list"})),
+ path(r"api/", zinc_views.api),
  path(r"search", zinc_views.search),
  path(r"search/", zinc_views.search),
  path(r"data/", core_views.data),

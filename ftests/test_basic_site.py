@@ -18,9 +18,9 @@ class HomePageTests(FunctionalTest):
         # There is a site description
         description = self.browser.find_element_by_id("site-description")
         self.assertIn("database of zinc binding sites", description.text.lower())
-        self.assertIn("2 PDB files", description.text)
+        self.assertIn("7 PDB files", description.text)
         self.assertIn("3 unique", description.text)
-        self.assertIn("4 representative", description.text)
+        self.assertIn("9 representative", description.text)
 
         # There is a search bar
         search = self.browser.find_element_by_id("site-search")

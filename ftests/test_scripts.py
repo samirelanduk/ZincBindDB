@@ -124,7 +124,7 @@ class DatabaseBuildingTests(DjangoTest):
         )
         self.assertEqual(pdb.chain_set.count(), 1)
 
-        # 1XDA is fine
+        # 1ZEH is fine
         pdb = Pdb.objects.get(id="1ZEH")
         self.assertIn("STRUCTURE OF INSULIN", pdb.title)
         self.assertEqual(pdb.assembly, 3)
@@ -164,5 +164,5 @@ class DatabaseBuildingTests(DjangoTest):
         self.assertEqual(pdb.assembly, 1)
         self.assertEqual(pdb.metal_set.count(), 3)
         self.assertEqual(pdb.zincsite_set.count(), 2)
-        bad_zinc = pdb.metal_set.get(atom_pdb_identifier=1866)
+        bad_zinc = pdb.metal_set.exclude(omission=None).first()
         self.assertIn("residues", bad_zinc.omission)
