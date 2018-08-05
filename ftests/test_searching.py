@@ -183,3 +183,6 @@ class QuickSearchTests(FunctionalTest):
         self.check_title("Page Not Found")
         self.get("/search?q=filler&page=ABC")
         self.check_title("Page Not Found")
+
+
+    #TODO advanced search inc. floats

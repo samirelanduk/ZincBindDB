@@ -76,8 +76,12 @@ class Pdb(models.Model):
         ]
         for numeric_term in numeric_terms:
             if numeric_term in GET_dict:
+                try:
+                    float(GET_dict[numeric_term])
+                except ValueError:
+                    return []
                 kwargs = {
-                 numeric_term.replace("_", "__"): GET_dict[numeric_term].upper()
+                 numeric_term.replace("_", "__"): GET_dict[numeric_term]
                 }
                 qs.append(models.Q(**kwargs))
         return Pdb.objects.filter(*qs).order_by("-deposited")
