@@ -11,10 +11,11 @@
         <div class="box" id="site-info">
             <h3>PDB</h3>
             <div><a href="/pdbs/{{ site.pdb.id }}/">{{ site.pdb.id }}</a> ({{ site.pdb.title }})</div>
+            {% if site.copies > 1 %}<div>({{ site.copies }} copies)</div>{% endif %}
 
             <h3>Metals</h3>
             {% for metal in site.metal_set.all %}
-            <div class="metal" data-ngl="{{ metal.ngl_sele }}">{{ metal.atom_pdb_identifier }} ({{ metal.element }})</div>
+            <div class="metal" data-ngl="{{ metal.ngl_sele }}">{{ metal.chain_pdb_identifier }}{{ metal.residue_pdb_identifier }} ({{ metal.element }})</div>
             {% endfor %}
 
             <h3>Liganding Residues</h3>
