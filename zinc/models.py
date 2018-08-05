@@ -161,6 +161,15 @@ class Chain(models.Model):
         )
 
 
+    @property
+    def zincsites(self):
+        """Returns all the ZincSite objects that have residues in this chain."""
+
+        residues = self.residue_set.all()
+        sites = set(res.site for res in residues)
+        return sites
+
+
 
 class ZincSiteCluster(models.Model):
     """A collection of equivalent zinc sites."""

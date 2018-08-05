@@ -42,7 +42,7 @@ class DatabaseBuildingTests(DjangoTest):
 
 
     def test_script(self):
-        main(log=False)
+        main(log=False, json=False)
 
         # The right things are printed
         self.check_print_statement("There are 8 PDBs with zinc")

@@ -8,13 +8,14 @@ sys.path.append(os.path.join("..", "zincbind"))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 import django; django.setup()
 from django.db import transaction
+from django.core.management import call_command
 from zinc.utilities import *
 from zinc.models import Pdb, Metal, Chain, ZincSite, Residue
 import atomium
 from tqdm import tqdm
 
 
-def main(reset=False, log=True):
+def main(reset=False, log=True, json=True):
     # Setup log
     if log:
         logger = get_log()
@@ -29,7 +30,7 @@ def main(reset=False, log=True):
         codes = [code for code in codes if code not in checked]
 
     # Go through each PDB
-    for code in tqdm(codes):
+    for code in tqdm(codes[:2]):
         with transaction.atomic():
             # Get PDB
             if log: logger.info("Getting PDB {} object from server".format(code))
@@ -113,6 +114,17 @@ def main(reset=False, log=True):
                 for r in cluster["residues"]:
                     chain = chains[r.chain.id]
                     Residue.create_from_atomium(r, chain, site)
+
+    # JSON?
+    if json:
+        print("Saving JSON")
+        sysout = sys.stdout
+        with open("data/zinc.json", "w") as f:
+            sys.stdout = f
+            call_command(
+             "dumpdata",  "--exclude=contenttypes", verbosity=0
+            )
+            sys.stdout = sysout
 
 
 if __name__ == "__main__":

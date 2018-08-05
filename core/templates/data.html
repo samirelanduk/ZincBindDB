@@ -8,6 +8,18 @@
 
     <div class="box about-box">
         <p>See the <a href="/api/">REST API</a> for programmatic access to the data.</p>
+
+        <form id="download-json" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="datatype" value="json">
+            <input type="submit" value="Download JSON">
+        </form>
+
+        <form id="download-sqlite" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="datatype" value="sqlite3">
+            <input type="submit" value="Download SQLite">
+        </form>
     </div>
 
     <div class="charts">

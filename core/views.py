@@ -1,6 +1,8 @@
 from collections import Counter
 from django.shortcuts import render
 from django.db.models import F
+from django.http import HttpResponse
+from django.core.management import call_command
 from zinc.models import ZincSite, Pdb, Residue, ZincSiteCluster
 
 def home(request):
@@ -34,6 +36,19 @@ def help(request):
 def data(request):
     """Returns the data page and the relevant values needed for its charts."""
 
+    if request.method == "POST":
+        with open(
+         "data/zinc." + request.POST["datatype"],
+         "r" + ("b" if request.POST["datatype"] == "sqlite3" else "")
+        ) as f:
+            filebody = f.read()
+        response = HttpResponse(
+         filebody, content_type="application/plain-text"
+        )
+        response["Content-Disposition"] = 'attachment; filename="zinc.{}"'.format(
+         request.POST["datatype"]
+        )
+        return response
     residue_counts = Residue.name_counts(5)
     sites = ZincSite.objects.all().annotate(
      organism=F("pdb__organism"),
