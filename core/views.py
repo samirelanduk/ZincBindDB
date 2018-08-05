@@ -4,6 +4,7 @@ from django.db.models import F
 from django.http import HttpResponse
 from django.core.management import call_command
 from zinc.models import ZincSite, Pdb, Residue, ZincSiteCluster
+from zinc.views import search
 
 def home(request):
     """Returns the home page, along with some object counts."""
@@ -61,3 +62,9 @@ def data(request):
     return render(request, "data.html", {
      "bar_data": [residue_counts, technique_counts, species_counts, class_counts]
     })
+
+
+def all_data(request):
+    request.GET = request.GET.copy()
+    request.GET["q"] = " "
+    return search(request)

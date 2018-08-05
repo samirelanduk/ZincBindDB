@@ -15,6 +15,8 @@ def angstroms(value):
 def pagify(url, page):
     """Takes a URL and adds a page number to it"""
 
+    if url.startswith("/data/all/") and "page" not in url:
+        url = url[:9] + "?" + url[10:]
     return re.sub(
      r"\&page=(\d+)", f"&page={page}", url
     ) if "page" in url else url + f"&page={page}"
