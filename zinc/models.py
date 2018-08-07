@@ -97,6 +97,7 @@ class Pdb(models.Model):
          stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
         )
         out, err = p.communicate()
+        print(out, err)
         results = json.loads(out
          )["BlastOutput2"][0]["report"]["results"]["search"]["hits"]
         ids = [r["description"][0]["title"].split("|")[1] for r in results]

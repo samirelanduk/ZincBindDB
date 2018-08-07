@@ -48,7 +48,7 @@ TEMPLATES = [{
 
 DATABASES = {"default": {
  "ENGINE": "django.db.backends.sqlite3",
- "NAME": os.path.join(BASE_DIR, "data", "zinc.sqlite3")
+ "NAME": os.path.join(BASE_DIR, "data/zinc.sqlite3")
 }}
 
 REST_FRAMEWORK = {

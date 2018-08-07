@@ -55,17 +55,19 @@ subprocess.call(
  shell=True
 )
 
-'''# Switch to postgres database remotely
-if sitename == "pontefract.io":
-    subprocess.call(
-     "ssh {} 'sed -i s/\"= local\"/\"= pontefract\"/g ~/{}/source/core/secrets.py'".format(sitename, sitename),
-     shell=True
-    )
-else:
-    subprocess.call(
-     "ssh {} 'sed -i s/\"= local\"/\"= pomfret\"/g ~/{}/source/core/secrets.py'".format(sitename, sitename),
-     shell=True
-    )'''
+# Make data go above source
+subprocess.call(
+ "ssh {} 'sed -i s/data/..\\\/data/g ~/{}/source/core/settings.py'".format(sitename, sitename),
+ shell=True
+)
+subprocess.call(
+ "ssh {} 'sed -i s/data\\\//..\\\/data\\\//g ~/{}/source/zinc/models.py'".format(sitename, sitename),
+ shell=True
+)
+subprocess.call(
+ "ssh {} 'sed -i s/data\\\//..\\\/data\\\//g ~/{}/source/core/views.py'".format(sitename, sitename),
+ shell=True
+)
 
 # Install pip packages
 subprocess.call(
