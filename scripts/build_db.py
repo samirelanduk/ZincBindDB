@@ -30,7 +30,7 @@ def main(reset=False, log=True, json=True):
         codes = [code for code in codes if code not in checked]
 
     # Go through each PDB
-    for code in tqdm(codes[:2]):
+    for code in tqdm(codes):
         with transaction.atomic():
             # Get PDB
             if log: logger.info("Getting PDB {} object from server".format(code))
