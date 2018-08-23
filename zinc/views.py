@@ -54,7 +54,13 @@ def zinc_site(request, pk):
 
 
 def api(request):
-    return render(request, "api.html")
+    return render(request, "api.html", {
+     "metal": Metal.objects.last(),
+     "residue": Residue.objects.last(),
+     "atom": Atom.objects.last(),
+     "chain_cluster": ChainCluster.objects.first(),
+     "site_cluster": ZincSiteCluster.objects.first()
+    })
 
 
 @api_view(["GET"])

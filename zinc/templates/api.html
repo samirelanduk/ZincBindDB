@@ -27,13 +27,13 @@
 			<tr><td><a href="/api/site-clusters/">/api/site-clusters/</a></td><td>all ZincSite Cluster objects.</td></tr>
 			<tr><td></td><td></td></tr>
 			<tr><td><a href="/api/pdbs/6FHQ/">/api/pdbs/6FHQ/</a></td><td>specific PDB object.</td></tr>
-			<tr><td><a href="/api/metals/41443/">/api/metals/41443/</a></td><td>specific Metal object.</td></tr>
+			<tr><td><a href="/api/metals/{{ metal.id }}/">/api/metals/{{ metal.id }}/</a></td><td>specific Metal object.</td></tr>
 			<tr><td><a href="/api/sites/6FHQ-1/">/api/sites/6FHQ-1/</a></td><td>specific ZincSite object.</td></tr>
-			<tr><td><a href="/api/residues/114804/">/api/residues/114804/</a></td><td>specific Residue object.</td></tr>
-			<tr><td><a href="/api/atoms/906555/">/api/atoms/906555/</a></td><td>specific Atom object.</td></tr>
+			<tr><td><a href="/api/residues/{{ residue.id }}/">/api/residues/{{ residue.id }}/</a></td><td>specific Residue object.</td></tr>
+			<tr><td><a href="/api/atoms/{{ atom.id }}/">/api/atoms/{{ atom.id }}/</a></td><td>specific Atom object.</td></tr>
 			<tr><td><a href="/api/chains/6FHQA/">/api/chains/6FHQA/</a></td><td>specific Chain object.</td></tr>
-			<tr><td><a href="/api/chain-clusters/3727/">/api/chain-clusters/3727/</a></td><td>specific Chain Cluster object.</td></tr>
-			<tr><td><a href="/api/site-clusters/11486/">/api/site-clusters/11486/</a></td><td>specific ZincSite Cluster object.</td></tr>
+			<tr><td><a href="/api/chain-clusters/{{ chain_cluster.id}}/">/api/chain-clusters/{{ chain_cluster.id}}/</a></td><td>specific Chain Cluster object.</td></tr>
+			<tr><td><a href="/api/site-clusters/{{ site_cluster.id }}/">/api/site-clusters/{{ site_cluster.id }}/</a></td><td>specific ZincSite Cluster object.</td></tr>
 		</table>
 	</div>
 </div>
