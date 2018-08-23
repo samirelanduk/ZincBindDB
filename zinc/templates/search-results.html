@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Search Results: {% if request.GET.sequence %}BLAST{% elif request.GET.q %}{{ request.GET.q }}{% else %}Advanced {% endif %}{% endblock %}
+{% block title %}{% if request.GET.q and request.GET.q == " " %}All Data{% else %}Search Results: {% if request.GET.sequence %}BLAST{% elif request.GET.q and request.GET.q != " " %}{{ request.GET.q }}{% else %}Advanced {% endif %}{% endif %}{% endblock %}
 
 {% block main %}
 {% if results.count %}
