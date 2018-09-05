@@ -5,7 +5,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = binascii.hexlify(os.urandom(24)).decode()
 
-VERSION = "0.5.1"
+VERSION = "0.6.0"
 
 ALLOWED_HOSTS = []
 

@@ -10,3 +10,5 @@ log.txt
 data/*
 *.css*
 *.sh
+*.png
+paper.py
