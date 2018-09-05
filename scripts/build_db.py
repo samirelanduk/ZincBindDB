@@ -34,8 +34,8 @@ def main(reset=False, log=True, json=True):
         with transaction.atomic():
             # Get PDB
             if log: logger.info("Getting PDB {} object from server".format(code))
-            pdb = atomium.fetch(code, pdbe=True)
-            if not pdb: continue
+            pdb = atomium.fetch(code)
+            if not pdb: pdb = atomium.fetch(code + ".cif")
 
             # Which assembly should be used?
             if log: logger.info("Getting best assembly")

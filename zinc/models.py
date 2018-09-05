@@ -32,8 +32,8 @@ class Pdb(models.Model):
 
         from .utilities import model_is_skeleton
         return Pdb.objects.create(
-         id=pdb.code, rfactor=pdb.rfactor, classification=pdb.classification,
-         deposited=pdb.deposition_date, organism=pdb.organism, title=pdb.title,
+         id=pdb.code, rfactor=pdb.rvalue, classification=pdb.classification,
+         deposited=pdb.deposition_date, organism=pdb.source_organism, title=pdb.title,
          expression=pdb.expression_system, technique=pdb.technique,
          keywords=", ".join(pdb.keywords) if pdb.keywords else "",
          resolution=pdb.resolution, skeleton=model_is_skeleton(pdb.model),
