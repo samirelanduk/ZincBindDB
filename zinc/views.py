@@ -22,7 +22,7 @@ def search(request):
         except KeyError:
             if "sequence" in request.GET:
                 try:
-                    results = Pdb.blast_search(request.GET["sequence"])
+                    results = Pdb.blast_search(request.GET["sequence"], request.GET["threshold"])
                 except: results = []
             else:
                 results = Pdb.advanced_search(request.GET)

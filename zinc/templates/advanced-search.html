@@ -31,7 +31,18 @@
 
 	<form method="GET" action="/search" class="box">
 		<h2>BLAST Search</h2>
-		<textarea name="sequence"></textarea>
+		<textarea name="sequence" placeholder="Raw or FASTA formatted peptide sequence"></textarea>
+		<label>Expect Threshold</label>
+		<select name="threshold" style="width: 100px;">
+			<option value="0.0001">0.0001</option>
+			<option value="0.001">0.001</option>
+			<option value="0.01">0.01</option>
+			<option value="0.1">0.1</option>
+			<option value="1.0">1</option>
+			<option value="10" selected="selected">10</option>
+			<option value="100">100</option>
+			<option value="1000">1000</option>
+		</select>
 		<input type="submit" value="BLAST">
 	</form>
 </div>

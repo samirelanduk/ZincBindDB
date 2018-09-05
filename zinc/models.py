@@ -88,12 +88,13 @@ class Pdb(models.Model):
 
 
     @staticmethod
-    def blast_search(sequence):
+    def blast_search(sequence, elimit):
         """BLAST searches the PDB chains using a sequence. There must be a
         blastp program in the PATH for this to work."""
 
+        print(elimit)
         p = subprocess.Popen(
-         'echo "{}" | blastp -db data/chains.fasta -outfmt 15'.format(sequence),
+         'echo "{}" | blastp -db data/chains.fasta -outfmt 15 -evalue {}'.format(sequence, elimit),
          stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
         )
         out, err = p.communicate()

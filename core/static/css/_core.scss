@@ -6,6 +6,10 @@ strong {
     font-weight: bold;
 }
 
+label {
+	font-weight: bold;
+}
+
 h1 {
 	font-size: 2em;
 	margin-bottom: $gap;
@@ -55,6 +59,7 @@ input[type=text], input[type=date] {
 textarea {
 	height: 25rem;
 	font-family: monospace;
+	margin-bottom: 2 * $gap;
 }
 
 $select-box-width: 3rem;
@@ -74,6 +79,7 @@ select {
 	background-repeat: no-repeat;
 	background-color: $cream;
 	padding-right: $select-box-width + 0.5rem;
+	cursor: pointer;
 	}
 
 input[type=submit], button {
