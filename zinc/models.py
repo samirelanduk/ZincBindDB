@@ -117,6 +117,13 @@ class Pdb(models.Model):
 
 
     @property
+    def omitted_metals(self):
+        """Gets all the metal objects that have no ZincSite in this Pdb"""
+
+        return Metal.objects.filter(pdb=self).exclude(omission=None)
+
+
+    @property
     def ngl_metals_sele(self):
         """The NGL selector text needed to grab all metal atoms in the PDB."""
 

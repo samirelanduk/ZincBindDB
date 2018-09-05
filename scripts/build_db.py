@@ -30,7 +30,7 @@ def main(reset=False, log=True, json=True):
         codes = [code for code in codes if code not in checked]
 
     # Go through each PDB
-    for code in tqdm(codes[:100]):
+    for code in tqdm(codes):
         with transaction.atomic():
             # Get PDB
             if log: logger.info("Getting PDB {} object from server".format(code))
@@ -42,7 +42,7 @@ def main(reset=False, log=True, json=True):
             model = pdb.generate_best_assembly()
             metals = model.atoms(is_metal=True)
             while not metals:
-                pdb.biomolecules.remove(pdb.best_assembly)
+                pdb.assemblies.remove(pdb.best_assembly)
                 model = pdb.generate_best_assembly()
                 metals = model.atoms(is_metal=True)
 
@@ -106,7 +106,7 @@ def main(reset=False, log=True, json=True):
                     )
                     Metal.create_from_atomium(
                      zinc, pdb_record,
-                     omission="Zinc has too few binding liganding atoms."
+                     omission="Zinc has too few liganding atoms."
                     )
                     continue
 

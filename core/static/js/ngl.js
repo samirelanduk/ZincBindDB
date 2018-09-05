@@ -28,7 +28,9 @@ function drawNgl(code, assembly, metals, residues, individual_residues, zoom) {
         component.addRepresentation("ball+stick", {sele: metals, aspectRatio: 8, assembly: stage.assembly});
 
         // Make residue side chains appear as sticks
-        component.addRepresentation("licorice", {sele: residues, assembly: stage.assembly});
+        if (residues.length > 0) {
+            component.addRepresentation("licorice", {sele: residues, assembly: stage.assembly});    
+        }
 
         // Add distance lines where appropriate
         for (var r = 0; r < individual_residues.length; r++) {

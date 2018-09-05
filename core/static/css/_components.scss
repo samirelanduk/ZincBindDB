@@ -224,13 +224,36 @@ table.api-table {
     }
 }
 
+#pdb-chains {
+
+	padding-left: 4 * $gap;
+
+	h3 {
+		margin-left: -2 * $gap;
+		margin-top: 2 * $gap;
+	}
+
+	.count {
+		font-size: 1.2em;
+	}
+
+	.chains {
+		h3 {
+			margin-top: 0px;
+		}
+
+
+	}
+
+
+}
 
 #pdb-sites {
     .pdb-sites-count {
-        padding-bottom: 15px;
     }
 
     .pdb-sites-list {
+		margin-top: $gap;
         border: 1px solid #e6ecf0;
         border-radius: 5px;
 
