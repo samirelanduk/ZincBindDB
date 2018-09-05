@@ -30,7 +30,7 @@ def main(reset=False, log=True, json=True):
         codes = [code for code in codes if code not in checked]
 
     # Go through each PDB
-    for code in tqdm(codes):
+    for code in tqdm(codes[:100]):
         with transaction.atomic():
             # Get PDB
             if log: logger.info("Getting PDB {} object from server".format(code))
@@ -94,6 +94,19 @@ def main(reset=False, log=True, json=True):
                     Metal.create_from_atomium(
                      zinc, pdb_record,
                      omission="Zinc has no binding residues."
+                    )
+                    continue
+                # Does the cluster have enough liganding atoms?
+                atoms = []
+                for residue in cluster["residues"]:
+                    atoms += [a for a in residue.atoms() if a.liganding]
+                if len(atoms) < 3:
+                    if log: logger.info(
+                     "Not creating site - too few liganding atoms"
+                    )
+                    Metal.create_from_atomium(
+                     zinc, pdb_record,
+                     omission="Zinc has too few binding liganding atoms."
                     )
                     continue
 
