@@ -86,6 +86,18 @@ class PdbViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 
+class PdbSearchResults(viewsets.ReadOnlyModelViewSet):
+    serializer_class = PdbSerializer
+
+    def get_queryset(self):
+        try:
+            results = Pdb.search(self.request.GET["q"])
+        except KeyError:
+            results = Pdb.advanced_search(self.request.GET)
+        return results
+
+
+
 class ZincSiteViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ZincSite.objects.all()
     serializer_class = ZincSiteSerializer

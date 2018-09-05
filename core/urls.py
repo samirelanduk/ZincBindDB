@@ -8,6 +8,8 @@ urlpatterns = [
  path(r"api/sites/", zinc_views.ZincSiteViewSet.as_view({"get": "list"})),
  path(r"api/chain-clusters/", zinc_views.ChainClusterViewSet.as_view({"get": "list"})),
  path(r"api/site-clusters/", zinc_views.ZincSiteClusterViewSet.as_view({"get": "list"})),
+ path(r"api/search", zinc_views.PdbSearchResults.as_view({"get": "list"})),
+ path(r"api/search/", zinc_views.PdbSearchResults.as_view({"get": "list"})),
  path(r"api/", zinc_views.api),
  path(r"search", zinc_views.search),
  path(r"search/", zinc_views.search),
