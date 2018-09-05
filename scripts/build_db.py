@@ -113,8 +113,9 @@ def main(reset=False, log=True, json=True):
                 # Create site record itself
                 if log: logger.info("Creating site")
                 site = ZincSite.objects.create(
-                 id=f"{pdb_record.id}-{index}",
-                 pdb=pdb_record, copies=cluster["count"]
+                 id=f"{pdb_record.id}-{index}", pdb=pdb_record,
+                 code=create_site_code(cluster["residues"]),
+                 copies=cluster["count"]
                 )
 
                 # Create metals

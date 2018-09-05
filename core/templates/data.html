@@ -25,16 +25,27 @@
     </div>
 
     <div class="charts">
-        <div class="chart-container"><div class="chart" id="residue-chart"></div>
-    </div><div class="chart-container"><div class="chart" id="technique-chart"></div></div>
-        <div class="chart-container"><div class="chart" id="species-chart"></div>
-    </div><div class="chart-container"><div class="chart" id="classification-chart"></div></div>
+
+
+        <div class="chart-container">
+            <div class="chart" id="residue-chart"></div>
+        </div><div class="chart-container">
+            <div class="chart" id="technique-chart"></div>
+        </div><div class="chart-container">
+            <div class="chart" id="species-chart"></div>
+        </div><div class="chart-container">
+            <div class="chart" id="classification-chart"></div>
+        </div><div class="chart-container">
+            <div class="chart" id="codes-chart"></div>
+        </div>
+
+
     </div>
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script>
-    var divs = ["residue-chart", "technique-chart", "species-chart", "classification-chart"];
-    var titles = ["Residues", "Techniques", "Species", "Classifications"];
-    var colors = ["#4A9586", "#2980b9", "#e67e22", "#8e44ad"];
+    var divs = ["residue-chart", "technique-chart", "species-chart", "classification-chart", "codes-chart"];
+    var titles = ["Residues", "Techniques", "Species", "Classifications", "Residue Codes"];
+    var colors = ["#4A9586", "#2980b9", "#e67e22", "#8e44ad", "#333333"];
     </script>
     {% for data in bar_data %}
     <script>

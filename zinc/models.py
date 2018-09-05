@@ -198,6 +198,7 @@ class ZincSite(models.Model):
 
     id = models.CharField(primary_key=True, max_length=128)
     pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
+    code = models.CharField(max_length=128)
     copies = models.IntegerField()
     cluster = models.ForeignKey(
      ZincSiteCluster, on_delete=models.SET_NULL, null=True, blank=True

@@ -3,8 +3,12 @@ import logging
 import time
 import os
 from datetime import datetime
+from atomium.models.data import CODES
 from itertools import combinations
 from atomium.structures import Chain, Residue
+
+CODES = CODES.copy()
+CODES["HOH"] = "w"
 
 class RcsbError(Exception):
     """Error raised if there's a problem talking to the RCSB web services."""
@@ -171,3 +175,8 @@ def check_clusters_have_unique_sites(clusters):
     ]) for cluster in clusters]
     unique_ids = set(cluster_ids)
     return len(cluster_ids) == len(unique_ids)
+
+
+def create_site_code(residues):
+    codes = [CODES.get(r.name, "X") for r in residues]
+    return "".join([f"{code}{codes.count(code)}" for code in sorted(set(codes))])

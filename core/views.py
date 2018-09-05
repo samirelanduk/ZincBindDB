@@ -59,8 +59,10 @@ def data(request):
     technique_counts = ZincSite.property_counts(sites, "technique", 3)
     species_counts = ZincSite.property_counts(sites, "organism", 6)
     class_counts = ZincSite.property_counts(sites, "classification", 6)
+    code_counts = ZincSite.property_counts(sites, "code", 9)
+    print(code_counts)
     return render(request, "data.html", {
-     "bar_data": [residue_counts, technique_counts, species_counts, class_counts]
+     "bar_data": [residue_counts, technique_counts, species_counts, class_counts, code_counts]
     })
 
 
