@@ -24,7 +24,7 @@
             {% if pdb.omitted_metals.count %}
             <div class="omitted">
                 <h3>Zinc atoms not used</h3>
-                {% for metal in pdb.omitted_metals %}<strong>{{ metal.chain_pdb_identifier }}{{ metal.residue_pdb_identifier }}</strong>: {{ metal.omission }}{% endfor %}
+                {% for metal in pdb.omitted_metals %}<div><strong>{{ metal.chain_pdb_identifier }}{{ metal.residue_pdb_identifier }}</strong>: {{ metal.omission }}</div>{% endfor %}
             </div>
             {% endif %}
 

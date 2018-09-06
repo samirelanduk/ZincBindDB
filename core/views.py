@@ -54,14 +54,23 @@ def data(request):
     sites = ZincSite.objects.all().annotate(
      organism=F("pdb__organism"),
      classification=F("pdb__classification"),
-     technique=F("pdb__technique")
+     technique=F("pdb__technique"),
+     resolution=F("pdb__resolution")
     )
     technique_counts = ZincSite.property_counts(sites, "technique", 3)
     species_counts = ZincSite.property_counts(sites, "organism", 6)
     class_counts = ZincSite.property_counts(sites, "classification", 6)
     code_counts = ZincSite.property_counts(sites, "code", 9)
+    resolutions = [["<1.5Å ", "1.5-2.0Å", "2.0-2.5Å", "2.5-3.0Å", "3.0Å+", "None"], [
+     sites.filter(resolution__lt=1.5).count(),
+     sites.filter(resolution__lt=2.0, resolution__gte=1.5).count(),
+     sites.filter(resolution__lt=2.5, resolution__gte=2.0).count(),
+     sites.filter(resolution__lt=3.0, resolution__gte=2.5).count(),
+     sites.filter(resolution__gte=3.0).count(),
+     sites.filter(resolution=None).count(),
+    ]]
     return render(request, "data.html", {
-     "bar_data": [residue_counts, technique_counts, species_counts, class_counts, code_counts]
+     "bar_data": [residue_counts, technique_counts, species_counts, class_counts, code_counts, resolutions]
     })
 
 

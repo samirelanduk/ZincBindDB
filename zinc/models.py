@@ -242,7 +242,7 @@ class ZincSite(models.Model):
         counts = Counter([site.__dict__[property] for site in sites]).most_common()
         if cutoff:
             counts = counts[:cutoff] + [
-             ["other", sum(n[1] for n in counts[cutoff:])]
+             ["OTHER", sum(n[1] for n in counts[cutoff:])]
             ]
         return [list(l) for l in zip(*counts)]
 
@@ -364,7 +364,7 @@ class Residue(models.Model):
         counts = [[n[0], c] for n, c in Counter(names).most_common()]
         if cutoff:
             counts = counts[:cutoff] + [
-             ["other", sum(n[1] for n in counts[cutoff:])]
+             ["OTHER", sum(n[1] for n in counts[cutoff:])]
             ]
         return [list(l) for l in zip(*counts)]
 

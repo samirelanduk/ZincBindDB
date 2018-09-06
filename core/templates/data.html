@@ -37,15 +37,17 @@
             <div class="chart" id="classification-chart"></div>
         </div><div class="chart-container">
             <div class="chart" id="codes-chart"></div>
+        </div><div class="chart-container">
+            <div class="chart" id="resolution-chart"></div>
         </div>
 
 
     </div>
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script>
-    var divs = ["residue-chart", "technique-chart", "species-chart", "classification-chart", "codes-chart"];
-    var titles = ["Residues", "Techniques", "Species", "Classifications", "Residue Codes"];
-    var colors = ["#4A9586", "#2980b9", "#e67e22", "#8e44ad", "#333333"];
+    var divs = ["residue-chart", "technique-chart", "species-chart", "classification-chart", "codes-chart", "resolution-chart"];
+    var titles = ["Residues", "Techniques", "Species", "Classifications", "Residue Codes", "Resolution"];
+    var colors = ["#4A9586", "#2980b9", "#e67e22", "#8e44ad", "#2c3e50", "#e74c3c"];
     </script>
     {% for data in bar_data %}
     <script>
