@@ -13,18 +13,18 @@
             <h3>Zinc-Bearing Chains in PDB</h3>
             <div class="count">{{ pdb.chain_set.count }} zinc-bearing chain{{ pdb.chain_set.count|pluralize }}</div>
             {% for chain in pdb.chain_set.all %}
-                <div class="chain">Chain {{ chain.chain_pdb_identifier }} ({{ chain.sequence|length }} residues;  {{ chain.zincsites|length }} zinc binding sites)</div>
+                <div class="chain">Chain {{ chain.chain_pdb_identifier }} ({{ chain.sequence|length }} residues;  {{ chain.zincsites|length }} zinc binding site{{ chain.zincsites.count|pluralize }})</div>
             {% endfor %}
         </div>
         <div class="metals">
             <h3>Zinc atoms identified in PDB</h3>
             <div class="count">{{ pdb.metal_set.count }} zinc atom{{ pdb.metal_set.count|pluralize }}</div>
-            ({% for metal in pdb.metal_set.all %}{{ metal.chain_pdb_identifier }}{{ metal.residue_pdb_identifier }}{% if not forloop.last %}, {% endif %}{% endfor %})
+            ({% for metal in pdb.metal_set.all %}{{ metal.chain_pdb_identifier }}:{{ metal.residue_pdb_identifier }}{% if not forloop.last %}, {% endif %}{% endfor %})
 
             {% if pdb.omitted_metals.count %}
             <div class="omitted">
                 <h3>Zinc atoms not used</h3>
-                {% for metal in pdb.omitted_metals %}<div><strong>{{ metal.chain_pdb_identifier }}{{ metal.residue_pdb_identifier }}</strong>: {{ metal.omission }}</div>{% endfor %}
+                {% for metal in pdb.omitted_metals %}<div><strong>{{ metal.chain_pdb_identifier }}:{{ metal.residue_pdb_identifier }}</strong>: {{ metal.omission }}</div>{% endfor %}
             </div>
             {% endif %}
 

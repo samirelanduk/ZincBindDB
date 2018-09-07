@@ -204,6 +204,7 @@ class ZincSite(models.Model):
     cluster = models.ForeignKey(
      ZincSiteCluster, on_delete=models.SET_NULL, null=True, blank=True
     )
+    representative = models.BooleanField(default=False)
 
 
     @property
@@ -274,11 +275,11 @@ class Metal(models.Model):
         """Creates a Metal record from an atomium atom."""
 
         residue = atom.ligand if atom.ligand else atom.residue
-        numeric_id = int("".join(
-         c for c in residue.id[1:] if c.isdigit() or c == "-"
-        ))
-        insertion = (residue.id[residue.id.find(str(numeric_id)) +
-         len(str(numeric_id)):])
+        numeric_id, insertion = residue.id.split(":")[1], ""
+        while not numeric_id[-1].isdigit():
+            insertion += numeric_id[-1]
+            numeric_id = numeric_id[:-1]
+        numeric_id = int(numeric_id)
         return Metal.objects.create(
          atom_pdb_identifier=atom.id, element=atom.element,
          name=atom.name, x=atom.x, y=atom.y, z=atom.z,
@@ -316,11 +317,11 @@ class Residue(models.Model):
         """Creates a residue record from an atomium Residue object and existing
         ZincSite and Chain records. You must specify the residue number."""
 
-        numeric_id = int("".join(
-         c for c in residue.id[1:] if c.isdigit() or c == "-"
-        ))
-        insertion = (residue.id[residue.id.find(str(numeric_id)) +
-         len(str(numeric_id)):])
+        numeric_id, insertion = residue.id.split(":")[1], ""
+        while not numeric_id[-1].isdigit():
+            insertion += numeric_id[-1]
+            numeric_id = numeric_id[:-1]
+        numeric_id = int(numeric_id)
         residue_record = Residue.objects.create(
          residue_pdb_identifier=numeric_id,
          insertion_pdb_identifier=insertion,
@@ -352,7 +353,7 @@ class Residue(models.Model):
     def atomium_id(self):
         """Recreates the atomium ID of the residue."""
 
-        return (f"{self.chain.chain_pdb_identifier}" +
+        return (f"{self.chain.chain_pdb_identifier}:" +
         f"{self.residue_pdb_identifier}{self.insertion_pdb_identifier}")
 
 
