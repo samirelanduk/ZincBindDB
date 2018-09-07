@@ -42,4 +42,7 @@ for index, pdb in enumerate(pdbs[:5], start=1):
     print(index)
     print(pdb["pdb"], pdb["duration"])
     print()
+for line in lines[-4:]:
+    print(line)
+    
 print("")
