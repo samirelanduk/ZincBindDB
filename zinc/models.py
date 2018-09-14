@@ -236,10 +236,11 @@ class ZincSite(models.Model):
 
 
     @staticmethod
-    def property_counts(sites, property, cutoff=None):
+    def property_counts(sites, property, cutoff=None, unique=False):
         """Takes a series of sites and a property name, and returns a sort of
         histogram of the different values."""
 
+        if unique: sites = sites.filter(representative=True)
         counts = Counter([site.__dict__[property] for site in sites]).most_common()
         if cutoff:
             counts = counts[:cutoff] + [
@@ -361,7 +362,7 @@ class Residue(models.Model):
     def name_counts(cutoff=None):
         """Returns the number of residues of each name in the database."""
 
-        names = Residue.objects.exclude(site=None).values_list("name")
+        names = Residue.objects.filter(site__representative=True).values_list("name")
         counts = [[n[0], c] for n, c in Counter(names).most_common()]
         if cutoff:
             counts = counts[:cutoff] + [
