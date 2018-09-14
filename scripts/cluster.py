@@ -80,7 +80,7 @@ try:
             unique_sites[site.fingerprint] = []
         unique_sites[site.fingerprint].append(site)
 
-    print("Writing ZincSite clusters to database...\n")
+    print("Writing ZincSite clusters to database...")
     with transaction.atomic():
         for index, fingerprint in enumerate(tqdm(unique_sites)):
             cluster = ZincSiteCluster.objects.create()
@@ -92,5 +92,12 @@ try:
                  key=lambda s: s.resolution if s.resolution else 100)[0]
                 best_site.representative = True
                 best_site.save()
+
+    print("Building BLAST database...\n")
+    subprocess.call(
+     "makeblastdb -in data/chains.fasta -dbtype prot",
+     shell=True, stdout=subprocess.PIPE
+    )
+
 finally:
     subprocess.call("rm temp*", shell=True)
