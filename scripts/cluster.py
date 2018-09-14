@@ -8,6 +8,7 @@ sys.path.append(os.path.join("..", "zincbind"))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 import django; django.setup()
 from django.db import transaction
+from django.db.models import F
 import subprocess
 import re
 from zinc.models import *
@@ -62,7 +63,9 @@ try:
                 chain.save()
 
     print("Assigning Zinc Sites to clusters...")
-    sites = ZincSite.objects.all()
+    sites = ZincSite.objects.all().annotate(
+     resolution=F("pdb__resolution")
+    )
     for site in tqdm(sites):
         chain_clusters = set([
          str(res.chain.cluster) for res in site.residue_set.all()
@@ -84,5 +87,10 @@ try:
             for site in unique_sites[fingerprint]:
                 site.cluster = cluster
                 site.save()
+            if unique_sites[fingerprint]:
+                best_site = sorted(unique_sites[fingerprint],
+                 key=lambda s: s.resolution if s.resolution else 100)[0]
+                best_site.representative = True
+                best_site.save()
 finally:
     subprocess.call("rm temp*", shell=True)
