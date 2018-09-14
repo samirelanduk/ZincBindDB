@@ -17,8 +17,7 @@ from tqdm import tqdm
 
 def main(reset=False, log=True, json=True):
     # Setup log
-    if log:
-        logger = get_log()
+    logger = get_log() if log else None
 
     # Get all PDBs which contain zinc
     if log: logger.info("Getting PDB codes")
@@ -30,6 +29,7 @@ def main(reset=False, log=True, json=True):
         codes = [code for code in codes if code not in checked]
 
     # Go through each PDB
+    mmcif_count = 0
     for code in tqdm(codes):
         with transaction.atomic():
             # Get PDB
@@ -37,7 +37,9 @@ def main(reset=False, log=True, json=True):
             try:
                 pdb = atomium.fetch(code)
             except ValueError:
-                pdb = atomium.fetch(code + ".cif")
+                mmcif_count += 1
+                if log: logger.info("Couldn't get {}".format(code))
+                continue
 
             # Which assembly should be used?
             if log: logger.info("Getting best assembly")
@@ -130,6 +132,10 @@ def main(reset=False, log=True, json=True):
                 for r in cluster["residues"]:
                     chain = chains[r.chain.id]
                     Residue.create_from_atomium(r, chain, site)
+    mmcif = []
+    if log: logger.info("{} mmcif files ignored".format(mmcif_count))
+    print("{} mmcif files ignored".format(mmcif_count))
+
 
     # JSON?
     if json:
