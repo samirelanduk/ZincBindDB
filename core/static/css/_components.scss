@@ -37,6 +37,12 @@ table.api-table {
 
 	td {
 		padding: 0.25rem;
+        width: 50%;
+
+        a {
+            word-break: break-word;
+        }
+
 	}
 
 	td:first-child {
@@ -91,6 +97,7 @@ table.api-table {
             background-image: url("/static/images/cross.png");
             background-clip: content-box;
             cursor: pointer;
+            flex-grow: 0.5;
 
 			img {
 				width: 2rem;
