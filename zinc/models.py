@@ -3,6 +3,7 @@
 import subprocess
 import json
 from collections import Counter
+from datetime import datetime
 from atomium.models.data import CODES
 from django.db import models
 
@@ -79,7 +80,10 @@ class Pdb(models.Model):
                 try:
                     float(GET_dict[numeric_term])
                 except ValueError:
-                    return []
+                    try:
+                        datetime.strptime(GET_dict[numeric_term], "%Y-%m-%d")
+                    except:
+                        return []
                 kwargs = {
                  numeric_term.replace("_", "__"): GET_dict[numeric_term]
                 }
