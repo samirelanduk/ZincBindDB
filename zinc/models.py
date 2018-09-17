@@ -299,7 +299,7 @@ class Metal(models.Model):
         """The NGL selector text needed to select the metal."""
 
         return (f"{self.residue_pdb_identifier}^" +
-        f"{self.insertion_pdb_identifier}:{self.chain_pdb_identifier}/0 and (%A or %)")
+        f"{self.insertion_pdb_identifier}:{self.chain_pdb_identifier}/0 and .{self.name}")
 
 
 
