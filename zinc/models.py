@@ -302,6 +302,14 @@ class Metal(models.Model):
         f"{self.insertion_pdb_identifier}:{self.chain_pdb_identifier}/0 and .{self.name}")
 
 
+    @property
+    def atomium_id(self):
+        """Recreates the atomium ID of the residue."""
+
+        return (f"{self.chain_pdb_identifier}:" +
+        f"{self.residue_pdb_identifier}{self.insertion_pdb_identifier}")
+
+
 
 class Residue(models.Model):
     "A collection of atoms, usually in a row on a chain."

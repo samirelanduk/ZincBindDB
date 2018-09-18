@@ -20,10 +20,11 @@ class DatabaseBuildingTests(DjangoTest):
          "5IV5", # mmCIF only
          "1B21", # no zinc in best assembly
          "4UXY", # skeleton
-         "1A2P", # some zincs not in assembly
+         "6H8P", # some zincs not in assembly
          "1ZEH", # zincs superimposed onto each other in assembly
          "1A6F", # sites duplicated in assembly
-         "6GFB", # zinc with no residues
+         "1BYF", # zinc with no residues
+         "1A0Q", # zinc with too few liganding atoms
         ]
 
 
@@ -45,11 +46,12 @@ class DatabaseBuildingTests(DjangoTest):
         main(log=False, json=False)
 
         # The right things are printed
-        self.check_print_statement("There are 8 PDBs with zinc")
+        self.check_print_statement("There are 9 PDBs with zinc")
         self.check_print_statement("0 have already been checked")
+        self.check_print_statement("1 mmcif files ignored")
 
         # The database has the right number of things in it
-        self.assertEqual(Pdb.objects.count(), 7)
+        self.assertEqual(Pdb.objects.count(), 8)
 
         # 6EQU is fine
         pdb = Pdb.objects.get(id="6EQU")
@@ -106,22 +108,19 @@ class DatabaseBuildingTests(DjangoTest):
         self.assertEqual(pdb.chain_set.count(), 0)
 
         # 1A2P is fine
-        pdb = Pdb.objects.get(id="1A2P")
-        self.assertIn("BARNASE WILDTYPE", pdb.title)
-        self.assertEqual(pdb.assembly, 1)
+        pdb = Pdb.objects.get(id="6H8P")
+        self.assertIn("JMJD2A/ KDM4A", pdb.title)
+        self.assertEqual(pdb.assembly, 2)
         self.assertFalse(pdb.skeleton)
-        self.assertEqual(pdb.metal_set.count(), 3)
+        self.assertEqual(pdb.metal_set.count(), 2)
         self.assertEqual(pdb.zincsite_set.count(), 1)
         self.assertEqual(pdb.chain_set.count(), 1)
         used_zinc = pdb.metal_set.filter(omission=None)
         self.assertEqual(used_zinc.count(), 1)
-        self.assertEqual(used_zinc.first().atom_pdb_identifier, 2628)
+        self.assertEqual(used_zinc.first().atom_pdb_identifier, 11226)
         tossed_zinc = pdb.metal_set.exclude(omission=None)
-        self.assertEqual(tossed_zinc.count(), 2)
-        self.assertEqual(
-         set(tossed_zinc.values_list("atom_pdb_identifier", flat=True)),
-         {2629, 2630}
-        )
+        self.assertEqual(tossed_zinc.count(), 1)
+        self.assertEqual(tossed_zinc.first().atom_pdb_identifier, 11168)
         self.assertEqual(pdb.chain_set.count(), 1)
 
         # 1ZEH is fine
@@ -159,10 +158,19 @@ class DatabaseBuildingTests(DjangoTest):
         self.assertEqual(site2.copies, 2)
 
         # 6GFB is fine
-        pdb = Pdb.objects.get(id="6GFB")
-        self.assertIn("BTB/POZ DOMAIN", pdb.title)
-        self.assertEqual(pdb.assembly, 1)
-        self.assertEqual(pdb.metal_set.count(), 3)
-        self.assertEqual(pdb.zincsite_set.count(), 2)
+        pdb = Pdb.objects.get(id="1BYF")
+        self.assertIn("POLYANDROCARPA", pdb.title)
+        self.assertEqual(pdb.assembly, 2)
+        self.assertEqual(pdb.metal_set.count(), 7)
+        self.assertEqual(pdb.zincsite_set.count(), 6)
         bad_zinc = pdb.metal_set.exclude(omission=None).first()
         self.assertIn("residues", bad_zinc.omission)
+
+        # 6GFB is fine
+        pdb = Pdb.objects.get(id="1A0Q")
+        self.assertIn("29G11 COMPLEXED", pdb.title)
+        self.assertEqual(pdb.metal_set.count(), 3)
+        self.assertEqual(pdb.zincsite_set.count(), 1)
+        bad_zinc = pdb.metal_set.exclude(omission=None).first()
+        self.assertIn("few", bad_zinc.omission)
+        self.assertEqual(len(set([m.atomium_id for m in pdb.metal_set.all()])), 3)

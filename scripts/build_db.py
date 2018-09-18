@@ -108,10 +108,10 @@ def main(reset=False, log=True, json=True):
                     if log: logger.info(
                      "Not creating site - too few liganding atoms"
                     )
-                    Metal.create_from_atomium(
-                     zinc, pdb_record,
-                     omission="Zinc has too few liganding atoms."
-                    )
+                    for metal in cluster["metals"]:
+                        Metal.create_from_atomium(
+                         metal, pdb_record, omission="Zinc has too few liganding atoms."
+                        )
                     continue
 
                 # Create site record itself
