@@ -24,8 +24,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
- "django.middleware.common.CommonMiddleware",
- "django.middleware.csrf.CsrfViewMiddleware",
+"django.middleware.common.CommonMiddleware",
+"django.middleware.csrf.CsrfViewMiddleware",
+ "htmlmin.middleware.HtmlMinifyMiddleware",
+ "htmlmin.middleware.MarkRequestMiddleware",
 ]
 
 STATIC_URL = "/static/"
