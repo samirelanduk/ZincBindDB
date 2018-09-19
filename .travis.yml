@@ -6,6 +6,7 @@ python:
 install:
     - pip install --upgrade git+https://github.com/samirelanduk/testarsenal.git@0.3
     - pip install -r requirements.txt
+    - pip install -r requirements-test.txt
 
 script:
     - djangovar=headless coverage run --source=core,zinc,scripts `which django-admin.py` test ftests.test_scripts --pythonpath=. --settings=core.settings
