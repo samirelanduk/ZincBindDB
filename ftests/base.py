@@ -22,10 +22,11 @@ class FunctionalTest(StaticLiveServerTestCase, BrowserTest):
         # 6EQU (1 site)
         # 1B21 (1 site)
         # 4UXY (0 sites)
-        # 1A2P (1 site)
+        # 6H8P (? site)
         # 1ZEH (2 sites)
         # 1A6F (2 sites)
-        # 6GFB (2 sites)
+        # 1BYF (? sites)
+        # 1A0Q (? sites)
 
 
     def tearDown(self):
