@@ -4,7 +4,7 @@
 
 ## About
 
-ZincBind is a database of Zinc Binding Sites. It was made, and is currently maintained by, Sam Ireland (that's me!) as part of his PhD.
+ZincBind is a database of Zinc Binding Sites. It was made, and is currently maintained, by [Sam Ireland](https://samireland.com/) (that's me!) as part of my PhD.
 
 ## Local Use
 
