@@ -3,3 +3,4 @@ testarsenal==0.2
 mixer==6.0.1
 freezegun==0.3.10
 tblib==1.3.2
+python-coveralls
