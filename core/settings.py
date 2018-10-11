@@ -19,13 +19,12 @@ INSTALLED_APPS = [
  "django.contrib.humanize",
  "sass_processor",
  "rest_framework",
- "core",
- "zinc"
+ "core"
 ]
 
 MIDDLEWARE = [
-"django.middleware.common.CommonMiddleware",
-"django.middleware.csrf.CsrfViewMiddleware",
+ "django.middleware.common.CommonMiddleware",
+ "django.middleware.csrf.CsrfViewMiddleware",
  "htmlmin.middleware.HtmlMinifyMiddleware",
  "htmlmin.middleware.MarkRequestMiddleware",
 ]
@@ -44,7 +43,7 @@ TEMPLATES = [{
   "context_processors": [
    "django.template.context_processors.request"
   ],
-  "builtins": ["zinc.templatetags"],
+  "builtins": ["core.templatetags"],
  },
 }]
 
