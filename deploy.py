@@ -41,7 +41,7 @@ subprocess.call(
 
 # Add allowed hosts
 subprocess.call(
- "ssh {} 'sed -i s/\"ALLOWED_HOSTS = \[\]\"/\"ALLOWED_HOSTS = \[£'{}£', £'www.{}£'\]\"/g ~/{}/source/core/settings.py'".format(sitename, sitename, sitename, sitename),
+ "ssh {} 'sed -i s/\"ALLOWED_HOSTS = \[\]\"/\"ALLOWED_HOSTS = \[£'{}£'\]\"/g ~/{}/source/core/settings.py'".format(sitename, sitename, sitename, sitename),
  shell=True
 )
 subprocess.call(
@@ -61,7 +61,7 @@ subprocess.call(
  shell=True
 )
 subprocess.call(
- "ssh {} 'sed -i s/data\\\//..\\\/data\\\//g ~/{}/source/zinc/models.py'".format(sitename, sitename),
+ "ssh {} 'sed -i s/data\\\//..\\\/data\\\//g ~/{}/source/core/models.py'".format(sitename, sitename),
  shell=True
 )
 subprocess.call(
