@@ -178,5 +178,5 @@ def check_clusters_have_unique_sites(clusters):
 
 
 def create_site_code(residues):
-    codes = [CODES.get(r.name, "X") for r in residues]
+    codes = [CODES.get(r.name, "X") for r in residues if r.__class__.__name__ = "Residue"]
     return "".join([f"{code}{codes.count(code)}" for code in sorted(set(codes))])
