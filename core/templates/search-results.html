@@ -9,6 +9,8 @@
         {% if results.num_pages > 1 %}<p>Page {{ page.number }} of {{ results.num_pages }}</p>{% endif %}
     </div>
 
+    {% include "search-nav.html" %}
+
     {% for object in page %}
     <div class="search-result">
         {% if chains %}
@@ -55,14 +57,7 @@
     </div>
     {% endfor %}
 
-    {% if results.num_pages > 1 %}
-        <div id="search-nav" class="box">
-            <a class="first-page" href="{{ request.get_full_path|pagify:1 }}"><<</a>
-            {% if page.has_previous %}<a class="previous-page" href="{{ request.get_full_path|pagify:page.previous_page_number }}">Previous Page</a>{% endif %}
-            {% if page.has_next %}<a class="next-page" href="{{ request.get_full_path|pagify:page.next_page_number }}">Next Page</a>{% endif %}
-            <a class="last-page" href="{{ request.get_full_path|pagify:results.num_pages }}">>></a>
-        </div>
-    {% endif %}
+    {% include "search-nav.html" %}
 {% else %}
     <div class="box no-results">
         <h2>There were no results matching your query.</h2>

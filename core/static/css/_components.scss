@@ -209,13 +209,46 @@ table.api-table {
 
 #search-nav {
     display: flex;
-    justify-content: center;
+	margin-top: $gap;
+	margin-bottom: $gap;
+	justify-content: center;
+	padding: 0px;
+	width: fit-content;
+	@include margin-side(auto);
+	border-radius: $curvature * 3;
 
-    .next-page, .previous-page {
-        display: block;
+	$page-link-width: 4rem;
+	.page-link {
+		width: $page-link-width;
+		height: $page-link-width;
+		display: block;
         text-align: center;
-        width: 50%;
-    }
+		vertical-align: middle;
+		border: 1px solid $border-gray;
+		line-height: $page-link-width;
+		margin-right: -1px;
+		font-size: 1.25em;
+	}
+
+	.page-link:first-child {
+		border-top-left-radius: $curvature * 3;
+		border-bottom-left-radius: $curvature * 3;
+	}
+
+	.page-link:last-child {
+		border-top-right-radius: $curvature * 3;
+		border-bottom-right-radius: $curvature * 3;
+	}
+
+	.page-link.selected {
+		box-shadow: inset 0 0 ($page-link-width * 0.25) $border-gray;
+		color: #000;
+		cursor: default;
+	}
+
+    div.page-link {
+		line-height: $page-link-width * 0.85;
+	}
 }
 
 #pdb-info {
@@ -563,6 +596,24 @@ table.api-table {
             width: 60%;
         }
     }
+
+	#search-nav {
+
+		$page-link-width: 5rem;
+		.page-link {
+			width: $page-link-width;
+			height: $page-link-width;
+			line-height: $page-link-width;
+		}	border-bottom-right-radius: $curvature * 3;
+
+		.page-link.selected {
+			box-shadow: inset 0 0 ($page-link-width * 0.25) $border-gray;
+		}
+
+	    div.page-link {
+			line-height: $page-link-width * 0.85;
+		}
+	}
 
     #home-2 {
         #site-more-info {
