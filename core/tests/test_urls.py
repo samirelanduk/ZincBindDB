@@ -1,6 +1,5 @@
 from testarsenal import DjangoTest
 import core.views as core_views
-import zinc.views as zinc_views
 
 class UrlTests(DjangoTest):
 
@@ -25,13 +24,13 @@ class UrlTests(DjangoTest):
 
 
     def test_search_url(self):
-        self.check_url_returns_view("/search", zinc_views.search)
-        self.check_url_returns_view("/search/", zinc_views.search)
+        self.check_url_returns_view("/search", core_views.search)
+        self.check_url_returns_view("/search/", core_views.search)
 
 
     def test_pdb_url(self):
-        self.check_url_returns_view("/pdbs/a111/", zinc_views.pdb)
+        self.check_url_returns_view("/pdbs/a111/", core_views.pdb)
 
 
     def test_zinc_site_url(self):
-        self.check_url_returns_view("/a1113456/", zinc_views.zinc_site)
+        self.check_url_returns_view("/a1113456/", core_views.zinc_site)

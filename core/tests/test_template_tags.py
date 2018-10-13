@@ -1,5 +1,5 @@
 from testarsenal import DjangoTest
-from zinc.templatetags import *
+from core.templatetags import *
 
 class AngstromConverterTests(DjangoTest):
 
@@ -21,6 +21,7 @@ class PagificationTests(DjangoTest):
          pagify("www.samireland.com?x=y&p=12", 2),
          "www.samireland.com?x=y&p=12&page=2"
         )
+        
 
     def test_can_update_page_url(self):
         self.assertEqual(

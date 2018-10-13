@@ -2,7 +2,7 @@ import logging
 from atomium.structures import Chain, Residue
 from unittest.mock import patch, Mock, MagicMock
 from testarsenal import DjangoTest
-from zinc.utilities import *
+from core.utilities import *
 
 class LogGenerationTests(DjangoTest):
 
@@ -73,10 +73,10 @@ class ZincClusteringTests(DjangoTest):
         self.metals[7].element = "FE"
 
 
-    @patch("zinc.utilities.get_atom_binding_residues")
-    @patch("zinc.utilities.merge_metal_groups")
-    @patch("zinc.utilities.remove_duplicates_from_cluster")
-    @patch("zinc.utilities.aggregate_clusters")
+    @patch("core.utilities.get_atom_binding_residues")
+    @patch("core.utilities.merge_metal_groups")
+    @patch("core.utilities.remove_duplicates_from_cluster")
+    @patch("core.utilities.aggregate_clusters")
     def test_can_cluster_zinc_from_metals(self, mock_agg, mock_rem, mock_merge, mock_res):
         mock_res.side_effect = lambda a: [a, a]
         mock_merge.return_value = [
@@ -145,7 +145,7 @@ class MetalMergingTests(DjangoTest):
          for i, metal in enumerate(self.metals)}
 
 
-    @patch("zinc.utilities.check_clusters_have_unique_residues")
+    @patch("core.utilities.check_clusters_have_unique_residues")
     def test_can_make_cluster_per_metal_if_nothing_in_common(self, mock_check):
         mock_check.return_value = True
         clusters = merge_metal_groups(self.d)
@@ -158,7 +158,7 @@ class MetalMergingTests(DjangoTest):
         ])
 
 
-    @patch("zinc.utilities.check_clusters_have_unique_residues")
+    @patch("core.utilities.check_clusters_have_unique_residues")
     def test_can_cluster_metals_together(self, mock_check):
         mock_check.side_effect = [False, True]
         self.d[self.metals[2]].add(self.residues[0])
@@ -218,14 +218,14 @@ class ClusterAggregationTests(DjangoTest):
         ]
 
 
-    @patch("zinc.utilities.check_clusters_have_unique_sites")
+    @patch("core.utilities.check_clusters_have_unique_sites")
     def test_can_leave_clusters_alone_if_no_copies(self, mock_check):
         mock_check.return_value = True
         aggregate_clusters(self.clusters)
         self.assertEqual(len(self.clusters), 2)
 
 
-    @patch("zinc.utilities.check_clusters_have_unique_sites")
+    @patch("core.utilities.check_clusters_have_unique_sites")
     def test_can_aggregate_clusters(self, mock_check):
         mock_check.side_effect = [False, True]
         aggregate_clusters(self.clusters)
