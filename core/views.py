@@ -31,14 +31,14 @@ def search(request):
     results = []
     if request.GET:
         try:
-            results = Pdb.search(request.GET["q"])
+            results = Pdb.search(request.GET["q"]).order_by(request.GET.get("sort", "-deposited"))
         except KeyError:
             if "sequence" in request.GET:
                 try:
                     results = Pdb.blast_search(request.GET["sequence"], request.GET["threshold"])
                 except: results = []
             else:
-                results = Pdb.advanced_search(request.GET)
+                results = Pdb.advanced_search(request.GET).order_by(request.GET.get("sort", "-deposited"))
     else:
         return render(request, "advanced-search.html")
     paginated_results = Paginator(results, 25)

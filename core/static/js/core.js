@@ -98,3 +98,17 @@ function validateSearch() {
         return true;
     };
 }
+
+function resortResults(select) {
+    var selectedOption = $(select).find(":selected").val();
+    var url = window.location.href;
+    if (!(url.includes("?"))) {
+        url += "?";
+    }
+    if (url.includes("sort=")) {
+        url = url.replace(/sort=[\-a-z]+/, "sort=" + selectedOption)
+    } else {
+        url += "&sort=" + selectedOption;
+    }
+    window.location.href = url;
+}

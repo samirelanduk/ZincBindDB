@@ -13,7 +13,7 @@
             <h3>Zinc-Bearing Chains in PDB</h3>
             <div class="count">{{ pdb.chain_set.count }} zinc-bearing chain{{ pdb.chain_set.count|pluralize }}</div>
             {% for chain in pdb.chain_set.all %}
-                <div class="chain">Chain {{ chain.chain_pdb_identifier }} ({{ chain.sequence|length }} residues;  {{ chain.zincsites|length }} zinc binding site{{ chain.zincsites.count|pluralize }})</div>
+                <div class="chain">Chain {{ chain.chain_pdb_identifier }} ({{ chain.sequence|length }} residues;  {{ chain.zincsites|length }} zinc binding site{{ chain.zincsites|length|pluralize }})</div>
             {% endfor %}
         </div>
         <div class="metals">

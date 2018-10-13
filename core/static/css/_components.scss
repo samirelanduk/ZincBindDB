@@ -112,6 +112,23 @@ table.api-table {
     }
 }
 
+div.search-head {
+
+	padding : $gap;
+	h2 {
+		span {
+			font-size: 0.6em;
+			margin-left: $gap;
+		}
+	}
+
+	select {
+		margin-top: 2 * $gap;
+		max-width: 25rem;
+		@include margin-side(auto);
+	}
+}
+
 .search-result {
 	@include white-box;
 	margin-top: $gap;

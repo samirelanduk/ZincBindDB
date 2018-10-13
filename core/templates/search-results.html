@@ -1,12 +1,27 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block title %}{% if request.GET.q and request.GET.q == " " %}All Data{% else %}Search Results: {% if request.GET.sequence %}BLAST{% elif request.GET.q and request.GET.q != " " %}{{ request.GET.q }}{% else %}Advanced {% endif %}{% endif %}{% endblock %}
 
 {% block main %}
 {% if results.count %}
-    <div class="box">
-        <h2>{{ results.count }} result{% if results.count != 1 %}s{% endif %}</h2>
-        {% if results.num_pages > 1 %}<p>Page {{ page.number }} of {{ results.num_pages }}</p>{% endif %}
+    <div class="box search-head">
+        <h2>{{ results.count|intcomma }} result{% if results.count != 1 %}s{% endif %} {% if results.num_pages > 1 %} <span>(Page {{ page.number }} of {{ results.num_pages }})</span>{% endif %}</h2>
+
+        {% if not chains %}
+        <select onchange="resortResults(this);">
+            <option value="-deposited"{% if request.GET.sort == '-deposited' or 'sort' not in request.GET %} selected{% endif %}>Newest to Oldest</option>
+            <option value="deposited"{% if request.GET.sort == 'deposited' %} selected {% endif %}>Oldest to Newest</option>
+            <option value="resolution"{% if request.GET.sort == 'resolution' %} selected {% endif %}>Resolution (Best to Worst)</option>
+            <option value="-resolution"{% if request.GET.sort == '-resolution' %} selected {% endif %}>Resolution (Worst to Best)</option>
+            <option value="rfactor"{% if request.GET.sort == 'rfactor' %} selected {% endif %}>R-value (Best to Worst)</option>
+            <option value="-rfactor"{% if request.GET.sort == '-rfactor' %} selected {% endif %}>R-value (Worst to Best)</option>
+            <option value="title"{% if request.GET.sort == 'title' %} selected {% endif %}>PDB Title (A-Z)</option>
+            <option value="-title"{% if request.GET.sort == '-title' %} selected {% endif %}>PDB Title (Z-A)</option>
+            <option value="id"{% if request.GET.sort == 'id' %} selected {% endif %}>PDB Code (A-Z)</option>
+            <option value="-id"{% if request.GET.sort == '-id' %} selected {% endif %}>PDB Code (Z-A)</option>
+        </select>
+        {% endif %}
     </div>
 
     {% include "search-nav.html" %}
