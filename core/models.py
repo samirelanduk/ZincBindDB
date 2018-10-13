@@ -323,6 +323,7 @@ class Residue(models.Model):
     name = models.CharField(max_length=128)
     site = models.ForeignKey(ZincSite, on_delete=models.CASCADE)
     chain = models.ForeignKey(Chain, on_delete=models.CASCADE)
+    chain_signature = models.CharField(max_length=128, blank=True)
 
 
     @staticmethod
@@ -335,9 +336,15 @@ class Residue(models.Model):
             insertion += numeric_id[-1]
             numeric_id = numeric_id[:-1]
         numeric_id = int(numeric_id)
+        signature = []
+        if residue.__class__.__name__ == "Residue":
+            if residue.previous: signature = [residue.previous.name.lower()]
+            signature.append(residue.name)
+            if residue.next: signature.append(residue.next.name.lower())
+        signature = ".".join(signature)
         residue_record = Residue.objects.create(
          residue_pdb_identifier=numeric_id,
-         insertion_pdb_identifier=insertion,
+         insertion_pdb_identifier=insertion, chain_signature=signature,
          name=residue.name, chain=chain, site=site,
         )
         for atom in residue.atoms():

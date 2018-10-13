@@ -25,7 +25,7 @@ function drawNgl(code, assembly, metals, residues, individual_residues, zoom) {
         stage.rep = component.addRepresentation("cartoon", {sele: "/0", assembly: stage.assembly});
 
         // Make metals appear as spheres
-        component.addRepresentation("ball+stick", {sele: metals, aspectRatio: 8, assembly: stage.assembly});
+        component.addRepresentation("spacefill", {sele: metals, assembly: stage.assembly});
 
         // Make residue side chains appear as sticks
         if (residues.length > 0) {
@@ -62,7 +62,7 @@ function setUpControls() {
         var class_ = classes[i];
         $("." + class_).each(function(x) {
             $(this).click(function(e) {
-                var rep = $(this).hasClass("metal") ? "ball+stick" : "licorice";
+                var rep = $(this).hasClass("metal") ? "spacefill" : "licorice";
                 var selector = $(this).attr("data-ngl");
                 if ($(this).hasClass("active")) {
                     $(this).removeClass("active");

@@ -11,7 +11,7 @@ from django.db import transaction
 from django.db.models import F
 import subprocess
 import re
-from zinc.models import *
+from core.models import *
 from tqdm import tqdm
 print("")
 
@@ -26,6 +26,10 @@ if not out:
 
 
 try:
+    print("Removing previous clusters from database...")
+    ChainCluster.objects.all().delete()
+    ZincSiteCluster.objects.all().delete()
+
     print("Creating FASTA file with {} chains...".format(Chain.objects.count()))
     lines = []
     for chain in Chain.objects.all():
@@ -68,10 +72,10 @@ try:
     )
     for site in tqdm(sites):
         chain_clusters = set([
-         str(res.chain.cluster) for res in site.residue_set.all()
+         str(res.chain.cluster.id) for res in site.residue_set.all() if res.chain.cluster
         ])
         site.fingerprint = "_".join(sorted(chain_clusters)) + "__" + "_".join(
-         [str(res.residue_pdb_identifier) for res in site.residue_set.all()]
+         [str(res.chain_signature) for res in site.residue_set.exclude(chain_signature="")]
         )
 
     unique_sites = {}

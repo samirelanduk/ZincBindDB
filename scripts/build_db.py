@@ -9,8 +9,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 import django; django.setup()
 from django.db import transaction
 from django.core.management import call_command
-from zinc.utilities import *
-from zinc.models import Pdb, Metal, Chain, ZincSite, Residue
+from core.utilities import *
+from core.models import Pdb, Metal, Chain, ZincSite, Residue
 import atomium
 from tqdm import tqdm
 
@@ -93,11 +93,11 @@ def main(reset=False, log=True, json=True):
             # Create binding sites
             for index, cluster in enumerate(zinc_clusters, start=1):
                 # Does the cluster even have any residues?
-                if len(cluster["residues"]) == 0:
-                    if log: logger.info("Not creating site - no residues")
+                if len([r for r in cluster["residues"] if r.__class__.__name__ == "Residue"]) < 2:
+                    if log: logger.info("Not creating site - too few residues")
                     Metal.create_from_atomium(
                      zinc, pdb_record,
-                     omission="Zinc has no binding residues."
+                     omission="Zinc has too few binding residues."
                     )
                     continue
                 # Does the cluster have enough liganding atoms?
