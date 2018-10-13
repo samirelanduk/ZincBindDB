@@ -5,7 +5,7 @@ from mixer.backend.django import mixer
 from testarsenal import BrowserTest
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core.management import call_command
-from zinc.models import *
+from core.models import *
 
 class FunctionalTest(StaticLiveServerTestCase, BrowserTest):
 

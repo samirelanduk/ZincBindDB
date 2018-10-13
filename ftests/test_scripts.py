@@ -1,6 +1,6 @@
 from unittest.mock import patch, Mock, MagicMock
 from testarsenal import DjangoTest
-from zinc.models import *
+from core.models import *
 from scripts.build_db import main
 
 class DatabaseBuildingTests(DjangoTest):
@@ -157,16 +157,16 @@ class DatabaseBuildingTests(DjangoTest):
         self.assertEqual(site2.residue_set.count(), 3)
         self.assertEqual(site2.copies, 2)
 
-        # 6GFB is fine
+        # 1BYF is fine
         pdb = Pdb.objects.get(id="1BYF")
         self.assertIn("POLYANDROCARPA", pdb.title)
         self.assertEqual(pdb.assembly, 2)
         self.assertEqual(pdb.metal_set.count(), 7)
-        self.assertEqual(pdb.zincsite_set.count(), 6)
+        self.assertEqual(pdb.zincsite_set.count(), 1)
         bad_zinc = pdb.metal_set.exclude(omission=None).first()
         self.assertIn("residues", bad_zinc.omission)
 
-        # 6GFB is fine
+        # 1A0Q is fine
         pdb = Pdb.objects.get(id="1A0Q")
         self.assertIn("29G11 COMPLEXED", pdb.title)
         self.assertEqual(pdb.metal_set.count(), 3)
@@ -174,3 +174,8 @@ class DatabaseBuildingTests(DjangoTest):
         bad_zinc = pdb.metal_set.exclude(omission=None).first()
         self.assertIn("few", bad_zinc.omission)
         self.assertEqual(len(set([m.atomium_id for m in pdb.metal_set.all()])), 3)
+
+        from django.core.management import call_command
+        call_command(
+         "dumpdata", "--all", "--exclude=contenttypes", "--output=ftests/testdb.json", verbosity=0
+        )

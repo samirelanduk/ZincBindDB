@@ -95,10 +95,11 @@ def main(reset=False, log=True, json=True):
                 # Does the cluster even have any residues?
                 if len([r for r in cluster["residues"] if r.__class__.__name__ == "Residue"]) < 2:
                     if log: logger.info("Not creating site - too few residues")
-                    Metal.create_from_atomium(
-                     zinc, pdb_record,
-                     omission="Zinc has too few binding residues."
-                    )
+                    for metal in cluster["metals"]:
+                        Metal.create_from_atomium(
+                         metal, pdb_record,
+                         omission="Zinc has too few binding residues."
+                        )
                     continue
                 # Does the cluster have enough liganding atoms?
                 atoms = []

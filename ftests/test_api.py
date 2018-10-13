@@ -1,5 +1,5 @@
 from .base import FunctionalTest
-from zinc.models import *
+from core.models import *
 import requests
 
 class APISearchingTests(FunctionalTest):

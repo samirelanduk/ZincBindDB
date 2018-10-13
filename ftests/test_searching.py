@@ -1,6 +1,6 @@
 from mixer.backend.django import mixer
 from .base import FunctionalTest
-from zinc.models import *
+from core.models import *
 from datetime import date, timedelta
 
 class SearchTest(FunctionalTest):
@@ -106,69 +106,6 @@ class QuickSearchTests(SearchTest):
         self.check_basic_search("antibody", ["1A0Q"])
         self.check_basic_search("bacillus", ["1B21", "1A6F"])
         self.check_basic_search("HEME", ["6H8P"])
-
-
-    def test_can_paginate_search_results(self):
-        self.populate_filler()
-
-        # User searches for the fillers
-        self.get("/")
-        self.quick_search("filler")
-
-        # They are on the search page
-        self.check_page("/search?q=filler")
-        self.check_title("Search Results: filler")
-
-        # The search information is there.
-        self.check_search_page_correct(105, (1, 5), 25, "PDB: A104", "PDB: A80")
-
-        # There is a link to the next page
-        search_nav = self.browser.find_element_by_id("search-nav")
-        next_ = search_nav.find_element_by_class_name("next-page")
-        with self.assertRaises(self.NoElement):
-            search_nav.find_element_by_class_name("previous-page")
-        self.click(next_)
-        self.check_page("/search?q=filler&page=2")
-
-        # The second page is correct
-        self.check_search_page_correct(105, (2, 5), 25, "PDB: A79", "PDB: A55")
-
-        # They keep going to the end
-        for page in (2, 3, 4):
-            self.check_page(f"/search?q=filler&page={page}")
-            self.check_search_page_correct(105, (page, 5), 25)
-            search_nav = self.browser.find_element_by_id("search-nav")
-            next_ = search_nav.find_element_by_class_name("next-page")
-            self.click(next_)
-
-        # The last page is correct
-        self.check_page("/search?q=filler&page=5")
-        self.check_search_page_correct(105, (5, 5), 5, "PDB: A4", "PDB: A0")
-        search_nav = self.browser.find_element_by_id("search-nav")
-        previous = search_nav.find_element_by_class_name("previous-page")
-        with self.assertRaises(self.NoElement):
-            search_nav.find_element_by_class_name("next-page")
-
-        # They can go back
-        for page in (5, 4, 3, 2):
-            self.check_page(f"/search?q=filler&page={page}")
-            info = self.browser.find_element_by_class_name("box")
-            self.assertIn(f"Page {page} of 5", info.text)
-            search_nav = self.browser.find_element_by_id("search-nav")
-            previous_ = search_nav.find_element_by_class_name("previous-page")
-            self.click(previous_)
-        self.check_page("/search?q=filler&page=1")
-        self.check_search_page_correct(105, (1, 5), 25, "PDB: A104", "PDB: A80")
-
-        # They can go to last and first pages
-        search_nav = self.browser.find_element_by_id("search-nav")
-        last = search_nav.find_element_by_class_name("last-page")
-        self.click(last)
-        self.check_page("/search?q=filler&page=5")
-        search_nav = self.browser.find_element_by_id("search-nav")
-        first = search_nav.find_element_by_class_name("first-page")
-        self.click(first)
-        self.check_page("/search?q=filler&page=1")
 
 
     def test_can_handle_malformed_search_urls(self):
