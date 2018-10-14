@@ -1,6 +1,6 @@
 # ZincBind
 [![Build Status](https://travis-ci.org/samirelanduk/ZincBind.svg)](https://travis-ci.org/samirelanduk/ZincBind)
-[![Coverage Status](https://coveralls.io/repos/github/samirelanduk/ZincBind/badge.svg?branch=0.1)](https://coveralls.io/github/samirelanduk/ZincBind)
+[![Coverage Status](https://coveralls.io/repos/github/samirelanduk/ZincBind/badge.svg)](https://coveralls.io/github/samirelanduk/ZincBind)
 
 ## About
 
