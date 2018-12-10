@@ -2,7 +2,7 @@
 	{% if site %}<h2>PDB Information</h2>{% endif %}
 	<div class="pdb-info-columns">
 		<div class="pdb-info-column">
-			<div class="pdb-info-row"><strong>Code: </strong><a href="https://www.rcsb.org/structure/{{ pdb.id }}" target="_blank">{{ pdb.id }}</a></div>
+			<div class="pdb-info-row"><strong>Code: </strong> <a href="https://www.rcsb.org/structure/{{ pdb.id }}" target="_blank">{{ pdb.id }}</a></div>
 			<div class="pdb-info-row"><strong>Classification: </strong> {{ pdb.classification }}</div>
 		</div>
 		<div class="pdb-info-column">
@@ -13,7 +13,7 @@
 	<div class="pdb-info-row"><strong>Keywords: </strong> {{ pdb.keywords }}</div>
 	<div class="pdb-info-row"><strong>Deposition Date: </strong> {{ pdb.deposited }}</div>
 	<div class="pdb-info-row"><strong>Experimental Technique: </strong> {{ pdb.technique }}</div>
-	<div class="pdb-info-row"><strong>Source Organism: </strong><em><script>document.write(formatSpecies("{{ pdb.organism }}"));</script></em></div>
-	<div class="pdb-info-row"><strong>Expression System: </strong><em><script>document.write(formatSpecies("{{ pdb.expression }}"));</script></em></div>
-    <div class="pdb-info-row"><strong>Biological Assembly: </strong>{{ pdb.assembly }}</div>
+	<div class="pdb-info-row"><strong>Source Organism: </strong> <em><script>document.write(formatSpecies("{{ pdb.organism }}"));</script></em></div>
+	<div class="pdb-info-row"><strong>Expression System: </strong> <em><script>document.write(formatSpecies("{{ pdb.expression }}"));</script></em></div>
+    <div class="pdb-info-row"><strong>Biological Assembly: </strong> {{ pdb.assembly }}</div>
 </div>
