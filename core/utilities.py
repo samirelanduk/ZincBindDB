@@ -96,11 +96,8 @@ def get_atom_binding_residues(metal):
 
     It will also mark atoms as 'liganding' or otherwise."""
 
-    kwargs = {
-     "cutoff": 3, "is_metal": False,
-     "element_regex": "[NOS]" if metal.element == "ZN" else "[^C]"
-    }
-    nearby_atoms = metal.nearby_atoms(**kwargs)
+    kwargs = {"cutoff": 3, "is_metal": False}
+    nearby_atoms = [a for a in metal.nearby_atoms(**kwargs) if a.element != "C"]
     nearby_residues = set([a.ligand or a.residue for a in nearby_atoms])
     for residue in nearby_residues:
         liganding = [a for a in residue.atoms() if a in nearby_atoms]
@@ -156,6 +153,19 @@ def remove_duplicates_from_cluster(cluster):
                 new_metals.add(metal)
                 break
     cluster["metals"] = new_metals
+    new_residues, potential_residues = set(), set()
+    for residue in cluster["residues"]:
+        if len(residue.atoms()) > 1:
+            new_residues.add(residue)
+        else:
+            potential_residues.add(residue)
+    locations = set([(r.atom().location) for r in potential_residues])
+    for loc in locations:
+        for residue in potential_residues:
+            if residue.atom().location == loc:
+                new_residues.add(residue)
+                break
+    cluster["residues"] = new_residues
 
 
 def aggregate_clusters(clusters):

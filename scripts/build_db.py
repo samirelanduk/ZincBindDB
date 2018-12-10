@@ -21,7 +21,7 @@ def main(reset=False, log=True, json=True):
 
     # Get all PDBs which contain zinc
     if log: logger.info("Getting PDB codes")
-    codes = get_zinc_pdb_codes()
+    codes = get_zinc_pdb_codes()[:100]
     print(f"There are {len(codes)} PDBs with zinc")
     if not reset:
         checked = [p.id for p in Pdb.objects.all()]
