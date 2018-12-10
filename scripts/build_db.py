@@ -21,7 +21,7 @@ def main(reset=False, log=True, json=True):
 
     # Get all PDBs which contain zinc
     if log: logger.info("Getting PDB codes")
-    codes = get_zinc_pdb_codes()[:100]
+    codes = get_zinc_pdb_codes()
     print(f"There are {len(codes)} PDBs with zinc")
     if not reset:
         checked = [p.id for p in Pdb.objects.all()]
@@ -105,6 +105,7 @@ def main(reset=False, log=True, json=True):
                 atoms = []
                 for residue in cluster["residues"]:
                     atoms += [a for a in residue.atoms() if a.liganding]
+                print(atoms)
                 if len(atoms) < 3:
                     if log: logger.info(
                      "Not creating site - too few liganding atoms"
