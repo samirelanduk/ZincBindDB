@@ -459,6 +459,7 @@ div.search-head {
 	.metal, .residue {
         display: inline-block;
         padding: $gap;
+        margin-right: $gap / 3;
         border: 1px solid $border-gray;
 		box-shadow: 0 2px 4px 0 rgba(0,0,0,0.2);
         @include margin-vert($gap / 3);
