@@ -100,11 +100,16 @@ def get_atom_binding_residues(metal):
      "cutoff": 3, "is_metal": False,
      "element_regex": "[NOS]" if metal.element == "ZN" else "[^C]"
     }
-    nearby_residues = metal.nearby_residues(ligands=True, **kwargs)
+    nearby_atoms = metal.nearby_atoms(**kwargs)
+    nearby_residues = set([a.ligand or a.residue for a in nearby_atoms])
     for residue in nearby_residues:
-        for atom in residue.atoms():
-            atom.liganding = False
-    for atom in metal.nearby_atoms(**kwargs): atom.liganding = True
+        liganding = [a for a in residue.atoms() if a in nearby_atoms]
+        liganding = sorted(liganding, key=lambda a: a.distance_to(metal))
+        liganding = [a for a in liganding if abs(
+         a.distance_to(metal) - liganding[0].distance_to(metal)
+        ) < 0.5]
+        for atom in residue.atoms(): atom.liganding = False
+        for atom in liganding: atom.liganding = True
     return nearby_residues
 
 

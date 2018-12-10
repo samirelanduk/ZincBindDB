@@ -253,6 +253,13 @@ class ZincSite(models.Model):
         return [list(l) for l in zip(*counts)]
 
 
+    @property
+    def coordination(self):
+        """Returns the number of liganding atoms in the site."""
+
+        return Atom.objects.filter(residue__site=self, liganding=True).count()
+
+
 
 class Metal(models.Model):
     """A metal atom - usually zinc."""
