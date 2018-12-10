@@ -172,7 +172,7 @@ def data(request):
     technique_counts = ZincSite.property_counts(sites, "technique", 3)
     species_counts = ZincSite.property_counts(sites, "organism", 6)
     class_counts = ZincSite.property_counts(sites, "classification", 6)
-    code_counts = ZincSite.property_counts(sites, "code", 9, unique=True)
+    code_counts = ZincSite.property_counts(sites, "code", 10, unique=True)
     resolutions = [["<1.5Å ", "1.5-2.0Å", "2.0-2.5Å", "2.5-3.0Å", "3.0Å+", "None"], [
      sites.filter(resolution__lt=1.5).count(),
      sites.filter(resolution__lt=2.0, resolution__gte=1.5).count(),

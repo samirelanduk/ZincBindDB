@@ -231,6 +231,7 @@ div.search-head {
 	justify-content: center;
 	padding: 0px;
 	width: fit-content;
+    width: -moz-fit-content;
 	@include margin-side(auto);
 	border-radius: $curvature * 3;
 
