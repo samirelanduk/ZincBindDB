@@ -37,9 +37,9 @@
                 <div class="pdb-deposited">{{ object.pdb.title }}</div>
             </div>
             <div class="sequence-alignment">
-                <div class="alignment-row">Query: {{ object.blast_data.qseq }}</div>
-                <div class="alignment-row">       {{ object.blast_data.midline }}</div>
-                <div class="alignment-row">Match: {{ object.blast_data.hseq }}</div>
+                <pre class="alignment-row">Query: {{ object.blast_data.qseq }}</pre>
+                <pre class="alignment-row">       {{ object.blast_data.midline }}</pre>
+                <pre class="alignment-row">Match: {{ object.blast_data.hseq }}</pre>
             </div>
         </div>
         {% else %}
