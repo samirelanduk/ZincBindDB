@@ -8,13 +8,10 @@ class DatabaseBuildingTests(DjangoTest):
     def setUp(self):
         self.patch1 = patch("scripts.build_db.get_zinc_pdb_codes")
         self.patch2 = patch("builtins.print")
-        self.patch3 = patch("scripts.build_db.tqdm")
-        self.patch4 = patch("logging.getLogger")
+        self.patch3 = patch("logging.getLogger")
         self.mock_codes = self.patch1.start()
         self.mock_print = self.patch2.start()
-        self.mock_tqdm = self.patch3.start()
-        self.mock_logging = self.patch4.start()
-        self.mock_tqdm.side_effect = lambda l: l
+        self.mock_logging = self.patch3.start()
         self.mock_codes.return_value = [
          "6EQU", #standard
          "5IV5", # mmCIF only
@@ -32,7 +29,6 @@ class DatabaseBuildingTests(DjangoTest):
         self.patch1.stop()
         self.patch2.stop()
         self.patch3.stop()
-        self.patch4.stop()
 
 
     def check_print_statement(self, fragment):
@@ -43,12 +39,11 @@ class DatabaseBuildingTests(DjangoTest):
 
 
     def test_script(self):
-        main(log=False, json=False)
+        main(json=False, multiprocess=False)
 
         # The right things are printed
         self.check_print_statement("There are 9 PDBs with zinc")
         self.check_print_statement("0 have already been checked")
-        self.check_print_statement("1 mmcif files ignored")
 
         # The database has the right number of things in it
         self.assertEqual(Pdb.objects.count(), 8)
@@ -130,14 +125,14 @@ class DatabaseBuildingTests(DjangoTest):
         self.assertEqual(pdb.metal_set.count(), 2)
         self.assertEqual(pdb.zincsite_set.count(), 2)
         site1 = pdb.metal_set.get(atom_pdb_identifier=850).site
-        self.assertEqual(site1.residue_set.count(), 3)
+        self.assertEqual(site1.residue_set.count(), 4)
         self.assertEqual(
          set([r.chain.chain_pdb_identifier for r in site1.residue_set.all()]),
          {"B"}
         )
         self.assertEqual(site1.copies, 1)
         site2 = pdb.metal_set.get(atom_pdb_identifier=860).site
-        self.assertEqual(site1.residue_set.count(), 3)
+        self.assertEqual(site2.residue_set.count(), 4)
         self.assertEqual(
          set([r.chain.chain_pdb_identifier for r in site2.residue_set.all()]),
          {"D"}
@@ -162,7 +157,6 @@ class DatabaseBuildingTests(DjangoTest):
         self.assertIn("POLYANDROCARPA", pdb.title)
         self.assertEqual(pdb.assembly, 2)
         self.assertEqual(pdb.metal_set.count(), 7)
-        self.assertEqual(pdb.zincsite_set.count(), 1)
         bad_zinc = pdb.metal_set.exclude(omission=None).first()
         self.assertIn("residues", bad_zinc.omission)
 
