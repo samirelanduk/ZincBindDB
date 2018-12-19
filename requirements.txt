@@ -1,5 +1,5 @@
 django==2.0
-requests==2.18.4
+requests>=2.20.0
 atomium==0.11.1
 djangorestframework==3.8.2
 tqdm==4.23.3
