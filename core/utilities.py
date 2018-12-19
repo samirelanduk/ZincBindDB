@@ -2,6 +2,7 @@ import requests
 import logging
 import time
 import os
+import math
 from datetime import datetime
 from atomium.models.data import CODES
 from itertools import combinations
@@ -97,14 +98,13 @@ def get_atom_binding_residues(metal):
     It will also mark atoms as 'liganding' or otherwise."""
 
     kwargs = {"cutoff": 3, "is_metal": False}
-    nearby_atoms = [a for a in metal.nearby_atoms(**kwargs) if a.element != "C"]
+    nearby_atoms = [a for a in metal.nearby_atoms(**kwargs) if a.element not in "CH"]
     nearby_residues = set([a.ligand or a.residue for a in nearby_atoms])
     for residue in nearby_residues:
         liganding = [a for a in residue.atoms() if a in nearby_atoms]
         liganding = sorted(liganding, key=lambda a: a.distance_to(metal))
-        liganding = [a for a in liganding if abs(
-         a.distance_to(metal) - liganding[0].distance_to(metal)
-        ) < 0.5]
+        if liganding:
+            liganding = [liganding[0]] + [a for a in liganding[1:] if metal.angle(liganding[0], a) > math.pi / 4]
         for atom in residue.atoms(): atom.liganding = False
         for atom in liganding: atom.liganding = True
     return nearby_residues

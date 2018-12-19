@@ -11,4 +11,5 @@ data/*
 *.css*
 *.sh
 *.png
+*.eps
 paper.py
