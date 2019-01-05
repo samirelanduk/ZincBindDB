@@ -4,7 +4,7 @@ import subprocess
 import json
 from collections import Counter
 from datetime import datetime
-from atomium.models.data import CODES
+from atomium.data import CODES
 from django.db import models
 
 class Pdb(models.Model):
@@ -28,7 +28,7 @@ class Pdb(models.Model):
 
 
     @staticmethod
-    def create_from_atomium(pdb):
+    def create_from_atomium(pdb, assembly_id):
         """Creates a Pdb record from an atomium Pdb object."""
 
         from .utilities import model_is_skeleton
@@ -38,7 +38,7 @@ class Pdb(models.Model):
          expression=pdb.expression_system, technique=pdb.technique,
          keywords=", ".join(pdb.keywords) if pdb.keywords else "",
          resolution=pdb.resolution, skeleton=model_is_skeleton(pdb.model),
-         assembly=pdb.best_assembly["id"] if pdb.best_assembly else None
+         assembly=assembly_id
         )
 
 
@@ -173,7 +173,7 @@ class Chain(models.Model):
 
         return Chain.objects.create(
          id=f"{pdb.id}{chain.id}", pdb=pdb,
-         sequence=chain.rep_sequence, chain_pdb_identifier=chain.id
+         sequence=chain.sequence, chain_pdb_identifier=chain.id
         )
 
 
@@ -286,8 +286,8 @@ class Metal(models.Model):
     def create_from_atomium(atom, pdb, site=None, omission=None):
         """Creates a Metal record from an atomium atom."""
 
-        residue = atom.ligand if atom.ligand else atom.residue
-        numeric_id, insertion = residue.id.split(":")[1], ""
+        residue = atom.structure
+        numeric_id, insertion = residue.id.split(".")[1], ""
         while not numeric_id[-1].isdigit():
             insertion += numeric_id[-1]
             numeric_id = numeric_id[:-1]
@@ -338,7 +338,7 @@ class Residue(models.Model):
         """Creates a residue record from an atomium Residue object and existing
         ZincSite and Chain records. You must specify the residue number."""
 
-        numeric_id, insertion = residue.id.split(":")[1], ""
+        numeric_id, insertion = residue.id.split(".")[1], ""
         while not numeric_id[-1].isdigit():
             insertion += numeric_id[-1]
             numeric_id = numeric_id[:-1]
@@ -419,5 +419,5 @@ class Atom(models.Model):
         return Atom.objects.create(
          atom_pdb_identifier=atom.id,
          name=atom.name, x=atom.x, y=atom.y, z=atom.z,
-         element=atom.element, residue=residue, liganding=atom.liganding
+         element=atom.element, residue=residue, liganding=atom._flag
         )

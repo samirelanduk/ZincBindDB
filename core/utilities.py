@@ -4,7 +4,7 @@ import time
 import os
 import math
 from datetime import datetime
-from atomium.models.data import CODES
+from atomium.data import CODES
 from itertools import combinations
 from atomium.structures import Chain, Residue
 
@@ -99,14 +99,14 @@ def get_atom_binding_residues(metal):
 
     kwargs = {"cutoff": 3, "is_metal": False}
     nearby_atoms = [a for a in metal.nearby_atoms(**kwargs) if a.element not in "CH"]
-    nearby_residues = set([a.ligand or a.residue for a in nearby_atoms])
+    nearby_residues = set([a.structure for a in nearby_atoms])
     for residue in nearby_residues:
         liganding = [a for a in residue.atoms() if a in nearby_atoms]
         liganding = sorted(liganding, key=lambda a: a.distance_to(metal))
         if liganding:
             liganding = [liganding[0]] + [a for a in liganding[1:] if metal.angle(liganding[0], a) > math.pi / 4]
-        for atom in residue.atoms(): atom.liganding = False
-        for atom in liganding: atom.liganding = True
+        for atom in residue.atoms(): atom._flag = False
+        for atom in liganding: atom._flag = True
     return nearby_residues
 
 

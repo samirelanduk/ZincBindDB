@@ -4,6 +4,8 @@
 
 import sys
 import os
+from math import inf
+from pprint import pprint
 sys.path.append(os.path.join("..", "zincbind"))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 import django; django.setup()
@@ -25,15 +27,26 @@ def process_code(code):
             return
 
         # Which assembly should be used?
-        model = pdb.generate_best_assembly()
+        model = pdb.model
+        assembly_id = None
         metals = model.atoms(is_metal=True)
-        while not metals:
-            pdb.assemblies.remove(pdb.best_assembly)
-            model = pdb.generate_best_assembly()
+        assemblies = sorted(pdb.assemblies, key=lambda a: inf if a["delta_energy"] is None else a["delta_energy"])
+        if assemblies:
+            model = pdb.generate_assembly(assemblies[0]["id"])
+            assembly_id = assemblies[0]["id"]
             metals = model.atoms(is_metal=True)
+            while not metals:
+                assemblies.pop(0)
+                if assemblies:
+                    model = pdb.generate_assembly(assemblies[0]["id"])
+                    assembly_id = assemblies[0]["id"]
+                else:
+                    model = pdb.model
+                    assembly_id = None
+                metals = model.atoms(is_metal=True)
 
         # Save the PDB
-        pdb_record = Pdb.create_from_atomium(pdb)
+        pdb_record = Pdb.create_from_atomium(pdb, assembly_id)
 
         # Is the PDB usable?
         if model_is_skeleton(model):
@@ -79,7 +92,7 @@ def process_code(code):
             # Does the cluster have enough liganding atoms?
             atoms = []
             for residue in cluster["residues"]:
-                atoms += [a for a in residue.atoms() if a.liganding]
+                atoms += [a for a in residue.atoms() if a._flag]
             if len(atoms) < 3:
                 for metal in cluster["metals"]:
                     Metal.create_from_atomium(
@@ -107,6 +120,7 @@ def process_code(code):
 def main(reset=False, json=True, multiprocess=True):
     # Get all PDBs which contain zinc
     codes = get_zinc_pdb_codes()
+
     print(f"There are {len(codes)} PDBs with zinc")
     if not reset:
         checked = [p.id for p in Pdb.objects.all()]
