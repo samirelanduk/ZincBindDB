@@ -4,147 +4,97 @@
 
 import sys
 import os
-from math import inf
-from pprint import pprint
 sys.path.append(os.path.join("..", "zincbind"))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 import django; django.setup()
 from django.db import transaction
-from django.core.management import call_command
 from core.utilities import *
 from core.models import Pdb, Metal, Chain, ZincSite, Residue
 import atomium
 from tqdm import tqdm
-from multiprocessing import Pool
 
-
-def process_code(code):
-    with transaction.atomic():
-        # Get PDB
-        try:
-            pdb = atomium.fetch(code)
-        except ValueError:
-            return
-
-        # Which assembly should be used?
-        model = pdb.model
-        assembly_id = None
-        metals = model.atoms(is_metal=True)
-        assemblies = sorted(pdb.assemblies, key=lambda a: inf if a["delta_energy"] is None else a["delta_energy"])
-        if assemblies:
-            model = pdb.generate_assembly(assemblies[0]["id"])
-            assembly_id = assemblies[0]["id"]
-            metals = model.atoms(is_metal=True)
-            while not metals:
-                assemblies.pop(0)
-                if assemblies:
-                    model = pdb.generate_assembly(assemblies[0]["id"])
-                    assembly_id = assemblies[0]["id"]
-                else:
-                    model = pdb.model
-                    assembly_id = None
-                metals = model.atoms(is_metal=True)
-
-        # Save the PDB
-        pdb_record = Pdb.create_from_atomium(pdb, assembly_id)
-
-        # Is the PDB usable?
-        if model_is_skeleton(model):
-            zincs = model.atoms(element="ZN")
-            for zinc in zincs:
-                Metal.create_from_atomium(
-                 zinc, pdb_record,
-                 omission="No residue side chain information in PDB."
-                )
-            return
-
-        # Are any PDB zincs not in assembly
-        au_zincs = pdb.model.atoms(element="ZN")
-        assembly_zinc_ids = [atom.id for atom in model.atoms(element="ZN")]
-        for zinc in au_zincs:
-            if zinc.id not in assembly_zinc_ids:
-                Metal.create_from_atomium(
-                 zinc, pdb_record,
-                 omission="Zinc was in asymmetric unit but not biological assembly."
-                )
-
-        # Get zinc clusters
-        zinc_clusters = cluster_zincs_with_residues(metals)
-
-        # Create chains
-        chains = {}
-        for cluster in zinc_clusters:
-            for o in cluster["residues"].union(cluster["metals"]):
-                chains[o.chain.id] = o.chain
-        for chain_id, chain in chains.items():
-            chains[chain_id] = Chain.create_from_atomium(chain, pdb_record)
-
-        # Create binding sites
-        for index, cluster in enumerate(zinc_clusters, start=1):
-            # Does the cluster even have any residues?
-            if len([r for r in cluster["residues"] if r.__class__.__name__ == "Residue"]) < 2:
-                for metal in cluster["metals"]:
-                    Metal.create_from_atomium(
-                     metal, pdb_record,
-                     omission="Zinc has too few binding residues."
-                    )
-                continue
-            # Does the cluster have enough liganding atoms?
-            atoms = []
-            for residue in cluster["residues"]:
-                atoms += [a for a in residue.atoms() if a._flag]
-            if len(atoms) < 3:
-                for metal in cluster["metals"]:
-                    Metal.create_from_atomium(
-                     metal, pdb_record, omission="Zinc has too few liganding atoms."
-                    )
-                continue
-
-            # Create site record itself
-            site = ZincSite.objects.create(
-             id=f"{pdb_record.id}-{index}", pdb=pdb_record,
-             code=create_site_code(cluster["residues"]),
-             copies=cluster["count"]
-            )
-
-            # Create metals
-            for metal in cluster["metals"]:
-                Metal.create_from_atomium(metal, pdb_record, site=site)
-
-            # Create residue records
-            for r in cluster["residues"]:
-                chain = chains[r.chain.id]
-                Residue.create_from_atomium(r, chain, site)
-
-
-def main(reset=False, json=True, multiprocess=True):
+def main(json=True):
     # Get all PDBs which contain zinc
-    codes = get_zinc_pdb_codes()
-
+    codes = get_zinc_pdb_codes()[:10]
     print(f"There are {len(codes)} PDBs with zinc")
-    if not reset:
-        checked = [p.id for p in Pdb.objects.all()]
-        print(f"{len(checked)} have already been checked")
-        codes = [code for code in codes if code not in checked]
 
-    # Go through each PDB
-    if multiprocess:
-        for code in tqdm(codes):
-            process_code(code)
-    else:
-        for code in codes: process_code(code)
+    # Which ones should be processed?
+    codes = remove_checked_codes(codes)
+    print(f"{len(codes)} are going to be checked")
+
+    # Process each code
+    for code in tqdm(codes):
+        with transaction.atomic():
+
+            # Get PDB
+            pdb = atomium.fetch(code)
+
+            # Get model
+            model, assembly_id = get_best_model(pdb)
+
+            # Save PDB record
+            pdb_record = Pdb.create_from_atomium(pdb, assembly_id)
+
+            # Check model is usable
+            if model_is_skeleton(model):
+                for zinc in model.atoms(element="ZN"):
+                    Metal.create_from_atomium(zinc, pdb_record,
+                     omission="No side chain information in PDB."
+                    )
+                continue
+
+            # Save any zincs not in model
+            for zinc in zincs_outside_model(model, pdb):
+                Metal.create_from_atomium(zinc, pdb_record,
+                 omission="Zinc in asymmetric unit but not biological assembly."
+                )
+
+            # Get metal clusters from model
+            clusters = cluster_zincs_with_residues(model.atoms(is_metal=True))
+
+            # Create chain records
+            chains = create_chains_dict(clusters)
+            for chain_id, chain in chains.items():
+                chains[chain_id] = Chain.create_from_atomium(chain, pdb_record)
+
+            # Create binding site from each cluster
+            for index, cluster in enumerate(clusters, start=1):
+
+                # Does the cluster have enough residues?
+                if residue_count(cluster) < 2:
+                    for metal in cluster["metals"]:
+                        Metal.create_from_atomium(metal, pdb_record,
+                         omission="Zinc has too few binding residues."
+                        )
+                    continue
+
+                # Does the cluster have enough liganding atoms?
+                if liganding_atom_count(cluster) < 3:
+                    for metal in cluster["metals"]:
+                        Metal.create_from_atomium(metal, pdb_record,
+                         omission="Zinc has too few liganding atoms."
+                        )
+                    continue
+
+                # Create site record itself
+                site = ZincSite.objects.create(
+                 id=f"{pdb_record.id}-{index}", copies=cluster["count"],
+                 code=create_site_code(cluster["residues"]), pdb=pdb_record
+                )
+
+                # Create metals
+                for metal in cluster["metals"]:
+                    Metal.create_from_atomium(metal, pdb_record, site=site)
+
+                # Create residue records
+                for r in cluster["residues"]:
+                    chain = chains[r.chain.id]
+                    Residue.create_from_atomium(r, chain, site)
 
     # JSON?
     if json:
-        print("Saving JSON")
-        sysout = sys.stdout
-        with open("data/zinc.json", "w") as f:
-            sys.stdout = f
-            call_command(
-             "dumpdata",  "--exclude=contenttypes", verbosity=0
-            )
-            sys.stdout = sysout
+        print("Saving JSON...")
+        dump_db_to_json()
 
 
-if __name__ == "__main__":
-    main(reset="reset" in sys.argv)
+if __name__ == "__main__": main()

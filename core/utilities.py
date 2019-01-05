@@ -2,37 +2,17 @@ import requests
 import logging
 import time
 import os
+import sys
 import math
 from datetime import datetime
 from atomium.data import CODES
 from itertools import combinations
 from atomium.structures import Chain, Residue
+from django.core.management import call_command
+from core.models import Pdb
 
 CODES = CODES.copy()
 CODES["HOH"] = "w"
-
-class RcsbError(Exception):
-    """Error raised if there's a problem talking to the RCSB web services."""
-    pass
-
-
-
-def get_log():
-    """Creates a logger object that writes to a file at data/logs."""
-
-    logger = logging.getLogger("Build Script")
-    logger.setLevel(logging.INFO)
-    os.environ["TZ"] = "Europe/London"
-    time.tzset()
-    handler = logging.FileHandler(
-     "data/logs/" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S.log")
-    )
-    handler.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(asctime)s - %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    return logger
-
 
 def get_zinc_pdb_codes():
     """Gets PDB codes for all structures with a zinc atom in them.
@@ -51,7 +31,27 @@ def get_zinc_pdb_codes():
         codes = response.text.split()
         if len(codes) > 10000:
             return response.text.split()
-    raise RcsbError("RCSB didn't send back PDB codes")
+    raise Exception("RCSB didn't send back PDB codes")
+
+
+def remove_checked_codes(codes):
+    checked = [p.id for p in Pdb.objects.all()]
+    return [c for c in codes if c not in checked]
+
+
+def get_best_model(pdb):
+    assemblies = sorted(pdb.assemblies, key=lambda a: math.inf
+     if a["delta_energy"] is None else a["delta_energy"])
+    if assemblies:
+        model = pdb.generate_assembly(assemblies[0]["id"])
+        metals = model.atoms(is_metal=True)
+        while not metals:
+            assemblies.pop(0)
+            model = pdb.generate_assembly(assemblies[0]["id"])
+            metals = model.atoms(is_metal=True)
+        return model, assemblies[0]["id"]
+    else:
+        return pdb.model, None
 
 
 def model_is_skeleton(model):
@@ -63,6 +63,13 @@ def model_is_skeleton(model):
             if name not in ["C", "N", "CA", "O"]:
                 return False
     return True
+
+
+def zincs_outside_model(model, pdb):
+    au_zincs = pdb.model.atoms(element="ZN")
+    assembly_zinc_ids = [atom.id for atom in model.atoms(element="ZN")]
+    return [z for z in au_zincs if z.id not in assembly_zinc_ids]
+
 
 
 def cluster_zincs_with_residues(metals):
@@ -192,6 +199,32 @@ def check_clusters_have_unique_sites(clusters):
     return len(cluster_ids) == len(unique_ids)
 
 
+def create_chains_dict(clusters):
+    chains = {}
+    for cluster in clusters:
+        for o in cluster["residues"]:
+            chains[o.chain.id] = o.chain
+    return chains
+
+
+def residue_count(cluster):
+    return len([r for r in cluster["residues"] if isinstance(r, Residue)])
+
+
+def liganding_atom_count(cluster):
+    atoms = []
+    for residue in cluster["residues"]:
+        atoms += [a for a in residue.atoms() if a._flag]
+    return len(atoms)
+
+
 def create_site_code(residues):
     codes = [CODES.get(r.name, "X") for r in residues if r.__class__.__name__ == "Residue"]
     return "".join([f"{code}{codes.count(code)}" for code in sorted(set(codes))])
+
+
+def dump_db_to_json():
+    with open("data/zinc.json", "w") as f:
+        sysout, sys.stdout = sys.stdout, f
+        call_command("dumpdata",  "--exclude=contenttypes", verbosity=0)
+    sys.stdout = sysout

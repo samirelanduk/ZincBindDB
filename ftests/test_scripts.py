@@ -8,10 +8,11 @@ class DatabaseBuildingTests(DjangoTest):
     def setUp(self):
         self.patch1 = patch("scripts.build_db.get_zinc_pdb_codes")
         self.patch2 = patch("builtins.print")
-        self.patch3 = patch("logging.getLogger")
+        self.patch3 = patch("scripts.build_db.tqdm")
         self.mock_codes = self.patch1.start()
         self.mock_print = self.patch2.start()
-        self.mock_logging = self.patch3.start()
+        self.mock_tqdm = self.patch3.start()
+        self.mock_tqdm.side_effect = lambda l: l
         self.mock_codes.return_value = [
          "6EQU", #standard
          "1B21", # no zinc in best assembly
@@ -37,17 +38,125 @@ class DatabaseBuildingTests(DjangoTest):
             raise ValueError(f"No print call with '{fragment}' in")
 
 
-    def test_script(self):
-        main(json=False, multiprocess=False)
+    def test_script_checking_only_new(self):
+        Pdb.objects.create(id="1SP1", skeleton=False)
+        self.mock_codes.return_value = ["1SP1", "3ZNF"]
+        main(json=False)
+        self.check_print_statement("There are 2 PDBs with zinc")
+        self.check_print_statement("1 are going to be checked")
+        self.mock_codes.return_value = ["1SP1", "3ZNF", "1PAA"]
 
-        # The right things are printed
-        self.check_print_statement("There are 8 PDBs with zinc")
-        self.check_print_statement("0 have already been checked")
 
-        # The database has the right number of things in it
-        self.assertEqual(Pdb.objects.count(), 8)
+    def test_can_get_best_model(self):
+        self.mock_codes.return_value = ["1B21"]
+        main(json=False)
+        pdb = Pdb.objects.get(id="1B21")
+        self.assertIn("BURIED SALT BRIDGE", pdb.title)
+        self.assertEqual(pdb.assembly, 3)
+        self.assertEqual(pdb.metal_set.count(), 1)
 
-        # 6EQU is fine
+
+    def test_can_reject_skeleton_models(self):
+        self.mock_codes.return_value = ["4UXY"]
+        main(json=False)
+        pdb = Pdb.objects.get(id="4UXY")
+        self.assertIn("ATP binding", pdb.title)
+        self.assertTrue(pdb.skeleton)
+        self.assertEqual(pdb.metal_set.count(), 1)
+        metal = pdb.metal_set.first()
+        self.assertEqual(metal.atom_pdb_identifier, 1171)
+        self.assertEqual(metal.residue_pdb_identifier, 1413)
+        self.assertEqual(metal.chain_pdb_identifier, "A")
+        self.assertIn("no side chain", metal.omission.lower())
+        self.assertEqual(pdb.zincsite_set.count(), 0)
+        self.assertEqual(pdb.chain_set.count(), 0)
+
+
+    def test_can_store_zincs_not_in_assembly(self):
+        self.mock_codes.return_value = ["6H8P"]
+        main(json=False)
+        pdb = Pdb.objects.get(id="6H8P")
+        self.assertIn("JMJD2A/ KDM4A", pdb.title)
+        self.assertEqual(pdb.assembly, 2)
+        self.assertFalse(pdb.skeleton)
+        self.assertEqual(pdb.metal_set.count(), 2)
+        self.assertEqual(pdb.zincsite_set.count(), 1)
+        self.assertEqual(pdb.chain_set.count(), 1)
+        used_zinc = pdb.metal_set.filter(omission=None)
+        self.assertEqual(used_zinc.count(), 1)
+        self.assertEqual(used_zinc.first().atom_pdb_identifier, 11222)
+        tossed_zinc = pdb.metal_set.exclude(omission=None)
+        self.assertEqual(tossed_zinc.count(), 1)
+        self.assertEqual(tossed_zinc.first().atom_pdb_identifier, 11164)
+        self.assertEqual(pdb.chain_set.count(), 1)
+
+
+    def test_can_handle_zincs_superimposed_onto_each_other(self):
+        self.mock_codes.return_value = ["1ZEH"]
+        main(json=False)
+        pdb = Pdb.objects.get(id="1ZEH")
+        self.assertIn("STRUCTURE OF INSULIN", pdb.title)
+        self.assertEqual(pdb.assembly, 3)
+        self.assertEqual(pdb.metal_set.count(), 2)
+        self.assertEqual(pdb.zincsite_set.count(), 2)
+        site1 = pdb.metal_set.get(atom_pdb_identifier=846).site
+        self.assertEqual(site1.residue_set.count(), 4)
+        self.assertEqual(
+         set([r.chain.chain_pdb_identifier for r in site1.residue_set.all()]),
+         {"B"}
+        )
+        self.assertEqual(site1.copies, 1)
+        site2 = pdb.metal_set.get(atom_pdb_identifier=856).site
+        self.assertEqual(site2.residue_set.count(), 4)
+        self.assertEqual(
+         set([r.chain.chain_pdb_identifier for r in site2.residue_set.all()]),
+         {"D"}
+        )
+        self.assertEqual(site2.copies, 1)
+
+
+    def test_can_handle_sites_being_duplicated_in_assembly(self):
+        self.mock_codes.return_value = ["1A6F"]
+        main(json=False)
+        pdb = Pdb.objects.get(id="1A6F")
+        self.assertIn("RNASE P PROTEIN FROM BACILLUS SUBTILIS", pdb.title)
+        self.assertEqual(pdb.assembly, 2)
+        self.assertEqual(pdb.metal_set.count(), 2)
+        self.assertEqual(pdb.zincsite_set.count(), 2)
+        site1 = pdb.metal_set.get(atom_pdb_identifier=951).site
+        self.assertEqual(site1.residue_set.count(), 8)
+        self.assertEqual(site1.copies, 1)
+        site2 = pdb.metal_set.get(atom_pdb_identifier=952).site
+        self.assertEqual(site2.residue_set.count(), 3)
+        self.assertEqual(site2.copies, 2)
+
+
+    def test_can_handle_sites_having_too_few_residues(self):
+        self.mock_codes.return_value = ["1BYF"]
+        main(json=False)
+        pdb = Pdb.objects.get(id="1BYF")
+        self.assertIn("POLYANDROCARPA", pdb.title)
+        self.assertEqual(pdb.assembly, 2)
+        self.assertEqual(pdb.metal_set.count(), 7)
+        bad_zinc = pdb.metal_set.exclude(omission=None).first()
+        self.assertIn("residues", bad_zinc.omission)
+
+
+    def test_can_handle_sites_having_too_few_liganding_atoms(self):
+        self.mock_codes.return_value = ["1A0Q"]
+        main(json=False)
+        pdb = Pdb.objects.get(id="1A0Q")
+        self.assertIn("29G11 COMPLEXED", pdb.title)
+        self.assertEqual(pdb.metal_set.count(), 3)
+        self.assertEqual(pdb.zincsite_set.count(), 1)
+        bad_zinc = pdb.metal_set.exclude(omission=None).first()
+        self.assertIn("few", bad_zinc.omission)
+        self.assertEqual(len(set([m.atomium_id for m in pdb.metal_set.all()])), 3)
+
+
+    def test_script_can_function_normally(self):
+        self.mock_codes.return_value = ["6EQU"]
+        main(json=False)
         pdb = Pdb.objects.get(id="6EQU")
         self.assertIn("anhydrase II", pdb.title)
         self.assertEqual(pdb.assembly, 1)
@@ -82,93 +191,10 @@ class DatabaseBuildingTests(DjangoTest):
         for res in site.residue_set.all():
             self.assertEqual(res.chain, chain)
 
-        # 1B21 is fine
-        pdb = Pdb.objects.get(id="1B21")
-        self.assertIn("BURIED SALT BRIDGE", pdb.title)
-        self.assertEqual(pdb.assembly, 3)
-        self.assertEqual(pdb.metal_set.count(), 1)
 
-        # 4UXY is fine
-        pdb = Pdb.objects.get(id="4UXY")
-        self.assertIn("ATP binding", pdb.title)
-        self.assertTrue(pdb.skeleton)
-        self.assertEqual(pdb.metal_set.count(), 1)
-        metal = pdb.metal_set.first()
-        self.assertEqual(metal.atom_pdb_identifier, 1171)
-        self.assertEqual(metal.residue_pdb_identifier, 1413)
-        self.assertEqual(metal.chain_pdb_identifier, "A")
-        self.assertIn("no residue", metal.omission.lower())
-        self.assertEqual(pdb.zincsite_set.count(), 0)
-        self.assertEqual(pdb.chain_set.count(), 0)
-
-        # 1A2P is fine
-        pdb = Pdb.objects.get(id="6H8P")
-        self.assertIn("JMJD2A/ KDM4A", pdb.title)
-        self.assertEqual(pdb.assembly, 2)
-        self.assertFalse(pdb.skeleton)
-        self.assertEqual(pdb.metal_set.count(), 2)
-        self.assertEqual(pdb.zincsite_set.count(), 1)
-        self.assertEqual(pdb.chain_set.count(), 1)
-        used_zinc = pdb.metal_set.filter(omission=None)
-        self.assertEqual(used_zinc.count(), 1)
-        self.assertEqual(used_zinc.first().atom_pdb_identifier, 11222)
-        tossed_zinc = pdb.metal_set.exclude(omission=None)
-        self.assertEqual(tossed_zinc.count(), 1)
-        self.assertEqual(tossed_zinc.first().atom_pdb_identifier, 11164)
-        self.assertEqual(pdb.chain_set.count(), 1)
-
-        # 1ZEH is fine
-        pdb = Pdb.objects.get(id="1ZEH")
-        self.assertIn("STRUCTURE OF INSULIN", pdb.title)
-        self.assertEqual(pdb.assembly, 3)
-        self.assertEqual(pdb.metal_set.count(), 2)
-        self.assertEqual(pdb.zincsite_set.count(), 2)
-        site1 = pdb.metal_set.get(atom_pdb_identifier=846).site
-        self.assertEqual(site1.residue_set.count(), 4)
-        self.assertEqual(
-         set([r.chain.chain_pdb_identifier for r in site1.residue_set.all()]),
-         {"B"}
-        )
-        self.assertEqual(site1.copies, 1)
-        site2 = pdb.metal_set.get(atom_pdb_identifier=856).site
-        self.assertEqual(site2.residue_set.count(), 4)
-        self.assertEqual(
-         set([r.chain.chain_pdb_identifier for r in site2.residue_set.all()]),
-         {"D"}
-        )
-        self.assertEqual(site2.copies, 1)
-
-        # 1A6F is fine
-        pdb = Pdb.objects.get(id="1A6F")
-        self.assertIn("RNASE P PROTEIN FROM BACILLUS SUBTILIS", pdb.title)
-        self.assertEqual(pdb.assembly, 2)
-        self.assertEqual(pdb.metal_set.count(), 2)
-        self.assertEqual(pdb.zincsite_set.count(), 2)
-        site1 = pdb.metal_set.get(atom_pdb_identifier=952).site
-        self.assertEqual(site1.residue_set.count(), 8)
-        self.assertEqual(site1.copies, 1)
-        site2 = pdb.metal_set.get(atom_pdb_identifier=953).site
-        self.assertEqual(site2.residue_set.count(), 3)
-        self.assertEqual(site2.copies, 2)
-
-        # 1BYF is fine
-        pdb = Pdb.objects.get(id="1BYF")
-        self.assertIn("POLYANDROCARPA", pdb.title)
-        self.assertEqual(pdb.assembly, 2)
-        self.assertEqual(pdb.metal_set.count(), 7)
-        bad_zinc = pdb.metal_set.exclude(omission=None).first()
-        self.assertIn("residues", bad_zinc.omission)
-
-        # 1A0Q is fine
-        pdb = Pdb.objects.get(id="1A0Q")
-        self.assertIn("29G11 COMPLEXED", pdb.title)
-        self.assertEqual(pdb.metal_set.count(), 3)
-        self.assertEqual(pdb.zincsite_set.count(), 1)
-        bad_zinc = pdb.metal_set.exclude(omission=None).first()
-        self.assertIn("few", bad_zinc.omission)
-        self.assertEqual(len(set([m.atomium_id for m in pdb.metal_set.all()])), 3)
-
+    def spit_out_json(self):
         from django.core.management import call_command
+        main(json=False)
         call_command(
          "dumpdata", "--all", "--exclude=contenttypes", "--output=ftests/testdb.json", verbosity=0
         )
