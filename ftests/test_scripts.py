@@ -124,7 +124,7 @@ class DatabaseBuildingTests(DjangoTest):
         self.assertEqual(pdb.metal_set.count(), 2)
         self.assertEqual(pdb.zincsite_set.count(), 2)
         site1 = pdb.metal_set.get(atom_pdb_identifier=951).site
-        self.assertEqual(site1.residue_set.count(), 8)
+        self.assertEqual(site1.residue_set.count(), 6)
         self.assertEqual(site1.copies, 1)
         site2 = pdb.metal_set.get(atom_pdb_identifier=952).site
         self.assertEqual(site2.residue_set.count(), 3)

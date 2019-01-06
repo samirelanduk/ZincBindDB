@@ -88,13 +88,29 @@ def cluster_zincs_with_residues(metals):
 
     Finally clusters with no zinc in are removed."""
 
+    metals = remove_duplicate_atoms(metals)
     metals = {metal: [] for metal in metals}
     for metal in metals:
         metals[metal] = get_atom_binding_residues(metal)
     clusters = merge_metal_groups(metals)
-    for cluster in clusters: remove_duplicates_from_cluster(cluster)
     aggregate_clusters(clusters)
     return [c for c in clusters if "ZN" in [a.element for a in c["metals"]]]
+
+
+def remove_duplicate_atoms(atoms):
+    new_set = set()
+    elements = set([m.element for m in atoms])
+    for element in elements:
+        relevant_atoms = [m for m in atoms if m.element == element]
+        unique_relevant = set()
+        for r in relevant_atoms:
+            for u in unique_relevant:
+                if r.distance_to(u) < 1:
+                    break
+            else:
+                unique_relevant.add(r)
+        new_set.update(unique_relevant)
+    return new_set
 
 
 def get_atom_binding_residues(metal):
@@ -107,6 +123,7 @@ def get_atom_binding_residues(metal):
     kwargs = {"cutoff": 3, "is_metal": False}
     nearby_atoms = [a for a in metal.nearby_atoms(**kwargs) if a.element not in "CH"]
     nearby_residues = set([a.structure for a in nearby_atoms])
+    nearby_residues = remove_duplicate_residues(nearby_residues)
     for residue in nearby_residues:
         liganding = [a for a in residue.atoms() if a in nearby_atoms]
         liganding = sorted(liganding, key=lambda a: a.distance_to(metal))
@@ -115,6 +132,15 @@ def get_atom_binding_residues(metal):
         for atom in residue.atoms(): atom._flag = False
         for atom in liganding: atom._flag = True
     return nearby_residues
+
+
+def remove_duplicate_residues(residues):
+    molecules = [r for r in residues if len(r.atoms()) > 1]
+    atoms = {r.atom(): r for r in residues if len(r.atoms()) == 1}
+    unique_atoms = remove_duplicate_atoms(atoms.keys())
+    for atom in unique_atoms:
+        molecules.append(atoms[atom])
+    return set(molecules)
 
 
 def merge_metal_groups(metals):
