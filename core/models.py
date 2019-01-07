@@ -380,7 +380,14 @@ class Residue(models.Model):
 
         if self.name not in CODES:
             return self.ngl_sele
-        return f"(sidechain or .CA) and " + self.ngl_sele
+        ligand_names = [a.name for a in self.atom_set.exclude(coordinatebond=None)]
+        includes = ["sidechain", ".CA"]
+        if "O" in ligand_names:
+            includes += [".O", ".C"]
+        if "N" in ligand_names:
+            includes += [".N"]
+        includes = " or ".join(includes)
+        return f"({includes}) and {self.ngl_sele}"
 
 
     @property

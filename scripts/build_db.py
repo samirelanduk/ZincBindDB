@@ -15,7 +15,7 @@ from tqdm import tqdm
 
 def main(json=True):
     # Get all PDBs which contain zinc
-    codes = get_zinc_pdb_codes()[:10]
+    codes = ["1AH7"]#get_zinc_pdb_codes()[:10]
     print(f"There are {len(codes)} PDBs with zinc")
 
     # Which ones should be processed?
