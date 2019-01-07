@@ -51,5 +51,15 @@
 {% block endjs %}
     <script src="/static/js/ngl-source.js"></script>
     <script src="/static/js/ngl.js"></script>
-    <script>drawNgl("{{ pdb.id }}", "{{ pdb.assembly }}", "{{ pdb.ngl_metals_sele }}", "{{ pdb.ngl_residues_sele }}", [{% for site in pdb.zincsite_set.all %}{% for residue in site.residue_set.all %}"{{ residue.ngl_side_chain_sele }}", {% endfor %}{% endfor %}], false); setUpControls();</script>
+    <script>
+    var bonds = [];
+    {% for site in pdb.zincsite_set.all %}
+        {% for bond in site.coordinatebond_set.all %}
+        bond = [];
+        bond.push("{{ bond.metal.ngl_sele }}")
+        bond.push("{{ bond.atom.ngl_sele }}")
+        bonds.push(bond)
+        {% endfor %}
+    {% endfor %}
+    drawNgl("{{ pdb.id }}", "{{ pdb.assembly }}", "{{ pdb.ngl_metals_sele }}", "{{ pdb.ngl_residues_sele }}", bonds, false); setUpControls();</script>
 {% endblock %}

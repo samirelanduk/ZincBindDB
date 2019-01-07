@@ -9,7 +9,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 import django; django.setup()
 from django.db import transaction
 from core.utilities import *
-from core.models import Pdb, Metal, Chain, ZincSite, Residue
+from core.models import Pdb, Metal, Chain, ZincSite, Residue, CoordinateBond
 import atomium
 from tqdm import tqdm
 
@@ -79,17 +79,26 @@ def main(json=True):
                 # Create site record itself
                 site = ZincSite.objects.create(
                  id=f"{pdb_record.id}-{index}", copies=cluster["count"],
-                 code=create_site_code(cluster["residues"]), pdb=pdb_record
+                 code=create_site_code(get_cluster_residues(cluster)), pdb=pdb_record
                 )
 
                 # Create metals
-                for metal in cluster["metals"]:
-                    Metal.create_from_atomium(metal, pdb_record, site=site)
+                metals = {}
+                for metal in cluster["metals"].keys():
+                    metals[metal.id] = Metal.create_from_atomium(metal, pdb_record, site=site)
 
                 # Create residue records
-                for r in cluster["residues"]:
+                atom_dict = {}
+                for r in get_cluster_residues(cluster):
                     chain = chains[r.chain.id]
-                    Residue.create_from_atomium(r, chain, site)
+                    Residue.create_from_atomium(r, chain, site, atom_dict)
+
+                # Create bond records
+                for metal, atoms in cluster["metals"].items():
+                    for atom in atoms:
+                        CoordinateBond.objects.create(
+                         metal=metals[metal.id], atom=atom_dict[atom.id], site=site
+                        )
 
     # JSON?
     if json:

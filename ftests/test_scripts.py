@@ -91,6 +91,25 @@ class DatabaseBuildingTests(DjangoTest):
         self.assertEqual(pdb.chain_set.count(), 1)
 
 
+    def test_can_reject_liganding_atoms_with_too_acute_angle(self):
+        self.mock_codes.return_value = ["2AHJ"]
+        main(json=False)
+        pdb = Pdb.objects.get(id="2AHJ")
+        for site in pdb.zincsite_set.all():
+            if site.metal_set.first().chain_pdb_identifier == "C":
+                self.assertEqual(site.metal_set.first().coordination, 4)
+
+
+    def test_can_handle_multi_metal_sites(self):
+        self.mock_codes.return_value = ["6A5K"]
+        main(json=False)
+        pdb = Pdb.objects.get(id="6A5K")
+        multi_site = pdb.zincsite_set.get(code="C9")
+        self.assertEqual(multi_site.metal_set.count(), 3)
+        for metal in multi_site.metal_set.all():
+            self.assertEqual(metal.coordinatebond_set.count(), 4)
+
+
     def test_can_handle_zincs_superimposed_onto_each_other(self):
         self.mock_codes.return_value = ["1ZEH"]
         main(json=False)
@@ -183,7 +202,6 @@ class DatabaseBuildingTests(DjangoTest):
         )
         res = site.residue_set.get(residue_pdb_identifier=94)
         self.assertEqual(res.atom_set.count(), 10)
-        self.assertEqual(res.atom_set.filter(liganding=True).count(), 1)
         self.assertEqual(pdb.chain_set.count(), 1)
         chain = pdb.chain_set.first()
         self.assertEqual(chain.chain_pdb_identifier, "A")

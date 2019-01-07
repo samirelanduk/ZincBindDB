@@ -257,6 +257,8 @@ class ZincSite(models.Model):
     def coordination(self):
         """Returns the number of liganding atoms in the site."""
 
+        return [m.coordination for m in self.metal_set.all()]
+
         return Atom.objects.filter(residue__site=self, liganding=True).count()
 
 
@@ -317,6 +319,11 @@ class Metal(models.Model):
         f"{self.residue_pdb_identifier}{self.insertion_pdb_identifier}")
 
 
+    @property
+    def coordination(self):
+        return len(self.coordinatebond_set.all())
+
+
 
 class Residue(models.Model):
     "A collection of atoms, usually in a row on a chain."
@@ -334,7 +341,7 @@ class Residue(models.Model):
 
 
     @staticmethod
-    def create_from_atomium(residue, chain, site):
+    def create_from_atomium(residue, chain, site, atom_dict):
         """Creates a residue record from an atomium Residue object and existing
         ZincSite and Chain records. You must specify the residue number."""
 
@@ -355,7 +362,7 @@ class Residue(models.Model):
          name=residue.name, chain=chain, site=site,
         )
         for atom in residue.atoms():
-            Atom.create_from_atomium(atom, residue_record)
+            atom_dict[atom.id] = Atom.create_from_atomium(atom, residue_record)
         return residue_record
 
 
@@ -410,7 +417,6 @@ class Atom(models.Model):
     y = models.FloatField()
     z = models.FloatField()
     element = models.CharField(max_length=8)
-    liganding = models.BooleanField()
     residue = models.ForeignKey(Residue, on_delete=models.CASCADE)
 
 
@@ -419,5 +425,28 @@ class Atom(models.Model):
         return Atom.objects.create(
          atom_pdb_identifier=atom.id,
          name=atom.name, x=atom.x, y=atom.y, z=atom.z,
-         element=atom.element, residue=residue, liganding=atom._flag
+         element=atom.element, residue=residue
         )
+
+
+    @property
+    def ngl_sele(self):
+        """The NGL selector text needed to select the atom."""
+
+        return (f"{self.residue.residue_pdb_identifier}^" +
+        f"{self.residue.insertion_pdb_identifier}:{self.residue.chain.chain_pdb_identifier}/0 and .{self.name}")
+
+
+
+class CoordinateBond(models.Model):
+
+    class Meta:
+        db_table = "bonds"
+
+    metal = models.ForeignKey(Metal, on_delete=models.CASCADE)
+    atom = models.ForeignKey(Atom, on_delete=models.CASCADE)
+    site = models.ForeignKey(ZincSite, on_delete=models.CASCADE)
+
+    @property
+    def ngl_sele(self):
+        return f"['({self.metal.ngl_sele})', '({self.atom.ngl_sele})']"

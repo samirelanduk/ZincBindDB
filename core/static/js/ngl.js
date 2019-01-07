@@ -1,4 +1,4 @@
-function drawNgl(code, assembly, metals, residues, individual_residues, zoom) {
+function drawNgl(code, assembly, metals, residues, bonds, zoom) {
     // Make a stage
     stage = new NGL.Stage("ngl-container", {backgroundColor: "#ffffff"});
 
@@ -33,10 +33,8 @@ function drawNgl(code, assembly, metals, residues, individual_residues, zoom) {
         }
 
         // Add distance lines where appropriate
-        for (var r = 0; r < individual_residues.length; r++) {
-            var selector = individual_residues[r] + " or " + metals;
-            component.addRepresentation("contact", {sele: selector, assembly: stage.assembly});
-        }
+        component.addRepresentation("distance", {atomPair: bonds, labelVisible: false, color: "skyblue", assembly: stage.assembly});
+
 
         // Store the representations
         stage.metals = metals;

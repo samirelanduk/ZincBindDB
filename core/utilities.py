@@ -10,6 +10,7 @@ from itertools import combinations
 from atomium.structures import Chain, Residue
 from django.core.management import call_command
 from core.models import Pdb
+from pprint import pprint
 
 CODES = CODES.copy()
 CODES["HOH"] = "w"
@@ -91,10 +92,10 @@ def cluster_zincs_with_residues(metals):
     metals = remove_duplicate_atoms(metals)
     metals = {metal: [] for metal in metals}
     for metal in metals:
-        metals[metal] = get_atom_binding_residues(metal)
+        metals[metal] = get_atom_liganding_atoms(metal)
     clusters = merge_metal_groups(metals)
     aggregate_clusters(clusters)
-    return [c for c in clusters if "ZN" in [a.element for a in c["metals"]]]
+    return [c for c in clusters if "ZN" in [a.element for a in c["metals"].keys()]]
 
 
 def remove_duplicate_atoms(atoms):
@@ -113,7 +114,7 @@ def remove_duplicate_atoms(atoms):
     return new_set
 
 
-def get_atom_binding_residues(metal):
+def get_atom_liganding_atoms(metal):
     """Takes an atom and gets all residues within 3Å - including ligands.
     In the case of zinc atoms, it will only use nitrogen, oxygen or sulphur
     atoms. For other atoms it will take everything except carbons.
@@ -122,16 +123,16 @@ def get_atom_binding_residues(metal):
 
     kwargs = {"cutoff": 3, "is_metal": False}
     nearby_atoms = [a for a in metal.nearby_atoms(**kwargs) if a.element not in "CH"]
-    nearby_residues = set([a.structure for a in nearby_atoms])
-    nearby_residues = remove_duplicate_residues(nearby_residues)
-    for residue in nearby_residues:
-        liganding = [a for a in residue.atoms() if a in nearby_atoms]
-        liganding = sorted(liganding, key=lambda a: a.distance_to(metal))
-        if liganding:
-            liganding = [liganding[0]] + [a for a in liganding[1:] if metal.angle(liganding[0], a) > math.pi / 4]
-        for atom in residue.atoms(): atom._flag = False
-        for atom in liganding: atom._flag = True
-    return nearby_residues
+    nearby_atoms = remove_duplicate_atoms(nearby_atoms)
+    nearby_atoms = sorted(nearby_atoms, key=lambda a: a.distance_to(metal))
+    liganding = []
+    for atom in nearby_atoms:
+        for ligand in liganding:
+            if metal.angle(atom, ligand) < math.pi / 4:
+                break
+        else:
+            liganding.append(atom)
+    return liganding
 
 
 def remove_duplicate_residues(residues):
@@ -151,54 +152,33 @@ def merge_metal_groups(metals):
     object with metals and residues. Two metals and their residues will be
     merged together if they share residues."""
 
-    clusters = [{"metals": {metal}, "residues": residues, "count": 1}
-     for metal, residues in metals.items()]
+    clusters = [{"metals": {metal: atoms}, "count": 1} for metal, atoms in metals.items()]
     while not check_clusters_have_unique_residues(clusters):
         for cluster1, cluster2 in combinations(clusters, 2):
-            if cluster1["residues"].intersection(cluster2["residues"]):
+            if get_cluster_residues(cluster1).intersection(get_cluster_residues(cluster2)):
                 cluster1["metals"].update(cluster2["metals"])
-                cluster1["residues"].update(cluster2["residues"])
                 clusters.remove(cluster2)
                 break
     return clusters
 
 
 def check_clusters_have_unique_residues(clusters):
-    """Takes a list of clusters and returns True if they don't share any
-    residues in common."""
+    residues = set()
+    all_residues = []
+    for cluster in clusters:
+        cluster_residues = get_cluster_residues(cluster)
+        for res in cluster_residues:
+            residues.add(res)
+            all_residues.append(res)
+    return len(residues) == len(all_residues)
 
-    residue_count = sum([len(cluster["residues"]) for cluster in clusters])
-    unique_residue_count = len(set.union(
-     *[cluster["residues"] for cluster in clusters]
-    ))
-    return residue_count == unique_residue_count
 
-
-def remove_duplicates_from_cluster(cluster):
-    """Takes a cluster representing a binding site, and removes a metal if its
-    ID is duplicated in the cluster."""
-
-    identifiers = set([m.id for m in cluster["metals"]])
-    new_metals = set()
-    for id_ in identifiers:
-        for metal in cluster["metals"]:
-            if metal.id == id_:
-                new_metals.add(metal)
-                break
-    cluster["metals"] = new_metals
-    new_residues, potential_residues = set(), set()
-    for residue in cluster["residues"]:
-        if len(residue.atoms()) > 1:
-            new_residues.add(residue)
-        else:
-            potential_residues.add(residue)
-    locations = set([(r.atom().location) for r in potential_residues])
-    for loc in locations:
-        for residue in potential_residues:
-            if residue.atom().location == loc:
-                new_residues.add(residue)
-                break
-    cluster["residues"] = new_residues
+def get_cluster_residues(cluster):
+    cluster_residues = set()
+    for atoms in cluster["metals"].values():
+        for atom in atoms:
+            cluster_residues.add(atom.structure)
+    return cluster_residues
 
 
 def aggregate_clusters(clusters):
@@ -207,8 +187,8 @@ def aggregate_clusters(clusters):
 
     while not check_clusters_have_unique_sites(clusters):
         for cluster1, cluster2 in combinations(clusters, 2):
-            if set([m.id for m in cluster1["metals"]]) ==\
-             set([m.id for m in cluster2["metals"]]):
+            if set([m.id for m in cluster1["metals"].keys()]) ==\
+             set([m.id for m in cluster2["metals"].keys()]):
                 cluster1["count"] += 1
                 clusters.remove(cluster2)
                 break
@@ -219,7 +199,7 @@ def check_clusters_have_unique_sites(clusters):
     sites."""
 
     cluster_ids = [frozenset([
-     m.id for m in cluster["metals"]
+     m.id for m in cluster["metals"].keys()
     ]) for cluster in clusters]
     unique_ids = set(cluster_ids)
     return len(cluster_ids) == len(unique_ids)
@@ -228,20 +208,20 @@ def check_clusters_have_unique_sites(clusters):
 def create_chains_dict(clusters):
     chains = {}
     for cluster in clusters:
-        for o in cluster["residues"]:
+        for o in get_cluster_residues(cluster):
             chains[o.chain.id] = o.chain
     return chains
 
 
 def residue_count(cluster):
-    return len([r for r in cluster["residues"] if isinstance(r, Residue)])
+    return len([r for r in get_cluster_residues(cluster) if isinstance(r, Residue)])
 
 
 def liganding_atom_count(cluster):
-    atoms = []
-    for residue in cluster["residues"]:
-        atoms += [a for a in residue.atoms() if a._flag]
-    return len(atoms)
+    liganding_atoms = []
+    for atoms in cluster["metals"].values():
+        liganding_atoms += atoms
+    return len(liganding_atoms)
 
 
 def create_site_code(residues):

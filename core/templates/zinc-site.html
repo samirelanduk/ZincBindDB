@@ -13,7 +13,7 @@
             <div><a href="/pdbs/{{ site.pdb.id }}/">{{ site.pdb.id }}</a> ({{ site.pdb.title }})</div>
             {% if site.copies > 1 %}<div>({{ site.copies }} copies)</div>{% endif %}
 
-            <h3>Metals{% if site.metal_set.count == 1 %} ({{ site.coordination }} Coordination){% endif %}</h3>
+            <h3>Metals ({{ site.coordination|join:", " }} Coordination)</h3>
             {% for metal in site.metal_set.all %}
             <div class="metal" data-ngl="{{ metal.ngl_sele }}">{{ metal.chain_pdb_identifier }}:{{ metal.residue_pdb_identifier }} ({{ metal.element }})</div>
             {% endfor %}
@@ -54,5 +54,15 @@
 {% block endjs %}
     <script src="/static/js/ngl-source.js"></script>
     <script src="/static/js/ngl.js"></script>
-    <script>drawNgl("{{ site.pdb.id }}", "{{ site.pdb.assembly }}", "{{ site.ngl_metals_sele }}", "{{ site.ngl_residues_sele }}", [{% for residue in site.residue_set.all %}"{{ residue.ngl_side_chain_sele }}", {% endfor %}], true); setUpControls();</script>
+    <script>
+        var bonds = [];
+        {% for bond in site.coordinatebond_set.all %}
+        bond = [];
+        bond.push("{{ bond.metal.ngl_sele }}")
+        bond.push("{{ bond.atom.ngl_sele }}")
+        bonds.push(bond)
+        {% endfor %}
+        drawNgl("{{ site.pdb.id }}", "{{ site.pdb.assembly }}", "{{ site.ngl_metals_sele }}", "{{ site.ngl_residues_sele }}", bonds, true);
+        setUpControls();
+    </script>
 {% endblock %}
