@@ -187,11 +187,15 @@ class Chain(models.Model):
 
 
 
-class ZincSiteCluster(models.Model):
+class Group(models.Model):
     """A collection of equivalent zinc sites."""
 
     class Meta:
-        db_table = "zincsite_clusters"
+        db_table = "groups"
+
+    code = models.CharField(max_length=128)
+    keywords = models.CharField(max_length=1024)
+    classifications = models.CharField(max_length=1024)
 
 
 
@@ -205,8 +209,8 @@ class ZincSite(models.Model):
     pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
     code = models.CharField(max_length=128)
     copies = models.IntegerField()
-    cluster = models.ForeignKey(
-     ZincSiteCluster, on_delete=models.SET_NULL, null=True, blank=True
+    group = models.ForeignKey(
+     Group, on_delete=models.SET_NULL, null=True, blank=True
     )
     representative = models.BooleanField(default=False)
 
@@ -216,8 +220,8 @@ class ZincSite(models.Model):
         """Returns other ZincSites in this cluster, or None if there aren't
         any."""
 
-        if self.cluster:
-            return self.cluster.zincsite_set.exclude(id=self.id)
+        if self.group:
+            return self.group.zincsite_set.exclude(id=self.id)
 
 
     @property

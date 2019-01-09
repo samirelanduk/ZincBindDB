@@ -17,7 +17,7 @@ def home(request):
     """Returns the home page, along with some object counts."""
 
     return render(request, "home.html", {"counts": [
-     ZincSiteCluster.objects.count(),
+     Group.objects.count(),
      ZincSite.objects.count(),
      Pdb.objects.count()
     ]})
@@ -53,10 +53,17 @@ def search(request):
 
 
 def pdb(request, code):
-    """Returns a particular Pdb"s page."""
+    """Returns a particular Pdb's page."""
 
     pdb = get_object_or_404(Pdb, id=code)
     return render(request, "pdb.html", {"pdb": pdb})
+
+
+def group(request, pk):
+    """Returns a particular Group's page."""
+
+    group = get_object_or_404(Group, id=pk)
+    return render(request, "group.html", {"group": group})
 
 
 def zinc_site(request, pk):
@@ -72,7 +79,7 @@ def api(request):
      "residue": Residue.objects.last(),
      "atom": Atom.objects.last(),
      "chain_cluster": ChainCluster.objects.first(),
-     "site_cluster": ZincSiteCluster.objects.first()
+     "site_cluster": Group.objects.first()
     })
 
 
@@ -86,7 +93,7 @@ def api_object(request, type, pk):
      "atoms": AtomSerializer,
      "chains": ChainSerializer,
      "chain-clusters": ChainClusterSerializer,
-     "site-clusters": ZincSiteClusterSerializer,
+     "site-clusters": GroupSerializer,
     }
     obj = get_object_or_404(lookup[type].Meta.model, id=pk)
     return Response(lookup[type](obj).data)
@@ -117,9 +124,9 @@ class ZincSiteViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 
-class ZincSiteClusterViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = ZincSiteCluster.objects.all()
-    serializer_class = ZincSiteClusterSerializer
+class GroupViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
 
 
 class ChainClusterViewSet(viewsets.ReadOnlyModelViewSet):

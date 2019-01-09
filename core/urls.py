@@ -6,7 +6,7 @@ urlpatterns = [
  path(r"api/pdbs/", core_views.PdbViewSet.as_view({"get": "list"})),
  path(r"api/sites/", core_views.ZincSiteViewSet.as_view({"get": "list"})),
  path(r"api/chain-clusters/", core_views.ChainClusterViewSet.as_view({"get": "list"})),
- path(r"api/site-clusters/", core_views.ZincSiteClusterViewSet.as_view({"get": "list"})),
+ path(r"api/groups/", core_views.GroupViewSet.as_view({"get": "list"})),
  path(r"api/search", core_views.PdbSearchResults.as_view({"get": "list"})),
  path(r"api/search/", core_views.PdbSearchResults.as_view({"get": "list"})),
  path(r"api/", core_views.api),
@@ -18,6 +18,7 @@ urlpatterns = [
  path(r"help/", core_views.help),
  path(r"changelog/", core_views.changelog),
  path(r"pdbs/<slug:code>/", core_views.pdb),
+ path(r"groups/<slug:pk>/", core_views.group),
  path(r"<slug:pk>/", core_views.zinc_site),
  path(r"", core_views.home),
 ]

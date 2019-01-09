@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}ZincSite Group{% endblock %}
+
+{% block main %}
+<div class="non-grid-column-container">
+    <h1>ZincSite Group</h1>
+
+    <div class="grid-2">
+        <div class="box" id="site-info">
+            <h3>Code</h3>
+            <div>{{ group.code }}</div>
+
+            <h3>Classifications</h3>
+            <div>{{ group.classifications }}</div>
+
+            <h3>Keywords</h3>
+            <div>{{ group.keywords }}</div>
+        </div>
+
+        <div id="pdb-sites">
+            <div class="scrollable box">
+
+                <div class="pdb-sites-count">{{ group.zincsite_set.count }} site{{ group.zincsite_set.count|pluralize }}.</div>
+                <div class="pdb-sites-list">
+                    {% for site in group.zincsite_set.all %}
+                    {% include "zinc-site-summary.html" %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

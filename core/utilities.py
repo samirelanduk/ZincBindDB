@@ -229,6 +229,18 @@ def create_site_code(residues):
     return "".join([f"{code}{codes.count(code)}" for code in sorted(set(codes))])
 
 
+def get_group_information(sites):
+    pdbs = [site.pdb for site in sites]
+    classifications = set()
+    keywords = pdbs[0].keywords.split(", ")
+    for pdb in pdbs:
+        classifications.add(pdb.classification)
+        for key in keywords:
+            if key not in pdb.keywords:
+                keywords.remove(key)
+    return ", ".join(keywords) or "Unknown", ", ".join(classifications) or "Unknown"
+
+
 def dump_db_to_json():
     with open("data/zinc.json", "w") as f:
         sysout, sys.stdout = sys.stdout, f

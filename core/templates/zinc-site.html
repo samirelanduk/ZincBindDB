@@ -27,6 +27,7 @@
         <div id="pdb-sites">
             <div class="scrollable box">
                 {% if site.equivalent_sites %}
+                <div><a href="/groups/{{ site.group.id }}/">Group</a></div>
                 <div class="pdb-sites-count">{{ site.equivalent_sites.count }} equivalent site{{ site.equivalent_sites.count|pluralize }}.</div>
                 <div class="pdb-sites-list">
                     {% for other_site in site.equivalent_sites %}

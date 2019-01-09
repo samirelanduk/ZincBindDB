@@ -12,6 +12,7 @@ from django.db.models import F
 import subprocess
 import re
 from core.models import *
+from core.utilities import get_group_information
 from tqdm import tqdm
 print("")
 
@@ -28,7 +29,7 @@ if not out:
 try:
     print("Removing previous clusters from database...")
     ChainCluster.objects.all().delete()
-    ZincSiteCluster.objects.all().delete()
+    Group.objects.all().delete()
 
     print("Creating FASTA file with {} chains...".format(Chain.objects.count()))
     lines = []
@@ -87,9 +88,12 @@ try:
     print("Writing ZincSite clusters to database...")
     with transaction.atomic():
         for index, fingerprint in enumerate(tqdm(unique_sites)):
-            cluster = ZincSiteCluster.objects.create()
+            keywords, classifications = get_group_information(unique_sites[fingerprint])
+            group = Group.objects.create(
+             code=unique_sites[fingerprint][0].code, keywords=keywords, classifications=classifications
+            )
             for site in unique_sites[fingerprint]:
-                site.cluster = cluster
+                site.group = group
                 site.save()
             if unique_sites[fingerprint]:
                 best_site = sorted(unique_sites[fingerprint],

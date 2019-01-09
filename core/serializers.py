@@ -56,12 +56,12 @@ class ZincSiteSerializer(serializers.ModelSerializer):
 
 
 
-class ZincSiteClusterSerializer(serializers.ModelSerializer):
+class GroupSerializer(serializers.ModelSerializer):
 
     zincsites = ZincSiteSerializer(source="zincsite_set", many=True)
 
     class Meta:
-        model = ZincSiteCluster
+        model = Group
         exclude = ()
 
 
