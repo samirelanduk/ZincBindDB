@@ -193,9 +193,18 @@ class Group(models.Model):
     class Meta:
         db_table = "groups"
 
-    code = models.CharField(max_length=128)
+    family = models.CharField(max_length=128)
     keywords = models.CharField(max_length=1024)
     classifications = models.CharField(max_length=1024)
+
+    @property
+    def keywords_list(self):
+        return self.keywords.split(", ")
+
+
+    @property
+    def classifications_list(self):
+        return self.classifications.split(", ")
 
 
 
@@ -207,7 +216,7 @@ class ZincSite(models.Model):
 
     id = models.CharField(primary_key=True, max_length=128)
     pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
-    code = models.CharField(max_length=128)
+    family = models.CharField(max_length=128)
     copies = models.IntegerField()
     group = models.ForeignKey(
      Group, on_delete=models.SET_NULL, null=True, blank=True

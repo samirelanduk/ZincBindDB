@@ -12,6 +12,7 @@ urlpatterns = [
  path(r"api/", core_views.api),
  path(r"search", core_views.search),
  path(r"search/", core_views.search),
+ path(r"families/", core_views.families),
  path(r"data/", core_views.data),
  path(r"data/all/", core_views.all_data),
  path(r"about/", core_views.about),

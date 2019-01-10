@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Families{% endblock %}
+
+{% block main %}
+<div class="non-grid-column-container">
+    <h1>All ZincSite Families</h1>
+
+	<div class="box">
+		<div class="families">
+			{% for family in families %}
+			<div class="family" onclick="$(this).next().slideToggle('swing')">{{ family.0 }} ({{ family.1|length }} groups)</div>
+			<div class="groups-container">
+				<div class="groups">
+					{% for group in family.1 %}
+					<a href="/groups/{{ group.id }}/" class="group">
+						<div class="keyword">{{ group.keywords_list.0 }}</div>
+                        <div class="classifications">{{ group.classifications }}</div>
+					</a>
+					{% endfor %}
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+</div>
+
+
+
+{% endblock %}

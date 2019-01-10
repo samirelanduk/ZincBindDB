@@ -73,6 +73,21 @@ def zinc_site(request, pk):
     return render(request, "zinc-site.html", {"site": site})
 
 
+def families(request):
+    """"""
+
+    families = {}
+    for group in Group.objects.all():
+        try:
+            families[group.family].append(group)
+        except: families[group.family] = [group]
+    families = reversed(sorted(families.items(), key=lambda f: len(f[1])))
+    families = [list(f) for f in families]
+    for family in families:
+        family[1] = list(reversed(sorted(family[1], key=lambda g: g.zincsite_set.count())))
+    return render(request, "families.html", {"families": families})
+
+
 def api(request):
     return render(request, "api.html", {
      "metal": Metal.objects.last(),
@@ -179,7 +194,7 @@ def data(request):
     technique_counts = ZincSite.property_counts(sites, "technique", 3)
     species_counts = ZincSite.property_counts(sites, "organism", 6)
     class_counts = ZincSite.property_counts(sites, "classification", 6)
-    code_counts = ZincSite.property_counts(sites, "code", 10, unique=True)
+    family_counts = ZincSite.property_counts(sites, "family", 10, unique=True)
     resolutions = [["<1.5Å ", "1.5-2.0Å", "2.0-2.5Å", "2.5-3.0Å", "3.0Å+", "None"], [
      sites.filter(resolution__lt=1.5).count(),
      sites.filter(resolution__lt=2.0, resolution__gte=1.5).count(),
@@ -189,7 +204,7 @@ def data(request):
      sites.filter(resolution=None).count(),
     ]]
     return render(request, "data.html", {
-     "bar_data": [residue_counts, technique_counts, species_counts, class_counts, code_counts, resolutions]
+     "bar_data": [residue_counts, technique_counts, species_counts, class_counts, family_counts, resolutions]
     })
 
 

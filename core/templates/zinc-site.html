@@ -18,7 +18,7 @@
             <div class="metal" data-ngl="{{ metal.ngl_sele }}">{{ metal.chain_pdb_identifier }}:{{ metal.residue_pdb_identifier }} ({{ metal.element }})</div>
             {% endfor %}
 
-            <h3>Liganding Residues ({{ site.code }})</h3>
+            <h3>Liganding Residues ({{ site.family }})</h3>
             {% for residue in site.residue_set.all %}
             <div class="residue" data-ngl="{{ residue.ngl_side_chain_sele }}">{{ residue.atomium_id }} ({{ residue.name }})</div>
             {% endfor %}

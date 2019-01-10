@@ -9,6 +9,8 @@
     <div class="box about-box">
         <p>The full list of Zinc Binding Sites can be browsed
         <a href="/data/all/">here</a>.</p>
+        <p>They can also be browsed by Family and Group
+        <a href="/families/">here</a>.</p>
         <p>See the <a href="/api/">REST API</a> for programmatic access to the data.</p>
 
         <form id="download-json" method="POST">
@@ -46,7 +48,7 @@
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script>
     var divs = ["residue-chart", "technique-chart", "species-chart", "classification-chart", "codes-chart", "resolution-chart"];
-    var titles = ["Residues", "Techniques", "Species", "Classifications", "Residue Codes", "Resolution"];
+    var titles = ["Residues", "Techniques", "Species", "Classifications", "Families", "Resolution"];
     var colors = ["#4A9586", "#2980b9", "#e67e22", "#8e44ad", "#2c3e50", "#e74c3c"];
     </script>
     {% for data in bar_data %}

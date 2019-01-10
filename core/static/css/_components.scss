@@ -453,7 +453,6 @@ div.search-head {
 
 }
 
-
 #site-info {
 
 	.metal, .residue {
@@ -471,6 +470,71 @@ div.search-head {
     }
 }
 
+.families {
+	border: 1px solid #e6ecf0;
+	border-radius: $curvature;
+
+	.family {
+		padding: $gap;
+		border-top: 1px solid #e6ecf0;
+		cursor: pointer;
+		background-color: lighten($purple, 75);
+	}
+
+	.family:first-child {
+		border-top: none;
+        border-top-left-radius: $curvature;
+        border-top-right-radius: $curvature;
+	}
+
+    .family:nth-last-child(2) {
+        border-bottom-left-radius: $curvature;
+        border-bottom-right-radius: $curvature;
+    }
+
+	.groups-container {
+		display: none;
+		border-top: 1px solid #e6ecf0;
+
+		.groups {
+			box-shadow: inset 0px 11px 15px -10px #DDD,
+			inset 0px -11px 15px -10px #DDD,
+			inset 11px 0px 15px -10px #DDD,
+			inset -11px 0px 15px -10px #DDD;
+			display: grid;
+			grid-template-columns: 1fr;
+			grid-gap: 1px;
+			background-color: #eee;
+            font-size: 0.75em;
+
+			.group {
+				padding: $gap;
+				background-color: #ffffff00;
+				text-align: center;
+				background-color: white;
+                color: inherit;
+                box-shadow: 0 0 2px rgba(0, 0, 0, 0.1) inset;
+                display: flex;
+                justify-content: center;
+                flex-direction: column;
+
+                div {
+                    background-color: #ffffff00;
+                    cursor: pointer;
+                }
+
+                .classifications {
+                    font-size: 0.8em;
+                }
+			}
+
+            .group:hover {
+                background-image: radial-gradient($hover-color, $hover-color);
+                transition: 0.5s;
+            }
+		}
+	}
+}
 
 #home-1 {
     background-color: $pale-purple;
@@ -650,6 +714,29 @@ div.search-head {
             margin-bottom: 4 * $gap;
         }
     }
+
+    .families {
+
+    	.family {
+
+    	}
+
+    	.family:first-child {
+
+    	}
+
+    	.groups-container {
+
+
+    		.groups {
+    			grid-template-columns: 1fr 1fr;
+
+    			.group {
+
+    			}
+    		}
+    	}
+    }
 }
 
 
@@ -722,6 +809,29 @@ div.search-head {
 	.thanks-grid-5 {
 		grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
 	}
+
+    .families {
+
+    	.family {
+
+    	}
+
+    	.family:first-child {
+
+    	}
+
+    	.groups-container {
+
+
+    		.groups {
+    			grid-template-columns: 1fr 1fr 1fr 1fr;
+
+    			.group {
+
+    			}
+    		}
+    	}
+    }
 }
 
 @mixin components--desktop() {
