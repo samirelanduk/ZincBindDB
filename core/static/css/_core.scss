@@ -109,6 +109,23 @@ input[type=submit], button {
     width: 100%;
 }
 
+.sequence {
+	font-family: monospace;
+	white-space: pre;
+	color: lighten($black, 20);
+	overflow-y: scroll;
+
+	span {
+		font-family: monospace;
+		white-space: pre;
+	}
+
+	.binding {
+		color: $black;
+		font-weight: bold;
+	}
+}
+
 
 @mixin core--tablet() {
 	.box {

@@ -167,13 +167,13 @@ class Chain(models.Model):
     )
 
     @staticmethod
-    def create_from_atomium(chain, pdb):
+    def create_from_atomium(chain, pdb, sequence):
         """Creates a chain record from an atomium Chain object and an existing
         Pdb record."""
 
         return Chain.objects.create(
          id=f"{pdb.id}{chain.id}", pdb=pdb,
-         sequence=chain.sequence, chain_pdb_identifier=chain.id
+         sequence=sequence, chain_pdb_identifier=chain.id
         )
 
 
@@ -272,7 +272,14 @@ class ZincSite(models.Model):
 
         return [m.coordination for m in self.metal_set.all()]
 
-        return Atom.objects.filter(residue__site=self, liganding=True).count()
+
+    @property
+    def chains(self):
+        """Returns the chains associated with this site."""
+
+        chains = Chain.objects.filter(pdb=self.pdb)
+        print(chains)
+        return [chain for chain in chains if self in chain.zincsites]
 
 
 

@@ -55,7 +55,9 @@ def main(json=True):
             # Create chain records
             chains = create_chains_dict(clusters)
             for chain_id, chain in chains.items():
-                chains[chain_id] = Chain.create_from_atomium(chain, pdb_record)
+                chains[chain_id] = Chain.create_from_atomium(
+                 chain, pdb_record, get_chain_sequence(chain, clusters)
+                )
 
             # Create binding site from each cluster
             for index, cluster in enumerate(clusters, start=1):

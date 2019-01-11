@@ -46,6 +46,13 @@
 
     {% include "ngl-pdb.html" %}
 
+    <div class="site-chains box">
+        {% for chain in site.chains %}
+        <h3>Chain {{ chain.chain_pdb_identifier }}</h3>
+        <div class="sequence">{{ chain.sequence }}</div>
+        {% endfor %}
+    </div>
+
     {% with site.pdb as pdb %}
     {% include "pdb-info.html" %}
     {% endwith %}

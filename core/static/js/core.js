@@ -19,6 +19,19 @@ $(document).ready(function() {
             });
         }
     });
+
+    $(".sequence").each(function() {
+        var s = "";
+        for (var i = 0; i < this.innerHTML.length; i++) {
+            char = this.innerHTML[i];
+            if (char == char.toUpperCase()) {
+                s = s + "<span class='binding'>" + char + "</span>";
+            } else {
+                s = s + "<span>" + char + "</span>";
+            }
+        }
+        this.innerHTML = s;
+    })
 });
 
 
