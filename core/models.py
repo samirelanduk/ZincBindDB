@@ -165,14 +165,17 @@ class Chain(models.Model):
     cluster = models.ForeignKey(
      ChainCluster, on_delete=models.SET_NULL, null=True, blank=True
     )
+    spacers = models.CharField(max_length=128, blank=True, null=True)
+
 
     @staticmethod
     def create_from_atomium(chain, pdb, sequence):
         """Creates a chain record from an atomium Chain object and an existing
         Pdb record."""
 
+        from .utilities import get_spacers
         return Chain.objects.create(
-         id=f"{pdb.id}{chain.id}", pdb=pdb,
+         id=f"{pdb.id}{chain.id}", pdb=pdb, spacers=get_spacers(sequence),
          sequence=sequence, chain_pdb_identifier=chain.id
         )
 

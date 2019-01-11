@@ -27,6 +27,11 @@ h2 {
 h3 {
 	font-size: 1.4em;
 	@include margin-vert($gap);
+
+    span {
+        font-size: 0.6em;
+        margin-left: $gap;
+    }
 }
 
 p {
@@ -114,6 +119,7 @@ input[type=submit], button {
 	white-space: pre;
 	color: lighten($black, 20);
 	overflow-y: scroll;
+    padding-bottom: 2 * $gap;
 
 	span {
 		font-family: monospace;

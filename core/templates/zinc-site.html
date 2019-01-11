@@ -48,7 +48,8 @@
 
     <div class="site-chains box">
         {% for chain in site.chains %}
-        <h3>Chain {{ chain.chain_pdb_identifier }}</h3>
+        <h3>Chain {{ chain.chain_pdb_identifier }}{% if chain.spacers %} <span>Spacers: {{ chain.spacers }}</span>{% endif %}</h3>
+
         <div class="sequence">{{ chain.sequence }}</div>
         {% endfor %}
     </div>

@@ -336,6 +336,18 @@ def get_group_information(sites):
     return ", ".join(keywords), ", ".join(classifications)
 
 
+def get_spacers(sequence):
+    spacers = []
+    count = None
+    for char in sequence:
+        if count is not None: count += 1
+        if char.istitle():
+            if count is not None: spacers.append(str(count - 1))
+            count = 0
+    return ", ".join(spacers)
+
+
+
 def dump_db_to_json():
     with open("data/zinc.json", "w") as f:
         sysout, sys.stdout = sys.stdout, f
