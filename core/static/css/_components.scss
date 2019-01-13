@@ -448,6 +448,8 @@ div.search-head {
         font-size: 0.9em;
         text-align: center;
         font-style: italic;
+		color: $hyperlink-blue;
+		cursor: pointer;
     }
 
 
@@ -787,11 +789,8 @@ div.search-head {
 
         .info {
             position: absolute;
-            background-color: #ffffff;
-            border: 1px solid black;
             bottom: $gap * 0.6;
-            right: $gap * 0.6;
-            font-size: 0.6em;
+            right: $gap;
         }
     }
 

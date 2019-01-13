@@ -33,5 +33,14 @@
             </select></form>
         </div>
     </div>
-    <div class="info">Double click protein for full-screen</div>
+    <div class="info">Download image</div>
+    <script>
+    $(".info").click(function() {
+        stage.makeImage({
+            factor: 2, antialias: false, trim: false, transparent: false
+        }).then(function(blob) {
+            NGL.download(blob, $("title")[0].innerHTML.split(" ")[0] + ".png");
+        });
+    })
+    </script>
 </div>
