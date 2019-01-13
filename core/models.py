@@ -114,6 +114,13 @@ class Pdb(models.Model):
 
 
     @property
+    def chains(self):
+        all_chains = Chain.objects.filter(site__pdb=self)
+        ids = set([c.chain_pdb_identifier for c in all_chains])
+        return [all_chains.filter(chain_pdb_identifier=id).first() for id in sorted(ids)]
+
+
+    @property
     def residues(self):
         """Gets all the residue objects that provide liganding atoms that belong
         to this Pdb."""
@@ -140,53 +147,6 @@ class Pdb(models.Model):
         """The NGL selector text needed to grab all binding residues."""
 
         return " or ".join([res.ngl_side_chain_sele for res in self.residues])
-
-
-
-class ChainCluster(models.Model):
-    """A collection of chains with similar sequence."""
-
-    class Meta:
-        db_table = "chain_clusters"
-
-
-
-class Chain(models.Model):
-    """A chain of residues in a PDB."""
-
-    class Meta:
-        db_table = "chains"
-        ordering = ["id"]
-
-    id = models.CharField(primary_key=True, max_length=128)
-    chain_pdb_identifier = models.CharField(max_length=128)
-    sequence = models.TextField()
-    pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
-    cluster = models.ForeignKey(
-     ChainCluster, on_delete=models.SET_NULL, null=True, blank=True
-    )
-    spacers = models.CharField(max_length=128, blank=True, null=True)
-
-
-    @staticmethod
-    def create_from_atomium(chain, pdb, sequence):
-        """Creates a chain record from an atomium Chain object and an existing
-        Pdb record."""
-
-        from .utilities import get_spacers
-        return Chain.objects.create(
-         id=f"{pdb.id}{chain.id}", pdb=pdb, spacers=get_spacers(sequence),
-         sequence=sequence, chain_pdb_identifier=chain.id
-        )
-
-
-    @property
-    def zincsites(self):
-        """Returns all the ZincSite objects that have residues in this chain."""
-
-        residues = self.residue_set.all()
-        sites = set(res.site for res in residues)
-        return sites
 
 
 
@@ -218,13 +178,13 @@ class ZincSite(models.Model):
         db_table = "zinc_sites"
 
     id = models.CharField(primary_key=True, max_length=128)
-    pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
     family = models.CharField(max_length=128)
     copies = models.IntegerField()
+    representative = models.BooleanField(default=False)
     group = models.ForeignKey(
      Group, on_delete=models.SET_NULL, null=True, blank=True
     )
-    representative = models.BooleanField(default=False)
+    pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
 
 
     @property
@@ -234,6 +194,11 @@ class ZincSite(models.Model):
 
         if self.group:
             return self.group.zincsite_set.exclude(id=self.id)
+
+
+    @property
+    def coordinatebonds(self):
+        return CoordinateBond.objects.filter(metal__site=self)
 
 
     @property
@@ -283,6 +248,53 @@ class ZincSite(models.Model):
         chains = Chain.objects.filter(pdb=self.pdb)
         print(chains)
         return [chain for chain in chains if self in chain.zincsites]
+
+
+
+class ChainCluster(models.Model):
+    """A collection of chains with similar sequence."""
+
+    class Meta:
+        db_table = "chain_clusters"
+
+
+
+class Chain(models.Model):
+    """A chain of residues in a PDB."""
+
+    class Meta:
+        db_table = "chains"
+        ordering = ["id"]
+
+    chain_pdb_identifier = models.CharField(max_length=128)
+    site_sequence = models.TextField()
+    sequence = models.TextField()
+    spacers = models.CharField(max_length=128, blank=True, null=True)
+    site_spacers = models.CharField(max_length=128, blank=True, null=True)
+    site = models.ForeignKey(ZincSite, on_delete=models.CASCADE)
+    cluster = models.ForeignKey(
+     ChainCluster, on_delete=models.SET_NULL, null=True, blank=True
+    )
+
+
+    @staticmethod
+    def create_from_atomium(chain, site, sequence, site_sequence):
+        """Creates a chain record from an atomium Chain object and an existing
+        Pdb record."""
+
+        from .utilities import get_spacers
+        return Chain.objects.create(
+         site=site, spacers=get_spacers(sequence),
+         sequence=sequence, site_spacers=get_spacers(site_sequence),
+         site_sequence=site_sequence, chain_pdb_identifier=chain.id
+        )
+
+
+    @property
+    def zincsites(self):
+        """Returns all the ZincSite objects that have residues in this chain."""
+
+        return self.site.pdb.zincsite_set.filter(chain__sequence=self.sequence, chain__chain_pdb_identifier=self.chain_pdb_identifier)
 
 
 
@@ -358,9 +370,9 @@ class Residue(models.Model):
     residue_pdb_identifier = models.IntegerField()
     insertion_pdb_identifier = models.CharField(max_length=128)
     name = models.CharField(max_length=128)
-    site = models.ForeignKey(ZincSite, on_delete=models.CASCADE)
-    chain = models.ForeignKey(Chain, on_delete=models.CASCADE)
     chain_signature = models.CharField(max_length=128, blank=True)
+    site = models.ForeignKey(ZincSite, on_delete=models.CASCADE)
+    chain = models.ForeignKey(Chain, blank=True, null=True, on_delete=models.CASCADE)
 
 
     @staticmethod
@@ -475,7 +487,6 @@ class CoordinateBond(models.Model):
 
     metal = models.ForeignKey(Metal, on_delete=models.CASCADE)
     atom = models.ForeignKey(Atom, on_delete=models.CASCADE)
-    site = models.ForeignKey(ZincSite, on_delete=models.CASCADE)
 
     @property
     def ngl_sele(self):

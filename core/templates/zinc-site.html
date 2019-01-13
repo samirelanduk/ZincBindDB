@@ -47,10 +47,10 @@
     {% include "ngl-pdb.html" %}
 
     <div class="site-chains box">
-        {% for chain in site.chains %}
-        <h3>Chain {{ chain.chain_pdb_identifier }}{% if chain.spacers %} <span>Spacers: {{ chain.spacers }}</span>{% endif %}</h3>
+        {% for chain in site.chain_set.all %}
+        <h3>Chain {{ chain.chain_pdb_identifier }}{% if chain.site_spacers %} <span>Spacers: {{ chain.site_spacers }}</span>{% endif %}</h3>
 
-        <div class="sequence">{{ chain.sequence }}</div>
+        <div class="sequence">{{ chain.site_sequence }}</div>
         {% endfor %}
     </div>
 
@@ -65,7 +65,7 @@
     <script src="/static/js/ngl.js"></script>
     <script>
         var bonds = [];
-        {% for bond in site.coordinatebond_set.all %}
+        {% for bond in site.coordinatebonds %}
         bond = [];
         bond.push("{{ bond.metal.ngl_sele }}")
         bond.push("{{ bond.atom.ngl_sele }}")

@@ -230,16 +230,29 @@ def create_site_code(residues):
     return "".join([f"{code}{codes.count(code)}" for code in sorted(set(codes))])
 
 
-def get_chain_sequence(chain, clusters):
+def residues_from_clusters(clusters):
+    all_residues = []
+    for c in clusters:
+        all_residues += get_cluster_residues(c)
+    return all_residues
+
+
+def get_chains_from_residues(residues):
+    chains = set()
+    for res in residues:
+        if isinstance(res, Residue):
+            chains.add(res.chain)
+    return chains
+
+
+def get_chain_sequence(chain, residues):
     full = "".join(res.code for res in chain)
     alignment = align_sequences(full, chain.sequence)
-    residues = []
-    for c in clusters: residues += get_cluster_residues(c)
     seq, indices, dash_count = "", [], 0
     for i, char in enumerate(alignment[0]):
         if char == "-":
             dash_count += 1
-        elif chain[i - dash_count] in residues:
+        elif chain[i - dash_count].id in [r.id for r in residues]:
             indices.append(i)
     for i, char in enumerate(chain.sequence):
         seq += char.upper() if i in indices else char.lower()

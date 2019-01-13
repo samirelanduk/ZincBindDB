@@ -69,7 +69,7 @@ class DatabaseBuildingTests(DjangoTest):
         self.assertEqual(metal.chain_pdb_identifier, "A")
         self.assertIn("no side chain", metal.omission.lower())
         self.assertEqual(pdb.zincsite_set.count(), 0)
-        self.assertEqual(pdb.chain_set.count(), 0)
+        self.assertEqual(len(pdb.chains), 0)
 
 
     def test_can_store_zincs_not_in_assembly(self):
@@ -81,14 +81,13 @@ class DatabaseBuildingTests(DjangoTest):
         self.assertFalse(pdb.skeleton)
         self.assertEqual(pdb.metal_set.count(), 2)
         self.assertEqual(pdb.zincsite_set.count(), 1)
-        self.assertEqual(pdb.chain_set.count(), 1)
+        self.assertEqual(len(pdb.chains), 1)
         used_zinc = pdb.metal_set.filter(omission=None)
         self.assertEqual(used_zinc.count(), 1)
         self.assertEqual(used_zinc.first().atom_pdb_identifier, 11222)
         tossed_zinc = pdb.metal_set.exclude(omission=None)
         self.assertEqual(tossed_zinc.count(), 1)
         self.assertEqual(tossed_zinc.first().atom_pdb_identifier, 11164)
-        self.assertEqual(pdb.chain_set.count(), 1)
 
 
     def test_can_reject_liganding_atoms_with_too_acute_angle(self):
@@ -104,7 +103,7 @@ class DatabaseBuildingTests(DjangoTest):
         self.mock_codes.return_value = ["6A5K"]
         main(json=False)
         pdb = Pdb.objects.get(id="6A5K")
-        multi_site = pdb.zincsite_set.get(code="C9")
+        multi_site = pdb.zincsite_set.get(family="C9")
         self.assertEqual(multi_site.metal_set.count(), 3)
         for metal in multi_site.metal_set.all():
             self.assertEqual(metal.coordinatebond_set.count(), 4)
@@ -202,10 +201,10 @@ class DatabaseBuildingTests(DjangoTest):
         )
         res = site.residue_set.get(residue_pdb_identifier=94)
         self.assertEqual(res.atom_set.count(), 10)
-        self.assertEqual(pdb.chain_set.count(), 1)
-        chain = pdb.chain_set.first()
+        self.assertEqual(len(pdb.chains), 1)
+        chain = pdb.chains[0]
         self.assertEqual(chain.chain_pdb_identifier, "A")
-        self.assertTrue(chain.sequence.startswith("GMSHHWGY"))
+        self.assertTrue(chain.sequence.startswith("gmshhwgy"))
         for res in site.residue_set.all():
             self.assertEqual(res.chain, chain)
 

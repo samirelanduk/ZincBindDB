@@ -34,7 +34,7 @@ try:
     print("Creating FASTA file with {} chains...".format(Chain.objects.count()))
     lines = []
     for chain in Chain.objects.all():
-        lines.append(">lcl|" + chain.id)
+        lines.append(">lcl|" + str(chain.id))
         sequence = chain.sequence
         while sequence:
             lines.append(sequence[:80])
@@ -73,7 +73,7 @@ try:
     )
     for site in tqdm(sites):
         chain_clusters = set([
-         str(res.chain.cluster.id) for res in site.residue_set.all() if res.chain.cluster
+         str(res.chain.cluster.id) for res in site.residue_set.all() if res.chain and res.chain.cluster
         ])
         site.fingerprint = "_".join(sorted(chain_clusters)) + "__" + "_".join(
          [str(res.chain_signature) for res in site.residue_set.exclude(chain_signature="")]

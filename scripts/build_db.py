@@ -15,7 +15,7 @@ from tqdm import tqdm
 
 def main(json=True):
     # Get all PDBs which contain zinc
-    codes = get_zinc_pdb_codes()[:100]
+    codes = get_zinc_pdb_codes()
     print(f"There are {len(codes)} PDBs with zinc")
 
     # Which ones should be processed?
@@ -52,22 +52,16 @@ def main(json=True):
             # Get metal clusters from model
             clusters = cluster_zincs_with_residues(model.atoms(is_metal=True))
 
-            # Create chain records
-            chains = create_chains_dict(clusters)
-            for chain_id, chain in chains.items():
-                chains[chain_id] = Chain.create_from_atomium(
-                 chain, pdb_record, get_chain_sequence(chain, clusters)
-                )
-
-            # Create binding site from each cluster
-            for index, cluster in enumerate(clusters, start=1):
-
+            # Remove unsuitable clusters
+            rejected_clusters = []
+            for cluster in clusters:
                 # Does the cluster have enough residues?
                 if residue_count(cluster) < 2:
                     for metal in cluster["metals"]:
                         Metal.create_from_atomium(metal, pdb_record,
                          omission="Zinc has too few binding residues."
                         )
+                    rejected_clusters.append(cluster)
                     continue
 
                 # Does the cluster have enough liganding atoms?
@@ -76,8 +70,12 @@ def main(json=True):
                         Metal.create_from_atomium(metal, pdb_record,
                          omission="Zinc has too few liganding atoms."
                         )
+                    rejected_clusters.append(cluster)
                     continue
+            for cluster in rejected_clusters: clusters.remove(cluster)
 
+            # Create binding site from each cluster
+            for index, cluster in enumerate(clusters, start=1):
                 # Create site record itself
                 site = ZincSite.objects.create(
                  id=f"{pdb_record.id}-{index}", copies=cluster["count"],
@@ -89,17 +87,26 @@ def main(json=True):
                 for metal in cluster["metals"].keys():
                     metals[metal.id] = Metal.create_from_atomium(metal, pdb_record, site=site)
 
+                # Create chains
+                all_residues = residues_from_clusters(clusters)
+                residues = get_cluster_residues(cluster)
+                chains = get_chains_from_residues(residues)
+                chain_dict = {}
+                for chain in chains:
+                    chain_dict[chain.id] = Chain.create_from_atomium(chain, site, sequence=get_chain_sequence(chain, all_residues), site_sequence=get_chain_sequence(chain, residues))
+
+
                 # Create residue records
                 atom_dict = {}
                 for r in get_cluster_residues(cluster):
-                    chain = chains[r.chain.id]
+                    chain = chain_dict.get(r.chain.id)
                     Residue.create_from_atomium(r, chain, site, atom_dict)
 
                 # Create bond records
                 for metal, atoms in cluster["metals"].items():
                     for atom in atoms:
                         CoordinateBond.objects.create(
-                         metal=metals[metal.id], atom=atom_dict[atom.id], site=site
+                         metal=metals[metal.id], atom=atom_dict[atom.id]
                         )
 
     # JSON?

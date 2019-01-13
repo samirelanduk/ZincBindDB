@@ -53,7 +53,7 @@
             <div class="pdb-secondary">
                  {{ object.classification}} |
                  {{ object.technique }}{% if object.resolution %} ({{ object.resolution }} Å){% endif %} |
-                 {{ object.chain_set.count }} zinc-bearing chain{% if object.chain_set.count != 1 %}s{% endif %}
+                 {{ object.chains|length }} zinc-bearing chain{% if object.chains|length != 1 %}s{% endif %}
              </div>
         </a>
         {% endif %}
