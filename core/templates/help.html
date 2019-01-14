@@ -55,6 +55,11 @@
         of data is here.</h2>
         <p>The full list of binding sites can be browsed <a href="/data/all/">
         here</a>.</p>
+        <p>In addition, you can browse by family <a href="/families">here</a>. In
+        ZincBind, a family is a collection of binding sites that each share the
+        same residue identities. So, the 'H3' family contains all those which
+        contain three histidine residues, 'C2H2' contains all those with two
+        cysteine and two histidine residues, and so on.</p>
     </div>
 
     <div class="box about-box">
@@ -69,7 +74,10 @@
         <p>After this is a description of the 'zinc bearing chains' in the PDB -
         these are those chains with residues involved in zinc binding in some
         way - and the relevant metal ions it contains. Here 'relevant' means
-        zinc, and any other metal that is in a zinc binding site.</p>
+        zinc, and any other metal that is in a zinc binding site. Within the
+        chain sequence, binding residues will be capitalised and in bold.</p>
+        <p>Any zinc atoms in the PDb which have not been assigned a binding site
+        will also be listed, along with the reason for their exclusion.</p>
         <p>Then there is a list of all the zinc binding sites in that PDB. Each
         one is a clickable link to that site's page, and has a summary of the
         residues in that site.</p>
@@ -99,8 +107,21 @@
         <p>Below this is the 3D manipulatable view of the site, zoomed in to the
         relevant residues. You can manipulate this with your mouse/touch
         gestures, and use the controls that accompany it.</p>
+        <p>Then there is a list of chains associated with the binding site.
+        Binding residues are highlighted here, but only if they are binding in
+        this particular site.</p>
         <p>Finally there is a summary of the other relevant PDB information for
         the structure the site comes from.</p>
+    </div>
+
+    <div class="box about-box">
+        <h2>I'm on the page for a Zinc Site Group and I don't know what I'm looking
+        at.</h2>
+        <p>The group's family will be listed first, along with classifications
+        and keywords that appear often in the binding sites within this group.
+        These can often give an insight as to the common function of the sites
+        in the group, but do remember that they are automatically generated.</p>
+        <p>After this comes a list of binding sites in this group.</p>
     </div>
 </div>
 {% endblock %}
