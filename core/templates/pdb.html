@@ -57,10 +57,10 @@
     {% for site in pdb.zincsite_set.all %}
         {% for bond in site.coordinatebonds %}
         bond = [];
-        bond.push("{{ bond.metal.ngl_sele }}")
-        bond.push("{{ bond.atom.ngl_sele }}")
+        bond.push("{{ bond.metal.ngl_sele|safe }}")
+        bond.push("{{ bond.atom.ngl_sele|safe }}")
         bonds.push(bond)
         {% endfor %}
     {% endfor %}
-    drawNgl("{{ pdb.id }}", "{{ pdb.assembly }}", "{{ pdb.ngl_metals_sele }}", "{{ pdb.ngl_residues_sele }}", bonds, false); setUpControls();</script>
+    drawNgl("{{ pdb.id }}", "{{ pdb.assembly }}", "{{ pdb.ngl_metals_sele|safe }}", "{{ pdb.ngl_residues_sele|safe }}", bonds, false); setUpControls();</script>
 {% endblock %}
