@@ -153,12 +153,14 @@ class ZincSite(models.Model):
         qs = []
         string_terms = [
          "title", "classification", "keywords",
-         "organism", "expression", "technique", "family"
+         "organism", "expression", "technique", "family", "code"
         ]
         for string_term in string_terms:
             if string_term in GET_dict:
                 if string_term == "family":
                     key = string_term
+                elif string_term == "code":
+                    key = "family__contains"
                 else:
                     key = "pdb__" + string_term + "__contains"
                 kwargs = {
