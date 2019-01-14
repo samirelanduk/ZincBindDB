@@ -142,7 +142,7 @@ class ZincSite(models.Model):
                 pdbs.append(pdb)
                 pdb = []
             pdb.append(site)
-        pdbs.append(pdb)
+        if pdb: pdbs.append(pdb)
         return pdbs
 
 
@@ -153,12 +153,16 @@ class ZincSite(models.Model):
         qs = []
         string_terms = [
          "title", "classification", "keywords",
-         "organism", "expression", "technique"
+         "organism", "expression", "technique", "family"
         ]
         for string_term in string_terms:
             if string_term in GET_dict:
+                if string_term == "family":
+                    key = string_term
+                else:
+                    key = "pdb__" + string_term + "__contains"
                 kwargs = {
-                 "pdb__" + string_term + "__contains": GET_dict[string_term].upper()
+                 key: GET_dict[string_term].upper()
                 }
                 qs.append(models.Q(**kwargs))
         numeric_terms = [
@@ -194,7 +198,7 @@ class ZincSite(models.Model):
                 pdbs.append(pdb)
                 pdb = []
             pdb.append(site)
-        pdbs.append(pdb)
+        if pdb: pdbs.append(pdb)
         return pdbs
 
 
