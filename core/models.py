@@ -42,77 +42,6 @@ class Pdb(models.Model):
         )
 
 
-    @staticmethod
-    def search(term):
-        """Searches the Pdb objects with a term by looking for an exact match
-        in IDs or a partial match in titles."""
-
-        return Pdb.objects.filter(
-         models.Q(id=term.upper()) | models.Q(title__contains=term.upper())
-         | models.Q(classification__contains=term.upper())
-         | models.Q(technique__contains=term.upper())
-         | models.Q(organism__contains=term.upper())
-         | models.Q(keywords__contains=term.upper())
-        ).order_by("-deposited")
-
-
-    @staticmethod
-    def advanced_search(GET_dict):
-        """Takes some GET data and uses it to search the PDBs."""
-
-        qs = []
-        string_terms = [
-         "title", "classification", "keywords",
-         "organism", "expression", "technique"
-        ]
-        for string_term in string_terms:
-            if string_term in GET_dict:
-                kwargs = {
-                 string_term + "__contains": GET_dict[string_term].upper()
-                }
-                qs.append(models.Q(**kwargs))
-        numeric_terms = [
-         "resolution_gt", "resolution_lt", "rfactor_gt", "rfactor_lt",
-         "deposited_gt", "deposited_lt"
-        ]
-        for numeric_term in numeric_terms:
-            if numeric_term in GET_dict:
-                try:
-                    float(GET_dict[numeric_term])
-                except ValueError:
-                    try:
-                        datetime.strptime(GET_dict[numeric_term], "%Y-%m-%d")
-                    except:
-                        return []
-                kwargs = {
-                 numeric_term.replace("_", "__"): GET_dict[numeric_term]
-                }
-                qs.append(models.Q(**kwargs))
-        return Pdb.objects.filter(*qs).order_by("-deposited")
-
-
-    @staticmethod
-    def blast_search(sequence, elimit):
-        """BLAST searches the PDB chains using a sequence. There must be a
-        blastp program in the PATH for this to work."""
-
-        print(elimit)
-        p = subprocess.Popen(
-         'echo "{}" | blastp -db data/chains.fasta -outfmt 15 -evalue {}'.format(sequence, elimit),
-         stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
-        )
-        out, err = p.communicate()
-        results = json.loads(out
-         )["BlastOutput2"][0]["report"]["results"]["search"]["hits"]
-        ids = [r["description"][0]["title"].split("|")[1] for r in results]
-        chains = sorted(
-         Chain.objects.filter(id__in=ids), key=lambda c: ids.index(c.id)
-        )
-        for chain, result in zip(chains, results):
-            chain.blast_data = result["hsps"][0]
-        return chains
-
-
     @property
     def chains(self):
         all_chains = Chain.objects.filter(site__pdb=self)
@@ -186,6 +115,88 @@ class ZincSite(models.Model):
     )
     pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
 
+    @staticmethod
+    def search(term, sort):
+        """Searches the ZincSite objects with a term by looking for an exact
+        match in PDB IDs or a partial match in PDB titles."""
+
+        sites = ZincSite.objects.filter(
+         models.Q(pdb__id=term.upper()) | models.Q(pdb__title__contains=term.upper())
+         | models.Q(pdb__classification__contains=term.upper())
+         | models.Q(pdb__technique__contains=term.upper())
+         | models.Q(pdb__organism__contains=term.upper())
+         | models.Q(pdb__keywords__contains=term.upper())
+        ).order_by(sort, "pdb__id").annotate(
+         pdb_id=models.F("pdb__id"),
+         deposited=models.F("pdb__deposited"),
+         species=models.F("pdb__organism"),
+         title=models.F("pdb__title"),
+         classification=models.F("pdb__classification"),
+         technique=models.F("pdb__technique"),
+         resolution=models.F("pdb__resolution"),
+         residue_count=models.Count("residue")
+        )
+        pdbs, pdb = [], []
+        for site in sites:
+            if pdb and site.pdb_id != pdb[-1].pdb_id:
+                pdbs.append(pdb)
+                pdb = []
+            pdb.append(site)
+        pdbs.append(pdb)
+        return pdbs
+
+
+    @staticmethod
+    def advanced_search(GET_dict, sort):
+        """Takes some GET data and uses it to search the PDBs."""
+
+        qs = []
+        string_terms = [
+         "title", "classification", "keywords",
+         "organism", "expression", "technique"
+        ]
+        for string_term in string_terms:
+            if string_term in GET_dict:
+                kwargs = {
+                 "pdb__" + string_term + "__contains": GET_dict[string_term].upper()
+                }
+                qs.append(models.Q(**kwargs))
+        numeric_terms = [
+         "resolution_gt", "resolution_lt", "rfactor_gt", "rfactor_lt",
+         "deposited_gt", "deposited_lt"
+        ]
+        for numeric_term in numeric_terms:
+            if numeric_term in GET_dict:
+                try:
+                    float(GET_dict[numeric_term])
+                except ValueError:
+                    try:
+                        datetime.strptime(GET_dict[numeric_term], "%Y-%m-%d")
+                    except:
+                        return []
+                kwargs = {
+                 "pdb__" + numeric_term.replace("_", "__"): GET_dict[numeric_term]
+                }
+                qs.append(models.Q(**kwargs))
+        sites = ZincSite.objects.filter(*qs).order_by(sort, "pdb__id").annotate(
+         pdb_id=models.F("pdb__id"),
+         deposited=models.F("pdb__deposited"),
+         species=models.F("pdb__organism"),
+         title=models.F("pdb__title"),
+         classification=models.F("pdb__classification"),
+         technique=models.F("pdb__technique"),
+         resolution=models.F("pdb__resolution"),
+         residue_count=models.Count("residue")
+        )
+        pdbs, pdb = [], []
+        for site in sites:
+            if pdb and site.pdb_id != pdb[-1].pdb_id:
+                pdbs.append(pdb)
+                pdb = []
+            pdb.append(site)
+        pdbs.append(pdb)
+        return pdbs
+
 
     @property
     def equivalent_sites(self):
@@ -241,15 +252,6 @@ class ZincSite(models.Model):
         return [m.coordination for m in self.metal_set.all()]
 
 
-    @property
-    def chains(self):
-        """Returns the chains associated with this site."""
-
-        chains = Chain.objects.filter(pdb=self.pdb)
-        print(chains)
-        return [chain for chain in chains if self in chain.zincsites]
-
-
 
 class ChainCluster(models.Model):
     """A collection of chains with similar sequence."""
@@ -288,6 +290,27 @@ class Chain(models.Model):
          sequence=sequence, site_spacers=get_spacers(site_sequence),
          site_sequence=site_sequence, chain_pdb_identifier=chain.id
         )
+
+
+    @staticmethod
+    def blast_search(sequence, elimit):
+        """BLAST searches the PDB chains using a sequence. There must be a
+        blastp program in the PATH for this to work."""
+
+        p = subprocess.Popen(
+         'echo "{}" | blastp -db data/chains.fasta -outfmt 15 -evalue {}'.format(sequence, elimit),
+         stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+        )
+        out, err = p.communicate()
+        results = json.loads(out
+         )["BlastOutput2"][0]["report"]["results"]["search"]["hits"]
+        ids = [int(r["description"][0]["title"].split("|")[1]) for r in results]
+        chains = sorted(
+         Chain.objects.filter(id__in=ids), key=lambda c: ids.index(c.id)
+        )
+        for chain, result in zip(chains, results):
+            chain.blast_data = result["hsps"][0]
+        return chains
 
 
     @property
@@ -429,7 +452,7 @@ class Residue(models.Model):
     def atomium_id(self):
         """Recreates the atomium ID of the residue."""
 
-        return (f"{self.chain.chain_pdb_identifier}:" +
+        return (f"{self.chain.chain_pdb_identifier}." +
         f"{self.residue_pdb_identifier}{self.insertion_pdb_identifier}")
 
 

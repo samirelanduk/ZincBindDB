@@ -31,14 +31,20 @@ def search(request):
     results = []
     if request.GET:
         try:
-            results = Pdb.search(request.GET["q"]).order_by(request.GET.get("sort", "-deposited"))
+            sort = request.GET.get("sort", "-deposited")
+            pdb_sort = "pdb__" + sort.replace("-", "")
+            if sort[0] == "-": pdb_sort = "-" + pdb_sort
+            results = ZincSite.search(request.GET["q"], pdb_sort)
         except KeyError:
             if "sequence" in request.GET:
                 try:
-                    results = Pdb.blast_search(request.GET["sequence"], request.GET["threshold"])
+                    results = Chain.blast_search(request.GET["sequence"], request.GET["threshold"])
                 except: results = []
             else:
-                results = Pdb.advanced_search(request.GET).order_by(request.GET.get("sort", "-deposited"))
+                sort = request.GET.get("sort", "-deposited")
+                pdb_sort = "pdb__" + sort.replace("-", "")
+                if sort[0] == "-": pdb_sort = "-" + pdb_sort
+                results = ZincSite.advanced_search(request.GET, pdb_sort)
     else:
         return render(request, "advanced-search.html")
     paginated_results = Paginator(results, 25)
