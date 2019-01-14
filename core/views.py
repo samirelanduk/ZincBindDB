@@ -57,7 +57,6 @@ def search(request):
     })
 
 
-
 def pdb(request, code):
     """Returns a particular Pdb's page."""
 
@@ -99,8 +98,9 @@ def api(request):
      "metal": Metal.objects.last(),
      "residue": Residue.objects.last(),
      "atom": Atom.objects.last(),
+     "chain": Chain.objects.last(),
      "chain_cluster": ChainCluster.objects.first(),
-     "site_cluster": Group.objects.first()
+     "group": Group.objects.first()
     })
 
 
@@ -128,14 +128,16 @@ class PdbViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class PdbSearchResults(viewsets.ReadOnlyModelViewSet):
-    serializer_class = PdbSerializer
+    serializer_class = ZincSiteSerializer
 
     def get_queryset(self):
         try:
-            results = Pdb.search(self.request.GET["q"])
+            results = ZincSite.search(self.request.GET["q"], "-deposited")
         except KeyError:
-            results = Pdb.advanced_search(self.request.GET)
-        return results
+            results = ZincSite.advanced_search(self.request.GET, "-deposited")
+        sites = []
+        for res in results: sites += res
+        return sites
 
 
 
