@@ -15,7 +15,7 @@ from tqdm import tqdm
 
 def main(json=True):
     # Get all PDBs which contain zinc
-    codes = get_zinc_pdb_codes()
+    codes = get_zinc_pdb_codes()[:50]
     print(f"There are {len(codes)} PDBs with zinc")
 
     # Which ones should be processed?
@@ -77,9 +77,11 @@ def main(json=True):
             # Create binding site from each cluster
             for index, cluster in enumerate(clusters, start=1):
                 # Create site record itself
+                residues = get_cluster_residues(cluster)
                 site = ZincSite.objects.create(
                  id=f"{pdb_record.id}-{index}", copies=cluster["count"],
-                 family=create_site_code(get_cluster_residues(cluster)), pdb=pdb_record
+                 family=create_site_code(get_cluster_residues(cluster)), pdb=pdb_record,
+                 residue_names=",".join(set([r.name for r in residues]))
                 )
 
                 # Create metals
@@ -89,7 +91,6 @@ def main(json=True):
 
                 # Create chains
                 all_residues = residues_from_clusters(clusters)
-                residues = get_cluster_residues(cluster)
                 chains = get_chains_from_residues(residues)
                 chain_dict = {}
                 for chain in chains:
