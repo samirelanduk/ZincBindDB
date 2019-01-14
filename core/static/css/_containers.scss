@@ -35,6 +35,26 @@
 }
 
 
+@mixin containers--tablet() {
+    .grid-2-tablet {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-column-gap: $gap;
+        margin-top: 2 * $gap;
+
+        form {
+            text-align: right;
+
+            input {
+                display: inline;
+            }
+        }
+
+        form:last-child {
+            text-align: left;
+        }
+    }
+}
 @mixin containers--laptop() {
 
     .home-container {

@@ -8,22 +8,23 @@
 
     <div class="box about-box">
         <p>The full list of Zinc Binding Sites can be browsed
-        <a href="/data/all/">here</a>.</p>
-        <p>They can also be browsed by Family and Group
-        <a href="/families/">here</a>.</p>
-        <p>See the <a href="/api/">REST API</a> for programmatic access to the data.</p>
+        <a href="/data/all/">here</a>. They can also be browsed by Family and Group
+        <a href="/families/">here</a>. See the <a href="/api/">REST API</a> for
+        programmatic access to the data.</p>
 
-        <form id="download-json" method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="datatype" value="json">
-            <input type="submit" value="Download JSON">
-        </form>
+        <div class="grid-2-tablet">
+            <form id="download-json" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="datatype" value="json">
+                <input type="submit" value="Download JSON">
+            </form>
 
-        <form id="download-sqlite" method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="datatype" value="sqlite3">
-            <input type="submit" value="Download SQLite">
-        </form>
+            <form id="download-sqlite" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="datatype" value="sqlite3">
+                <input type="submit" value="Download SQLite">
+            </form>
+        </div>
     </div>
 
     <div class="charts">

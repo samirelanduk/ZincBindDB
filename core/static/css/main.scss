@@ -86,6 +86,7 @@ html {
     @include base--tablet;
     @include core--tablet;
     @include components--tablet;
+    @include containers--tablet;
 }
 
 @media (min-width: $laptop-width) {
