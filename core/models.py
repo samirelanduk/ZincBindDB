@@ -449,7 +449,7 @@ class Residue(models.Model):
     def ngl_side_chain_sele(self):
         """The NGL selector text needed to select the residue side chain."""
 
-        if self.name not in CODES:
+        if self.name not in CODES or self.name in "ACTGU":
             return self.ngl_sele
         ligand_names = [a.name for a in self.atom_set.exclude(coordinatebond=None)]
         includes = ["sidechain", ".CA"]
