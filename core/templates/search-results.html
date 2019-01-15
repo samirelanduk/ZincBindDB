@@ -47,7 +47,7 @@
             <div class="pdb-result-main">
                 <div class="pdb-code">PDB: {{ object.0.pdb_id }}</div>
                 <div class="pdb-deposited">{{ object.0.deposited }}</div>
-                <div class="pdb-species"><script>document.write(formatSpecies("{{ object.0.organism }}"));</script></div>
+                <div class="pdb-species"><script>document.write(formatSpecies("{{ object.0.species }}"));</script></div>
             </div>
             <div class="pdb-title">{{ object.0.title|truncatewords:20 }}</div>
             <div class="pdb-secondary">
