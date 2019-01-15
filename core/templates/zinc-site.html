@@ -20,7 +20,7 @@
 
             <h3>Liganding Residues ({{ site.family }})</h3>
             {% for residue in site.residue_set.all %}
-            <div class="residue" data-ngl="{{ residue.ngl_side_chain_sele }}">{{ residue.atomium_id }} ({{ residue.name }})</div>
+            <div class="residue" data-ngl="{{ residue.ngl_side_chain_sele }}">{{ residue.atomium }} ({{ residue.name }})</div>
             {% endfor %}
         </div>
 

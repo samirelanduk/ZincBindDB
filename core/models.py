@@ -402,6 +402,8 @@ class Residue(models.Model):
     residue_pdb_identifier = models.IntegerField()
     insertion_pdb_identifier = models.CharField(max_length=128)
     name = models.CharField(max_length=128)
+    atomium = models.CharField(max_length=128)
+    chain_pdb_identifier = models.CharField(max_length=128)
     chain_signature = models.CharField(max_length=128, blank=True)
     site = models.ForeignKey(ZincSite, on_delete=models.CASCADE)
     chain = models.ForeignKey(Chain, blank=True, null=True, on_delete=models.CASCADE)
@@ -424,9 +426,9 @@ class Residue(models.Model):
             if residue.next: signature.append(residue.next.name.lower())
         signature = ".".join(signature)
         residue_record = Residue.objects.create(
-         residue_pdb_identifier=numeric_id,
+         residue_pdb_identifier=numeric_id, chain_pdb_identifier=residue.chain.id,
          insertion_pdb_identifier=insertion, chain_signature=signature,
-         name=residue.name, chain=chain, site=site,
+         name=residue.name, chain=chain, site=site, atomium=residue.id
         )
         for atom in residue.atoms():
             atom_dict[atom.id] = Atom.create_from_atomium(atom, residue_record)
@@ -438,7 +440,7 @@ class Residue(models.Model):
         """The NGL selector text needed to select the residue."""
 
         return (f"{self.residue_pdb_identifier}^" +
-        f"{self.insertion_pdb_identifier}:{self.chain.chain_pdb_identifier}/0 and (%A or %)")
+        f"{self.insertion_pdb_identifier}:{self.chain_pdb_identifier}/0 and (%A or %)")
 
 
     @property
@@ -455,14 +457,6 @@ class Residue(models.Model):
             includes += [".N"]
         includes = " or ".join(includes)
         return f"({includes}) and {self.ngl_sele}"
-
-
-    @property
-    def atomium_id(self):
-        """Recreates the atomium ID of the residue."""
-
-        return (f"{self.chain.chain_pdb_identifier}." +
-        f"{self.residue_pdb_identifier}{self.insertion_pdb_identifier}")
 
 
     @staticmethod
@@ -508,7 +502,7 @@ class Atom(models.Model):
         """The NGL selector text needed to select the atom."""
 
         return (f"{self.residue.residue_pdb_identifier}^" +
-        f"{self.residue.insertion_pdb_identifier}:{self.residue.chain.chain_pdb_identifier}/0 and .{self.name}")
+        f"{self.residue.insertion_pdb_identifier}:{self.residue.chain_pdb_identifier}/0 and .{self.name}")
 
 
 

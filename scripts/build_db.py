@@ -15,7 +15,7 @@ from tqdm import tqdm
 
 def main(json=True):
     # Get all PDBs which contain zinc
-    codes = get_zinc_pdb_codes()
+    codes = get_zinc_pdb_codes()[:50]
     print(f"There are {len(codes)} PDBs with zinc")
 
     # Which ones should be processed?
@@ -100,7 +100,7 @@ def main(json=True):
                 # Create residue records
                 atom_dict = {}
                 for r in get_cluster_residues(cluster):
-                    chain = chain_dict.get(r.chain.id)
+                    chain = chain_dict.get(r.chain.id) if isinstance(r, Residue) else None
                     Residue.create_from_atomium(r, chain, site, atom_dict)
 
                 # Create bond records
