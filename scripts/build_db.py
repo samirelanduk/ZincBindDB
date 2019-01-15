@@ -81,7 +81,7 @@ def main(json=True):
                 site = ZincSite.objects.create(
                  id=f"{pdb_record.id}-{index}", copies=cluster["count"],
                  family=create_site_code(get_cluster_residues(cluster)), pdb=pdb_record,
-                 residue_names=",".join(set([r.name for r in residues]))
+                 residue_names="".join(set([f".{r.name}." for r in residues]))
                 )
 
                 # Create metals

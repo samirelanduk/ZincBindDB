@@ -158,16 +158,18 @@ class ZincSite(models.Model):
         ]
         for string_term in string_terms:
             if string_term in GET_dict:
+                value = GET_dict[string_term].upper()
                 if string_term == "family":
                     key = string_term
                 elif string_term == "residue_names":
                     key = string_term + "__contains"
+                    value = f".{value}."
                 elif string_term == "code":
                     key = "family__contains"
                 else:
-                    key = "pdb__" + string_term + "__contains"
+                    key = "pdb__" + string_term + "__icontains"
                 kwargs = {
-                 key: GET_dict[string_term].upper()
+                 key: value
                 }
                 qs.append(models.Q(**kwargs))
         numeric_terms = [
