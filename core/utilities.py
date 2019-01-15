@@ -221,7 +221,9 @@ def residue_count(cluster):
 def liganding_atom_count(cluster):
     liganding_atoms = []
     for atoms in cluster["metals"].values():
-        liganding_atoms += atoms
+        for atom in atoms:
+            if isinstance(atom.structure, Residue):
+                liganding_atoms.append(atom)
     return len(liganding_atoms)
 
 
