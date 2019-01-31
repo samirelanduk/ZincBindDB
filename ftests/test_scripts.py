@@ -69,7 +69,7 @@ class DatabaseBuildingTests(DjangoTest):
         self.assertEqual(metal.chain_pdb_identifier, "A")
         self.assertIn("no side chain", metal.omission.lower())
         self.assertEqual(pdb.zincsite_set.count(), 0)
-        self.assertEqual(len(pdb.chains), 0)
+        #self.assertEqual(len(pdb.chains), 0)
 
 
     def test_can_store_zincs_not_in_assembly(self):
@@ -81,7 +81,6 @@ class DatabaseBuildingTests(DjangoTest):
         self.assertFalse(pdb.skeleton)
         self.assertEqual(pdb.metal_set.count(), 2)
         self.assertEqual(pdb.zincsite_set.count(), 1)
-        self.assertEqual(len(pdb.chains), 1)
         used_zinc = pdb.metal_set.filter(omission=None)
         self.assertEqual(used_zinc.count(), 1)
         self.assertEqual(used_zinc.first().atom_pdb_identifier, 11222)
@@ -99,16 +98,6 @@ class DatabaseBuildingTests(DjangoTest):
                 self.assertEqual(site.metal_set.first().coordination, 4)
 
 
-    def test_can_handle_multi_metal_sites(self):
-        self.mock_codes.return_value = ["6A5K"]
-        main(json=False)
-        pdb = Pdb.objects.get(id="6A5K")
-        multi_site = pdb.zincsite_set.get(family="C9")
-        self.assertEqual(multi_site.metal_set.count(), 3)
-        for metal in multi_site.metal_set.all():
-            self.assertEqual(metal.coordinatebond_set.count(), 4)
-
-
     def test_can_handle_zincs_superimposed_onto_each_other(self):
         self.mock_codes.return_value = ["1ZEH"]
         main(json=False)
@@ -120,17 +109,27 @@ class DatabaseBuildingTests(DjangoTest):
         site1 = pdb.metal_set.get(atom_pdb_identifier=846).site
         self.assertEqual(site1.residue_set.count(), 4)
         self.assertEqual(
-         set([r.chain.chain_pdb_identifier for r in site1.residue_set.all()]),
+         set([r.chain.chain_pdb_identifier for r in site1.residue_set.exclude(chain=None)]),
          {"B"}
         )
         self.assertEqual(site1.copies, 1)
         site2 = pdb.metal_set.get(atom_pdb_identifier=856).site
         self.assertEqual(site2.residue_set.count(), 4)
         self.assertEqual(
-         set([r.chain.chain_pdb_identifier for r in site2.residue_set.all()]),
+         set([r.chain.chain_pdb_identifier for r in site2.residue_set.exclude(chain=None)]),
          {"D"}
         )
         self.assertEqual(site2.copies, 1)
+
+
+    def test_can_handle_multi_metal_sites(self):
+        self.mock_codes.return_value = ["6A5K"]
+        main(json=False)
+        pdb = Pdb.objects.get(id="6A5K")
+        multi_site = pdb.zincsite_set.get(family="C9")
+        self.assertEqual(multi_site.metal_set.count(), 3)
+        for metal in multi_site.metal_set.all():
+            self.assertEqual(metal.coordinatebond_set.count(), 4)
 
 
     def test_can_handle_sites_being_duplicated_in_assembly(self):
@@ -172,6 +171,29 @@ class DatabaseBuildingTests(DjangoTest):
         self.assertEqual(len(set([m.atomium_id for m in pdb.metal_set.all()])), 3)
 
 
+    def test_can_create_chains_properly(self):
+        self.mock_codes.return_value = ["1B0N"]
+        main(json=False)
+        pdb = Pdb.objects.get(id="1B0N")
+        self.assertEqual(pdb.assembly, 2)
+        self.assertEqual(pdb.chain_set.count(), 2)
+        chain_a = pdb.chain_set.get(chain_pdb_identifier="A")
+        self.assertEqual(chain_a.spacers, "17, 35, 7, 0, 1, 25")
+        self.assertEqual(len([r for r in chain_a.sequence if r.isupper()]), 7)
+        chain_b = pdb.chain_set.get(chain_pdb_identifier="B")
+        self.assertEqual(chain_b.spacers, "4, 3, 2")
+        self.assertEqual(len([r for r in chain_b.sequence if r.isupper()]), 4)
+        zn = Metal.objects.get(residue_pdb_identifier=1001)
+        site = zn.site
+        self.assertEqual(site.chainsiteinteraction_set.count(), 2)
+        chain_interaction_a = site.chainsiteinteraction_set.get(chain=chain_a)
+        self.assertEqual(chain_interaction_a.spacers, "2")
+        self.assertEqual(len([r for r in chain_interaction_a.sequence if r.isupper()]), 2)
+        chain_interaction_b = site.chainsiteinteraction_set.get(chain=chain_b)
+        self.assertEqual(chain_interaction_b.spacers, "3, 2")
+        self.assertEqual(len([r for r in chain_interaction_b.sequence if r.isupper()]), 3)
+
+
     def test_script_can_function_normally(self):
         self.mock_codes.return_value = ["6EQU"]
         main(json=False)
@@ -201,12 +223,13 @@ class DatabaseBuildingTests(DjangoTest):
         )
         res = site.residue_set.get(residue_pdb_identifier=94)
         self.assertEqual(res.atom_set.count(), 10)
-        self.assertEqual(len(pdb.chains), 1)
-        chain = pdb.chains[0]
+        self.assertEqual(pdb.chain_set.count(), 1)
+        chain = pdb.chain_set.first()
         self.assertEqual(chain.chain_pdb_identifier, "A")
         self.assertTrue(chain.sequence.startswith("gmshhwgy"))
         for res in site.residue_set.all():
-            self.assertEqual(res.chain, chain)
+            from pprint import pprint
+            self.assertEqual(res.chain, chain if res.name == "HIS" else None)
 
 
     def spit_out_json(self):

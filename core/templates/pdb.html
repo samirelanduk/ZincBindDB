@@ -11,9 +11,9 @@
     <div id="pdb-chains" class="box">
         <div class="chains">
             <h3>Zinc-Bearing Chains in PDB</h3>
-            <div class="count">{{ pdb.chains|length }} zinc-bearing chain{{ pdb.chains|length|pluralize }}</div>
-            {% for chain in pdb.chains %}
-                <div class="chain">Chain {{ chain.chain_pdb_identifier }} ({{ chain.sequence|length }} residues;  {{ chain.zincsites|length }} zinc binding site{{ chain.zincsites|length|pluralize }})</div>
+            <div class="count">{{ pdb.chain_set.count }} zinc-bearing chain{{ pdb.chain_set.count|pluralize }}</div>
+            {% for chain in pdb.chain_set.all %}
+                <div class="chain">Chain {{ chain.chain_pdb_identifier }} ({{ chain.sequence|length }} residues;  {{ chain.zincsites|length }} zinc binding site{{ chain.zincsites|length|pluralize }}; {% if chain.spacers %}Spacers: {{ chain.spacers }} {% endif %})</div>
                 <div class="sequence">{{ chain.sequence }}</div>
             {% endfor %}
         </div>

@@ -20,7 +20,7 @@ def get_zinc_pdb_codes():
     """Gets PDB codes for all structures with a zinc atom in them.
 
     If the response returned has an error code of 500, or if there are fewer
-    than 10,000 PDB codes sent back, an RcsbError will be thrown."""
+    than 10,000 PDB codes sent back, an error will be thrown."""
 
     query = "<orgPdbQuery>"\
     "<queryType>org.pdb.query.simple.ChemCompFormulaQuery</queryType>"\
@@ -73,30 +73,29 @@ def zincs_outside_model(model, pdb):
     return [z for z in au_zincs if z.id not in assembly_zinc_ids]
 
 
-
-def cluster_zincs_with_residues(metals):
+def site_zincs_with_residues(metals):
     """This function takes a set of atoms - all the metal atoms found in an
     atomium model.
 
     For each atom it will identify the binding residues for that atom and
     associate them with each other.
 
-    From this dictionary, a list of cluster dictionaries will be made. In the
-    simplest case, each metal will be a cluster, but two metal atoms will be
-    merged into one cluster if they share binding residues.
+    From this dictionary, a list of site dictionaries will be made. In the
+    simplest case, each metal will be a site, but two metal atoms will be
+    merged into one site if they share binding residues.
 
-    Then, duplicates will be removed. Two clusters are duplicates if they have
+    Then, duplicates will be removed. Two sites are duplicates if they have
     the same metal atom IDs - this is usually created from symmetry operations.
 
-    Finally clusters with no zinc in are removed."""
+    Finally sites with no zinc in are removed."""
 
     metals = remove_duplicate_atoms(metals)
     metals = {metal: [] for metal in metals}
     for metal in metals:
         metals[metal] = get_atom_liganding_atoms(metal)
-    clusters = merge_metal_groups(metals)
-    aggregate_clusters(clusters)
-    return [c for c in clusters if "ZN" in [a.element for a in c["metals"].keys()]]
+    sites = merge_metal_groups(metals)
+    aggregate_sites(sites)
+    return [c for c in sites if "ZN" in [a.element for a in c["metals"].keys()]]
 
 
 def remove_duplicate_atoms(atoms):
@@ -145,82 +144,82 @@ def remove_duplicate_residues(residues):
     return set(molecules)
 
 
-def merge_metal_groups(metals):
+def merge_metal_groups(sites):
     """Takes a dictionary in which the keys are metal atoms and the values are
     the set of residues that bind to them.
 
-    It then creates a list of clusters from this, where each cluster is a dict
+    It then creates a list of sites from this, where each site is a dict
     object with metals and residues. Two metals and their residues will be
     merged together if they share residues."""
 
-    clusters = [{"metals": {metal: atoms}, "count": 1} for metal, atoms in metals.items()]
-    while not check_clusters_have_unique_residues(clusters):
-        for cluster1, cluster2 in combinations(clusters, 2):
-            if get_cluster_residues(cluster1).intersection(get_cluster_residues(cluster2)):
-                cluster1["metals"].update(cluster2["metals"])
-                clusters.remove(cluster2)
+    #sites = [{"metals": {metal: atoms}, "count": 1} for metal, atoms in metals.items()]
+    while not check_sites_have_unique_residues(sites):
+        for site1, site2 in combinations(sites, 2):
+            if get_site_residues(site1).intersection(get_site_residues(site2)):
+                site1["metals"].update(site2["metals"])
+                sites.remove(site2)
                 break
-    return clusters
+    return sites
 
 
-def check_clusters_have_unique_residues(clusters):
+def check_sites_have_unique_residues(sites):
     residues = set()
     all_residues = []
-    for cluster in clusters:
-        cluster_residues = get_cluster_residues(cluster)
-        for res in cluster_residues:
+    for site in sites:
+        site_residues = get_site_residues(site)
+        for res in site_residues:
             residues.add(res)
             all_residues.append(res)
     return len(residues) == len(all_residues)
 
 
-def get_cluster_residues(cluster):
-    cluster_residues = set()
-    for atoms in cluster["metals"].values():
+def get_site_residues(site):
+    site_residues = set()
+    for atoms in site["metals"].values():
         for atom in atoms:
-            cluster_residues.add(atom.structure)
-    return cluster_residues
+            site_residues.add(atom.structure)
+    return site_residues
 
 
-def aggregate_clusters(clusters):
-    """Takes a list of cluster dictionaries and merges those with the same metal
+def aggregate_sites(sites):
+    """Takes a list of site dictionaries and merges those with the same metal
     IDs."""
 
-    while not check_clusters_have_unique_sites(clusters):
-        for cluster1, cluster2 in combinations(clusters, 2):
-            if set([m.id for m in cluster1["metals"].keys()]) ==\
-             set([m.id for m in cluster2["metals"].keys()]):
-                cluster1["count"] += 1
-                clusters.remove(cluster2)
+    while not check_sites_have_unique_sites(sites):
+        for site1, site2 in combinations(sites, 2):
+            if set([m.id for m in site1["metals"].keys()]) ==\
+             set([m.id for m in site2["metals"].keys()]):
+                site1["count"] += 1
+                sites.remove(site2)
                 break
 
 
-def check_clusters_have_unique_sites(clusters):
-    """Takes a list of clusters and returns True if they have any equivalent
+def check_sites_have_unique_sites(sites):
+    """Takes a list of sites and returns True if they have any equivalent
     sites."""
 
-    cluster_ids = [frozenset([
-     m.id for m in cluster["metals"].keys()
-    ]) for cluster in clusters]
-    unique_ids = set(cluster_ids)
-    return len(cluster_ids) == len(unique_ids)
+    site_ids = [frozenset([
+     m.id for m in site["metals"].keys()
+    ]) for site in sites]
+    unique_ids = set(site_ids)
+    return len(site_ids) == len(unique_ids)
 
 
-def create_chains_dict(clusters):
+def create_chains_dict(sites):
     chains = {}
-    for cluster in clusters:
-        for o in get_cluster_residues(cluster):
+    for site in sites:
+        for o in get_site_residues(site):
             chains[o.chain.id] = o.chain
     return chains
 
 
-def residue_count(cluster):
-    return len([r for r in get_cluster_residues(cluster) if isinstance(r, Residue)])
+def residue_count(site):
+    return len([r for r in get_site_residues(site) if isinstance(r, Residue)])
 
 
-def liganding_atom_count(cluster):
+def liganding_atom_count(site):
     liganding_atoms = []
-    for atoms in cluster["metals"].values():
+    for atoms in site["metals"].values():
         for atom in atoms:
             if isinstance(atom.structure, Residue):
                 liganding_atoms.append(atom)
@@ -232,17 +231,17 @@ def create_site_code(residues):
     return "".join([f"{code}{codes.count(code)}" for code in sorted(set(codes))])
 
 
-def residues_from_clusters(clusters):
+def residues_from_sites(sites):
     all_residues = []
-    for c in clusters:
-        all_residues += get_cluster_residues(c)
+    for c in sites:
+        all_residues += get_site_residues(c)
     return all_residues
 
 
 def get_chains_from_residues(residues):
     chains = set()
     for res in residues:
-        if isinstance(res, Residue):
+        if isinstance(res, Residue) and res.chain.id not in [c.id for c in chains]:
             chains.add(res.chain)
     return chains
 

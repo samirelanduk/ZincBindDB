@@ -9,13 +9,13 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 import django; django.setup()
 from django.db import transaction
 from core.utilities import *
-from core.models import Pdb, Metal, Chain, ZincSite, Residue, CoordinateBond
+from core.models import Pdb, Metal, Chain, ZincSite, Residue, CoordinateBond, ChainSiteInteraction
 import atomium
 from tqdm import tqdm
 
 def main(json=True):
     # Get all PDBs which contain zinc
-    codes = get_zinc_pdb_codes()[:100]
+    codes = get_zinc_pdb_codes()
     print(f"There are {len(codes)} PDBs with zinc")
 
     # Which ones should be processed?
@@ -49,62 +49,85 @@ def main(json=True):
                  omission="Zinc in asymmetric unit but not biological assembly."
                 )
 
-            # Get metal clusters from model
-            clusters = cluster_zincs_with_residues(model.atoms(is_metal=True))
+            # Get metals
+            metals = remove_duplicate_atoms(model.atoms(is_metal=True))
 
-            # Remove unsuitable clusters
-            rejected_clusters = []
-            for cluster in clusters:
-                # Does the cluster have enough residues?
-                if residue_count(cluster) < 2:
-                    for metal in cluster["metals"]:
-                        Metal.create_from_atomium(metal, pdb_record,
-                         omission="Zinc has too few binding residues."
-                        )
-                    rejected_clusters.append(cluster)
-                    continue
+            # Determine liganding atoms of all metals
+            metals = {m: get_atom_liganding_atoms(m) for m in metals}
 
-                # Does the cluster have enough liganding atoms?
-                if liganding_atom_count(cluster) < 3:
-                    for metal in cluster["metals"]:
-                        Metal.create_from_atomium(metal, pdb_record,
-                         omission="Zinc has too few liganding atoms."
-                        )
-                    rejected_clusters.append(cluster)
-                    continue
-            for cluster in rejected_clusters: clusters.remove(cluster)
+            # Get binding site dicts
+            sites = [{"metals": {m: v}, "count": 1} for m, v in metals.items()]
+            merge_metal_groups(sites)
 
-            # Create binding site from each cluster
-            for index, cluster in enumerate(clusters, start=1):
+            # Aggregate duplicate sites
+            aggregate_sites(sites)
+            sites.sort(key=lambda s: min(a.id for a in s["metals"].keys()))
+
+            # Remove sites with no zinc
+            sites = [site for site in sites if "ZN" in [
+             a.element for a in site["metals"].keys()
+            ]]
+
+            # Remove sites with not enough residues
+            bad_sites = [s for s in sites if residue_count(s) < 2]
+            for site in bad_sites:
+                for metal in site["metals"]:
+                    Metal.create_from_atomium(metal, pdb_record,
+                     omission="Zinc has too few binding residues."
+                    )
+                sites.remove(site)
+
+            # Remove sites with not enough liganding atoms
+            bad_sites = [s for s in sites if liganding_atom_count(s) < 3]
+            for site in bad_sites:
+                for metal in site["metals"]:
+                    Metal.create_from_atomium(metal, pdb_record,
+                     omission="Zinc has too few liganding atoms."
+                    )
+                sites.remove(site)
+
+            # Create chain records
+            all_residues = residues_from_sites(sites)
+            chains = get_chains_from_residues(all_residues)
+            chain_dict = {}
+            for chain in chains:
+                sequence = get_chain_sequence(chain, all_residues)
+                chain_dict[chain.id] = Chain.create_from_atomium(chain, pdb_record, sequence=sequence)
+
+            # Save sites
+            for index, site in enumerate(sites, start=1):
                 # Create site record itself
-                residues = get_cluster_residues(cluster)
-                site = ZincSite.objects.create(
-                 id=f"{pdb_record.id}-{index}", copies=cluster["count"],
-                 family=create_site_code(get_cluster_residues(cluster)), pdb=pdb_record,
+                residues = get_site_residues(site)
+                site_record = ZincSite.objects.create(
+                 id=f"{pdb_record.id}-{index}", copies=site["count"],
+                 family=create_site_code(residues), pdb=pdb_record,
                  residue_names="".join(set([f".{r.name}." for r in residues]))
                 )
 
                 # Create metals
                 metals = {}
-                for metal in cluster["metals"].keys():
-                    metals[metal.id] = Metal.create_from_atomium(metal, pdb_record, site=site)
+                for metal in site["metals"].keys():
+                    metals[metal.id] = Metal.create_from_atomium(
+                     metal, pdb_record, site=site_record
+                    )
 
-                # Create chains
-                all_residues = residues_from_clusters(clusters)
+                # Create chain interaction
                 chains = get_chains_from_residues(residues)
-                chain_dict = {}
                 for chain in chains:
-                    chain_dict[chain.id] = Chain.create_from_atomium(chain, site, sequence=get_chain_sequence(chain, all_residues), site_sequence=get_chain_sequence(chain, residues))
-
+                    sequence = get_chain_sequence(chain, residues)
+                    ChainSiteInteraction.objects.create(
+                     chain=chain_dict[chain.id], site=site_record,
+                     sequence=sequence, spacers=get_spacers(sequence)
+                    )
 
                 # Create residue records
                 atom_dict = {}
-                for r in get_cluster_residues(cluster):
-                    chain = chain_dict.get(r.chain.id) if isinstance(r, Residue) else None
-                    Residue.create_from_atomium(r, chain, site, atom_dict)
+                for r in get_site_residues(site):
+                    chain = chain_dict.get(r.chain.id) if isinstance(r, atomium.Residue) else None
+                    Residue.create_from_atomium(r, chain, site_record, atom_dict)
 
                 # Create bond records
-                for metal, atoms in cluster["metals"].items():
+                for metal, atoms in site["metals"].items():
                     for atom in atoms:
                         CoordinateBond.objects.create(
                          metal=metals[metal.id], atom=atom_dict[atom.id]

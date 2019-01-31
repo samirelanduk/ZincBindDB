@@ -47,10 +47,10 @@
     {% include "ngl-pdb.html" %}
 
     <div class="site-chains box">
-        {% for chain in site.chain_set.all %}
-        <h3>Chain {{ chain.chain_pdb_identifier }}{% if chain.site_spacers %} <span>Spacers: {{ chain.site_spacers }}</span>{% endif %}</h3>
+        {% for csi in site.chainsiteinteraction_set.all %}
+        <h3>Chain {{ csi.chain.chain_pdb_identifier }}{% if csi.spacers %} <span>Spacers: {{ csi.spacers }}</span>{% endif %}</h3>
 
-        <div class="sequence">{{ chain.site_sequence }}</div>
+        <div class="sequence">{{ csi.sequence }}</div>
         {% endfor %}
     </div>
 

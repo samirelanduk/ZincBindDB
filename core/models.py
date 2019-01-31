@@ -43,13 +43,6 @@ class Pdb(models.Model):
 
 
     @property
-    def chains(self):
-        all_chains = Chain.objects.filter(site__pdb=self)
-        ids = set([c.chain_pdb_identifier for c in all_chains])
-        return [all_chains.filter(chain_pdb_identifier=id).first() for id in sorted(ids)]
-
-
-    @property
     def residues(self):
         """Gets all the residue objects that provide liganding atoms that belong
         to this Pdb."""
@@ -248,7 +241,7 @@ class ZincSite(models.Model):
         histogram of the different values."""
 
         if unique: sites = sites.filter(representative=True)
-        counts = Counter([site.__dict__[property] for site in sites]).most_common()
+        counts = Counter([str(site.__dict__[property]).upper() for site in sites]).most_common()
         if cutoff:
             counts = counts[:cutoff] + [
              ["OTHER", sum(n[1] for n in counts[cutoff:])]
@@ -279,27 +272,25 @@ class Chain(models.Model):
         db_table = "chains"
         ordering = ["id"]
 
+    id = models.CharField(primary_key=True, max_length=128)
     chain_pdb_identifier = models.CharField(max_length=128)
-    site_sequence = models.TextField()
     sequence = models.TextField()
     spacers = models.CharField(max_length=128, blank=True, null=True)
-    site_spacers = models.CharField(max_length=128, blank=True, null=True)
-    site = models.ForeignKey(ZincSite, on_delete=models.CASCADE)
+    pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
     cluster = models.ForeignKey(
      ChainCluster, on_delete=models.SET_NULL, null=True, blank=True
     )
 
 
     @staticmethod
-    def create_from_atomium(chain, site, sequence, site_sequence):
+    def create_from_atomium(chain, pdb, sequence):
         """Creates a chain record from an atomium Chain object and an existing
         Pdb record."""
 
         from .utilities import get_spacers
         return Chain.objects.create(
-         site=site, spacers=get_spacers(sequence),
-         sequence=sequence, site_spacers=get_spacers(site_sequence),
-         site_sequence=site_sequence, chain_pdb_identifier=chain.id
+         id=f"{pdb.id}{chain.id}", pdb=pdb, spacers=get_spacers(sequence),
+         sequence=sequence, chain_pdb_identifier=chain.id
         )
 
 
@@ -328,7 +319,20 @@ class Chain(models.Model):
     def zincsites(self):
         """Returns all the ZincSite objects that have residues in this chain."""
 
-        return self.site.pdb.zincsite_set.filter(chain__sequence=self.sequence, chain__chain_pdb_identifier=self.chain_pdb_identifier)
+        return set([csi.site for csi in ChainSiteInteraction.objects.filter(chain=self)])
+        #return self.site.pdb.zincsite_set.filter(chain__sequence=self.sequence, chain__chain_pdb_identifier=self.chain_pdb_identifier)
+
+
+
+class ChainSiteInteraction(models.Model):
+
+    class Meta:
+        db_table = "chain_site_interactions"
+
+    chain = models.ForeignKey(Chain, on_delete=models.CASCADE, blank=True, null=True)
+    site = models.ForeignKey(ZincSite, on_delete=models.CASCADE, blank=True, null=True)
+    sequence = models.TextField()
+    spacers = models.CharField(max_length=128, blank=True, null=True)
 
 
 
