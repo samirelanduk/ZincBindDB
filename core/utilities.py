@@ -152,7 +152,6 @@ def merge_metal_groups(sites):
     object with metals and residues. Two metals and their residues will be
     merged together if they share residues."""
 
-    #sites = [{"metals": {metal: atoms}, "count": 1} for metal, atoms in metals.items()]
     while not check_sites_have_unique_residues(sites):
         for site1, site2 in combinations(sites, 2):
             if get_site_residues(site1).intersection(get_site_residues(site2)):

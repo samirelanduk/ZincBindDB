@@ -55,6 +55,17 @@ def main(json=True):
             # Determine liganding atoms of all metals
             metals = {m: get_atom_liganding_atoms(m) for m in metals}
 
+            # Ignore metals with too few liganding atoms
+            useless_metals = []
+            for metal, atoms in metals.items():
+                if len([a for a in atoms if isinstance(a.structure, atomium.Residue)]) < 3:
+                    useless_metals.append(metal)
+                    if metal.element == "ZN":
+                        Metal.create_from_atomium(metal, pdb_record,
+                         omission="Zinc has too few liganding atoms."
+                        )
+            for metal in useless_metals: del metals[metal]
+
             # Get binding site dicts
             sites = [{"metals": {m: v}, "count": 1} for m, v in metals.items()]
             merge_metal_groups(sites)
@@ -67,24 +78,6 @@ def main(json=True):
             sites = [site for site in sites if "ZN" in [
              a.element for a in site["metals"].keys()
             ]]
-
-            # Remove sites with not enough residues
-            bad_sites = [s for s in sites if residue_count(s) < 2]
-            for site in bad_sites:
-                for metal in site["metals"]:
-                    Metal.create_from_atomium(metal, pdb_record,
-                     omission="Zinc has too few binding residues."
-                    )
-                sites.remove(site)
-
-            # Remove sites with not enough liganding atoms
-            bad_sites = [s for s in sites if liganding_atom_count(s) < 3]
-            for site in bad_sites:
-                for metal in site["metals"]:
-                    Metal.create_from_atomium(metal, pdb_record,
-                     omission="Zinc has too few liganding atoms."
-                    )
-                sites.remove(site)
 
             # Create chain records
             all_residues = residues_from_sites(sites)

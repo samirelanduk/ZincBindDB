@@ -148,17 +148,6 @@ class DatabaseBuildingTests(DjangoTest):
         self.assertEqual(site2.copies, 2)
 
 
-    def test_can_handle_sites_having_too_few_residues(self):
-        self.mock_codes.return_value = ["1BYF"]
-        main(json=False)
-        pdb = Pdb.objects.get(id="1BYF")
-        self.assertIn("POLYANDROCARPA", pdb.title)
-        self.assertEqual(pdb.assembly, 2)
-        self.assertEqual(pdb.metal_set.count(), 7)
-        bad_zinc = pdb.metal_set.exclude(omission=None).first()
-        self.assertIn("residues", bad_zinc.omission)
-
-
     def test_can_handle_sites_having_too_few_liganding_atoms(self):
         self.mock_codes.return_value = ["1A0Q"]
         main(json=False)
