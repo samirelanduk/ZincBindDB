@@ -333,7 +333,7 @@ def get_group_information(sites):
     title_keywords = {}
     bad_keywords = ["INHIBITOR", "ZINC", "ZINC ENZYME"]
     for keyword in keywords:
-        if keyword not in bad_keywords:
+        if keyword not in bad_keywords and not keyword.isdigit():
             count = 0
             for pdb in pdbs:
                 if keyword in pdb.title: count += 1
