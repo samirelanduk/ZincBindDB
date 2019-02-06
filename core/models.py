@@ -78,6 +78,7 @@ class Group(models.Model):
     class Meta:
         db_table = "groups"
 
+    id = models.CharField(primary_key=True, max_length=128)
     family = models.CharField(max_length=128)
     keywords = models.CharField(max_length=1024)
     classifications = models.CharField(max_length=1024)
@@ -320,7 +321,6 @@ class Chain(models.Model):
         """Returns all the ZincSite objects that have residues in this chain."""
 
         return set([csi.site for csi in ChainSiteInteraction.objects.filter(chain=self)])
-        #return self.site.pdb.zincsite_set.filter(chain__sequence=self.sequence, chain__chain_pdb_identifier=self.chain_pdb_identifier)
 
 
 

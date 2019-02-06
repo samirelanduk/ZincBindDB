@@ -89,8 +89,10 @@ try:
     with transaction.atomic():
         for index, fingerprint in enumerate(tqdm(unique_sites)):
             keywords, classifications = get_group_information(unique_sites[fingerprint])
+            oldest = sorted(unique_sites[fingerprint], key=lambda s: s.pdb.deposited)[0]
             group = Group.objects.create(
-             family=unique_sites[fingerprint][0].family, keywords=keywords, classifications=classifications
+             id=f"g{oldest.id}", family=unique_sites[fingerprint][0].family,
+             keywords=keywords, classifications=classifications
             )
             for site in unique_sites[fingerprint]:
                 site.group = group
