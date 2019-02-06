@@ -114,7 +114,7 @@ def api_object(request, type, pk):
      "atoms": AtomSerializer,
      "chains": ChainSerializer,
      "chain-clusters": ChainClusterSerializer,
-     "site-clusters": GroupSerializer,
+     "groups": GroupSerializer,
     }
     obj = get_object_or_404(lookup[type].Meta.model, id=pk)
     return Response(lookup[type](obj).data)
