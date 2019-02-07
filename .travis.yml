@@ -8,7 +8,7 @@ install:
     - pip install -r requirements-test.txt
 
 script:
-    - djangovar=headless coverage run --source=core,scripts `which django-admin.py` test ftests.test_scripts core --pythonpath=. --settings=core.settings
+    - djangovar=headless coverage run --source=core,scripts `which django-admin.py` test ftests.test_scripts --pythonpath=. --settings=core.settings
 
 after_success:
   - coveralls
