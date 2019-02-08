@@ -31,7 +31,7 @@
         {% if chains %}
         <div class="pdb-result">
             <div class="pdb-result-main">
-                <div class="pdb-code">Chain {{ object.chain_pdb_identifier }} ({{ object.site.pdb.id }})</div>
+                <div class="pdb-code">Chain {{ object.chain_pdb_identifier }} (<a href="/pdbs/{{ object.pdb.id }}/">{{ object.pdb.id }}</a>)</div>
                 <div class="pdb-deposited">Score: {{ object.blast_data.score }}</div>
                 <div class="pdb-species">E-value: {{ object.blast_data.evalue }}</div>
                 <div class="pdb-deposited">{{ object.pdb.title }}</div>

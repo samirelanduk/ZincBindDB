@@ -307,7 +307,7 @@ class Chain(models.Model):
         out, err = p.communicate()
         results = json.loads(out
          )["BlastOutput2"][0]["report"]["results"]["search"]["hits"]
-        ids = [int(r["description"][0]["title"].split("|")[1]) for r in results]
+        ids = [r["description"][0]["title"].split("|")[1] for r in results]
         chains = sorted(
          Chain.objects.filter(id__in=ids), key=lambda c: ids.index(c.id)
         )
