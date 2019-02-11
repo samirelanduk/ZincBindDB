@@ -437,7 +437,7 @@ class Residue(models.Model):
          name=residue.name, chain=chain, site=site, atomium=residue.id
         )
         for atom in residue.atoms():
-            atom_dict[atom.id] = Atom.create_from_atomium(atom, residue_record)
+            atom_dict[atom] = Atom.create_from_atomium(atom, residue_record)
         return residue_record
 
 

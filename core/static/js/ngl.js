@@ -33,8 +33,29 @@ function drawNgl(code, assembly, metals, residues, bonds, zoom) {
         }
 
         // Add distance lines where appropriate
-        component.addRepresentation("distance", {atomPair: bonds, labelVisible: false, color: "skyblue", assembly: stage.assembly});
-
+        for (var b = 0; b < bonds.length; b++) {
+            var metalPos = bonds[b][0];
+            var atomPos = bonds[b][1];
+            var vector = [
+                metalPos[0] - atomPos[0], metalPos[1] - atomPos[1], metalPos[2] - atomPos[2]
+            ]
+            DIV = 16;
+            miniVector = [vector[0] / DIV, vector[1] / DIV, vector[2] / DIV]
+            lines = []
+            for (x = 0; x <= DIV; x++) {
+                lines.push([
+                    atomPos[0] + miniVector[0] * x, atomPos[1] + miniVector[1] * x, atomPos[2] + miniVector[2] * x
+                ])
+            }
+            for (x = 0; x < DIV; x++) {
+                if (x % 3 != 0) {
+                    var shape = new NGL.Shape("shape", { disableImpostor: true });
+                    shape.addCylinder(lines[x], lines[x + 1], [0.205, 0.178, 0.39], 0.1);
+                    var shapeComp = stage.addComponentFromObject(shape);
+                    shapeComp.addRepresentation("distance");
+                }
+            }
+        }
 
         // Store the representations
         stage.metals = metals;

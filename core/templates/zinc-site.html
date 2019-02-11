@@ -67,11 +67,11 @@
         var bonds = [];
         {% for bond in site.coordinatebonds %}
         bond = [];
-        bond.push("{{ bond.metal.ngl_sele|safe }}")
-        bond.push("{{ bond.atom.ngl_sele|safe }}")
+        bond.push([{{ bond.metal.x }}, {{ bond.metal.y }}, {{ bond.metal.z }}]);
+        bond.push([{{ bond.atom.x }}, {{ bond.atom.y }}, {{ bond.atom.z }}]);
         bonds.push(bond)
         {% endfor %}
-        drawNgl("{{ site.pdb.id }}", "{{ site.pdb.assembly }}", "{{ site.ngl_metals_sele|safe }}", "{{ site.ngl_residues_sele|safe }}", bonds, true);
+        drawNgl("{{ site.pdb.id }}", "{{ site.pdb.assembly }}", "{{ site.ngl_metals_sele|safe }}", "{{ site.ngl_residues_sele|safe }}", bonds, [0, 0, 0]);
         setUpControls();
     </script>
 {% endblock %}

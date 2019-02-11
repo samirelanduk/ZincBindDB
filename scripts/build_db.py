@@ -71,7 +71,7 @@ def main(json=True):
             merge_metal_groups(sites)
 
             # Aggregate duplicate sites
-            aggregate_sites(sites)
+            #aggregate_sites(sites)
             sites.sort(key=lambda s: min(a.id for a in s["metals"].keys()))
 
             # Remove sites with no zinc
@@ -123,7 +123,7 @@ def main(json=True):
                 for metal, atoms in site["metals"].items():
                     for atom in atoms:
                         CoordinateBond.objects.create(
-                         metal=metals[metal.id], atom=atom_dict[atom.id]
+                         metal=metals[metal.id], atom=atom_dict[atom]
                         )
 
     # JSON?
