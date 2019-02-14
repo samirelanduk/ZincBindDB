@@ -7,7 +7,7 @@
 		</div>
 		<div class="pdb-info-column">
 			<div class="pdb-info-row"><strong>Resolution: </strong> {{ pdb.resolution|angstroms }}</div>
-			<div class="pdb-info-row"><strong>R-factor: </strong> {{ pdb.rfactor|angstroms }}</div>
+			<div class="pdb-info-row"><strong>R-factor: </strong> {% if pdb.rfactor %}{{ pdb.rfactor }}{% else %}N/A{% endif %}</div>
 		</div>
 	</div>
 	<div class="pdb-info-row"><strong>Keywords: </strong> {{ pdb.keywords }}</div>
