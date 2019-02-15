@@ -50,7 +50,7 @@ function drawNgl(code, assembly, metals, residues, bonds, zoom) {
             for (x = 0; x < DIV; x++) {
                 if (x % 3 != 0) {
                     var shape = new NGL.Shape("shape", { disableImpostor: true });
-                    shape.addCylinder(lines[x], lines[x + 1], [0.205, 0.178, 0.39], 0.1);
+                    shape.addCylinder(lines[x], lines[x + 1], [0.56, 0.37, 0.6], 0.1);
                     var shapeComp = stage.addComponentFromObject(shape);
                     shapeComp.addRepresentation("distance");
                 }
@@ -66,7 +66,8 @@ function drawNgl(code, assembly, metals, residues, bonds, zoom) {
 
         // Zoom the appropriate ammount
         if (zoom) {
-            component.autoView(residues);
+            //component.autoView(residues);
+            component.autoView();
         } else {
             component.autoView();
         }
