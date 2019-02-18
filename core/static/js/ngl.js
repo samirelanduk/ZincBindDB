@@ -67,7 +67,8 @@ function drawNgl(code, assembly, metals, residues, bonds, zoom) {
         // Zoom the appropriate ammount
         if (zoom) {
             //component.autoView(residues);
-            component.autoView();
+            stage.viewerControls.center(bonds[0][0]);
+            stage.viewerControls.zoom(0.75);
         } else {
             component.autoView();
         }
