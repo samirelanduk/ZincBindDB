@@ -18,7 +18,7 @@ def home(request):
 
     return render(request, "home.html", {"counts": [
      Group.objects.count(),
-     ZincSite.objects.aggregate(sum=Sum("copies"))["sum"],
+     ZincSite.objects.count(),
      Pdb.objects.count()
     ]})
 
