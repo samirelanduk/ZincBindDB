@@ -455,7 +455,7 @@ class Residue(models.Model):
 
         if self.name not in CODES or self.name in "ACTGU":
             return self.ngl_sele
-        ligand_names = [a.name for a in self.atom_set.exclude(coordinatebond=None)]
+        ligand_names = [a.name for a in self.atom_set.all() if a.coordinatebond_set.count()]
         includes = ["sidechain", ".CA"]
         if "O" in ligand_names:
             includes += [".O", ".C"]
