@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Predict{% endblock %}
+
+{% block main %}
+<div class="column-container">
+  <div class="box structure=predict">
+    <h2>Predict from Structure</h2>
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="submit" value="Go">
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -57,6 +57,10 @@ def search(request):
     })
 
 
+def predict(request):
+    return render(request, "predict.html")
+
+
 def pdb(request, code):
     """Returns a particular Pdb's page."""
 
