@@ -6,8 +6,8 @@ secrets.py
 log.txt
 *.sqlite3*
 *.json
-*.pdb
 data/*
+jobs/*
 *.css*
 *.sh
 *.png

@@ -15,12 +15,28 @@
     var stage = new NGL.Stage("ngl-container");
     var stringBlob = new Blob([localStorage.getItem("pdb-" + {{ request.GET.job }})], {type: "text/plain"});
     stage.loadFile(stringBlob, {ext: "pdb"}).then(function(component) {
-        component.addRepresentation("cartoon", {sele: "/0"});
+        stage.component = component;
+        component.addRepresentation("cartoon", {sele: "polymer and not ( water or ion )/0", color: "#fff"});
         component.autoView();
-        stage.viewerControls.zoom(0.4);
         stage.setSpin(true);
         $("canvas").css("background-color", "#ffffff");
     });
+    var rep;
+    var resCode;
+    function switchResidueColours() {
+        var res = [
+             "ALA", "ARG", "ASN", "ASP", "CYS", "GLU", "GLN", "GLY", "HIS", "ILE",
+             "LEU", "LYS", "MET", "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL"
+        ];
+        try {res.splice(res.indexOf(resCode), 1);;} catch (e) {}
+        resCode = res[Math.floor(Math.random() * res.length)];
+
+        try {rep.setVisibility(false);} catch (e) {}
+        rep = stage.compList[0].addRepresentation("licorice", {
+         color: "#472b52", sele: resCode
+        });
+    }
+    window.setInterval(switchResidueColours, 250);
     </script>
 
     <div class="output">
@@ -57,7 +73,13 @@
             var reader = new FileReader();
             reader.readAsText(file, "UTF-8");
             reader.onload = function (evt) {
-                localStorage.setItem("pdb-" + $("#jobid").val(), evt.target.result);
+                try {
+                    localStorage.setItem("pdb-" + $("#jobid").val(), evt.target.result);
+                } catch (e) {
+                    localStorage.clear();
+                    localStorage.setItem("pdb-" + $("#jobid").val(), evt.target.result);
+                }
+
             }
         })
       </script>
