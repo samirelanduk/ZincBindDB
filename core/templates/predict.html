@@ -4,12 +4,45 @@
 
 {% block main %}
 <div class="column-container">
-  <div class="box structure=predict">
+  {% if request.GET.job %}
+  <div class="box">
+    <h2>Scanning...</h2>
+    <div id="pdb-ngl">
+        <div id="ngl-container" class="ngl-full"></div>
+    </div>
+    <script src="/static/js/ngl-source.js"></script>
+    <script>
+    var stage = new NGL.Stage("ngl-container");
+    var stringBlob = new Blob([localStorage.getItem("pdb-" + {{ request.GET.job }})], {type: "text/plain"});
+    stage.loadFile(stringBlob, {ext: "pdb"}).then(function(component) {
+        component.addRepresentation("cartoon", {sele: "/0"});
+        component.autoView();
+        stage.setSpin(true);
+        $("canvas").css("background-color", "#ffffff");
+    });
+    </script>
+  </div>
+  {% else %}
+  <div class="box structure-predict">
     <h2>Predict from Structure</h2>
     <form method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="jobid" id="jobid">
+      <input type="file" name="file" id="file">
+      <script>
+        $("#jobid").val(new Date().getTime());
+        $("#file").on("change", function() {
+            var file = $("#file")[0].files[0];
+            var reader = new FileReader();
+            reader.readAsText(file, "UTF-8");
+            reader.onload = function (evt) {
+                localStorage.setItem("pdb-" + $("#jobid").val(), evt.target.result);
+            }
+        })
+      </script>
       {% csrf_token %}
       <input type="submit" value="Go">
     </form>
   </div>
+  {% endif %}
 </div>
 {% endblock %}

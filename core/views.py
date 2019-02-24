@@ -58,6 +58,9 @@ def search(request):
 
 
 def predict(request):
+    if request.method == "POST":
+        return redirect(f"/predict?job={request.POST['jobid']}")
+        return render(request, "predict.html", {"job": 1})
     return render(request, "predict.html")
 
 
