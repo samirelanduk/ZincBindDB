@@ -17,9 +17,31 @@
     stage.loadFile(stringBlob, {ext: "pdb"}).then(function(component) {
         component.addRepresentation("cartoon", {sele: "/0"});
         component.autoView();
+        stage.viewerControls.zoom(0.4);
         stage.setSpin(true);
         $("canvas").css("background-color", "#ffffff");
     });
+    </script>
+
+    <div class="output">
+        <p>Job started...</p>
+    </div>
+
+    <script>
+    var wait = 0;
+    function doPoll(){
+        $.get("{{ request.get_full_path }}&report", function(data) {
+            var lines = data.split("\n\n");
+            var html = "";
+            for (line of lines) {
+                html += ("<div class='line'>" + line + "</div>");
+            }
+            $(".output")[0].innerHTML = html;
+            wait += 1000;
+            setTimeout(doPoll, wait);
+        });
+    }
+    doPoll();
     </script>
   </div>
   {% else %}

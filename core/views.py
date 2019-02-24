@@ -1,4 +1,6 @@
 from collections import Counter
+import os
+from subprocess import Popen
 from rest_framework import mixins
 from rest_framework import generics
 from rest_framework.decorators import api_view
@@ -59,8 +61,23 @@ def search(request):
 
 def predict(request):
     if request.method == "POST":
+        os.mkdir(f"jobs/{request.POST['jobid']}")
+        uploaded_file = request.FILES["file"]
+        for chunk in uploaded_file.chunks():
+            with open(f"jobs/{request.POST['jobid']}/{uploaded_file.name}", "ab") as f:
+                f.write(chunk)
+        p = Popen(['scripts/predict.py', f"jobs/{request.POST['jobid']}/{uploaded_file.name}"])
         return redirect(f"/predict?job={request.POST['jobid']}")
-        return render(request, "predict.html", {"job": 1})
+    elif "report" in request.GET:
+        try:
+            with open(f"jobs/{request.GET['job']}/output.txt") as f:
+                filebody = f.read()
+        except:
+            filebody = "Starting job..."
+        response = HttpResponse(
+         filebody, content_type="application/plain-text"
+        )
+        return response
     return render(request, "predict.html")
 
 
