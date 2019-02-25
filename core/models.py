@@ -2,6 +2,7 @@
 
 import subprocess
 import json
+import numpy as np
 from collections import Counter
 from datetime import datetime
 from atomium.data import CODES
@@ -509,6 +510,17 @@ class Atom(models.Model):
 
         return (f"{self.residue.residue_pdb_identifier}^" +
         f"{self.residue.insertion_pdb_identifier}:{self.residue.chain_pdb_identifier}/0 and .{self.name}")
+
+
+    def distance_to(self, atom):
+        """Returns the distance (in whatever units the coordinates are defined
+        in) between this atom and another."""
+
+        x, y, z = atom.x, atom.y, atom.z
+        x_sum = pow((x - self.x), 2)
+        y_sum = pow((y - self.y), 2)
+        z_sum = pow((z - self.z), 2)
+        return np.sqrt(x_sum + y_sum + z_sum)
 
 
 
