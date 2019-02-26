@@ -62,5 +62,5 @@ for profile in profiles:
          all_combos.pop(1)
          all_combos.pop(1)
     all_combos = all_combos[0]
-    if isinstance(all_combos[0][0], tuple): all_combos = [r[0] for r in all_combos]
+    if all_combos and isinstance(all_combos[0][0], tuple): all_combos = [r[0] for r in all_combos]
     print_and_log(log_path, f"\t{len(all_combos)} possible combinations...")
