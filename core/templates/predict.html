@@ -50,7 +50,7 @@
             var lines = data.split("\n\n");
             var html = "";
             for (line of lines) {
-                html += ("<div class='line'>" + line + "</div>");
+                html += ("<div class='line'>" + line.replace("<", "").replace(">", "") + "</div>");
             }
             $(".output")[0].innerHTML = html;
             wait += 1000;
