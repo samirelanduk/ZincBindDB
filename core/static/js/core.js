@@ -32,6 +32,20 @@ $(document).ready(function() {
         }
         this.innerHTML = s;
     })
+
+    $("input[type=\"file\"]").each(function(index, input) {
+      var label	 = input.nextElementSibling;
+      var labelVal = label.innerHTML;
+      $(input).change(function(e) {
+        var fileName = "";
+        fileName = e.target.value.split("\\").pop();
+        if (fileName) {
+          label.innerHTML = fileName;
+        } else {
+          label.innerHTML = labelVal;
+        }
+      });
+    });
 });
 
 

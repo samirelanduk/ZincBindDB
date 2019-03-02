@@ -519,20 +519,20 @@ div.search-head {
 				background-color: #ffffff00;
 				text-align: center;
 				background-color: white;
-                color: inherit;
-                box-shadow: 0 0 2px rgba(0, 0, 0, 0.1) inset;
-                display: flex;
-                justify-content: center;
-                flex-direction: column;
+        color: inherit;
+        box-shadow: 0 0 2px rgba(0, 0, 0, 0.1) inset;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
 
-                div {
-                    background-color: #ffffff00;
-                    cursor: pointer;
-                }
+        div {
+            background-color: #ffffff00;
+            cursor: pointer;
+        }
 
-                .classifications {
-                    font-size: 0.8em;
-                }
+        .classifications {
+            font-size: 0.8em;
+        }
 			}
 
             .group:hover {
@@ -542,6 +542,30 @@ div.search-head {
 		}
 	}
 }
+
+.job-upload {
+
+		align-items: end;
+		margin-bottom: 5rem;
+
+		.structure-file {
+			margin-top: 3rem;
+			align-items: baseline;
+		}
+
+		.structure-code {
+			margin-top: 3rem;
+			@include margin-side(4rem);
+			display: flex;
+			flex-direction: column;
+			text-align: center;
+
+			input {
+				margin-bottom: 0px;
+			}
+		}
+}
+
 
 #home-1 {
     background-color: $pale-purple;
