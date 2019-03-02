@@ -93,7 +93,9 @@ try:
                         scores[combo] = grid[x][y]
                         break
             if combo not in scores: scores[combo] = np.inf
-        for combo, score in sorted(scores.items(), key=lambda s: s[1]):
-            print_and_log(log_path, f"{str(combo[0])[9:-1]}, {str(combo[1])[9:-1]} {score} {vectors[combo]}")
+        negatives = [s for s in sorted(scores.items(), key=lambda s: s[1]) if s[1] <= 0]
+        for combo, score in negatives:
+            pass#print_and_log(log_path, f"{str(combo[0])[9:-1]}, {str(combo[1])[9:-1]} {score} {vectors[combo]}")
+        print_and_log(log_path, f"\tFound {len(negatives)} possible site{'' if len(negatives) == 1 else 's'}")
 except Exception as e:
     print_and_log(log_path, str(e))

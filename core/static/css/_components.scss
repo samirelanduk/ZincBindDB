@@ -444,6 +444,10 @@ div.search-head {
         }
     }
 
+		.output {
+			text-align: left;
+		}
+
     .info {
         padding: $gap / 2;
         font-size: 0.9em;
@@ -712,6 +716,10 @@ div.search-head {
             display: flex;
             align-items: center;
         }
+
+				.output {
+					display: block;
+				}
     }
 
     .thanks-grid {
@@ -815,6 +823,10 @@ div.search-head {
                 }
             }
         }
+
+				.output {
+					display: block;
+				}
 
         .info {
             position: absolute;
