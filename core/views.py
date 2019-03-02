@@ -1,4 +1,5 @@
 from collections import Counter
+import requests
 import os
 from subprocess import Popen
 from rest_framework import mixins
@@ -62,11 +63,18 @@ def search(request):
 def predict(request):
     if request.method == "POST":
         os.mkdir(f"jobs/{request.POST['jobid']}")
-        uploaded_file = request.FILES["file"]
-        for chunk in uploaded_file.chunks():
-            with open(f"jobs/{request.POST['jobid']}/{uploaded_file.name}", "ab") as f:
-                f.write(chunk)
-        p = Popen(['scripts/predict.py', f"jobs/{request.POST['jobid']}/{uploaded_file.name}"])
+        if "file" in request.FILES:
+            uploaded_file = request.FILES["file"]
+            for chunk in uploaded_file.chunks():
+                with open(f"jobs/{request.POST['jobid']}/{uploaded_file.name}", "ab") as f:
+                    f.write(chunk)
+            filename = uploaded_file.name
+        else:
+            r = requests.get(f"https://files.rcsb.org/view/{request.POST['code']}.cif")
+            with open(f"jobs/{request.POST['jobid']}/{request.POST['code']}.cif", "w") as f:
+                f.write(r.text)
+            filename = request.POST["code"] + ".cif"
+        p = Popen(['scripts/predict.py', f"jobs/{request.POST['jobid']}/{filename}"])
         return redirect(f"/predict?job={request.POST['jobid']}")
     elif "report" in request.GET:
         try:
