@@ -14,24 +14,34 @@
     <script>
     var stage = new NGL.Stage("ngl-container");
     function loadStructure(component) {
+        $("canvas").css("background-color", "#ffffff");
         stage.component = component;
         component.addRepresentation("cartoon", {sele: "polymer and not ( water or ion )/0", color: "#fff"});
         component.autoView();
         stage.setSpin(true);
-        $("canvas").css("background-color", "#ffffff");
     }
     let storedValue = localStorage.getItem("pdb-" + {{ request.GET.job }});
     if (storedValue.length < 20) {
       stage.loadFile("rcsb://" + storedValue + ".mmtf").then(loadStructure);
     } else {
-      var stringBlob = new Blob([storedValue], {type: "text/plain"});
-      stage.loadFile(stringBlob, {ext: "pdb"}).then(loadStructure);
+      if (storedValue.slice(0, 5) == "data:") {
+        storedValue = Uint8Array.from(atob(storedValue.slice(37)), c => c.charCodeAt(0));
+        var stringBlob = new Blob([storedValue], {type: "application/octet-stream"});
+        stage.loadFile(stringBlob, {ext: "mmtf"}).then(loadStructure);
+      } else {
+        var stringBlob = new Blob([storedValue], {type: "text/plain"});
+        if (storedValue.includes("_atom_site")) {
+          stage.loadFile(stringBlob, {ext: "cif"}).then(loadStructure);
+        } else {
+          stage.loadFile(stringBlob, {ext: "pdb"}).then(loadStructure);
+        }
+      }
     }
 
     var rep;
     var resCode;
     function switchResidueColours() {
-        var res = [
+        /*var res = [
              "ALA", "ARG", "ASN", "ASP", "CYS", "GLU", "GLN", "GLY", "HIS", "ILE",
              "LEU", "LYS", "MET", "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL"
         ];
@@ -41,7 +51,7 @@
         try {rep.setVisibility(false);} catch (e) {}
         rep = stage.compList[0].addRepresentation("licorice", {
          color: "#472b52", sele: resCode
-        });
+       });*/
     }
     window.setInterval(switchResidueColours, 250);
     </script>
@@ -76,8 +86,8 @@
         <div class="structure-file">
           <input type="hidden" name="jobid" id="jobid">
 
-          <input type="file" name="file" id="file"
-          data-multiple-caption="{count} files selected" multiple>
+          <input type="file" name="file" id="file" accept=".pdb,.cif,.mmcif,.mmtf"
+          data-multiple-caption="{count} files selected">
           <label for="file">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" fill="#FFFFFF">
               <path d="M10 0l-5.2 4.9h3.3v5.1h3.8v-5.1h3.3l-5.2-4.9zm9.3
@@ -99,7 +109,11 @@
             $("#code").prop("disabled", true);
             var file = $("#file")[0].files[0];
             var reader = new FileReader();
-            reader.readAsText(file, "UTF-8");
+            if ($("#file").val().includes("mmtf")) {
+              reader.readAsDataURL(file);
+            } else {
+              reader.readAsText(file, "UTF-8");
+            }
             reader.onload = function (evt) {
                 try {
                     localStorage.setItem("pdb-" + $("#jobid").val(), evt.target.result);
