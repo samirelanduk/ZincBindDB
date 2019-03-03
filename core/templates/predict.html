@@ -11,6 +11,10 @@
       <div class="ngl-controls output">
       </div>
   </div>
+
+  <div class="box predict-results">
+    No zinc binding sites found yet.
+  </div>
     <script src="/static/js/ngl-source.js"></script>
     <script>
     var stage = new NGL.Stage("ngl-container");
@@ -57,24 +61,30 @@
     window.setInterval(switchResidueColours, 250);
     </script>
 
-
-
     <script>
-    var wait = 0;
+    var wait = 500;
     function doPoll(){
         $.get("{{ request.get_full_path }}&report", function(data) {
             var lines = data.split("\n\n");
             var html = "";
+            var sites = [];
             for (line of lines) {
+              if (line[0] == "_") {
+                line = line.slice(1).split(" ");
+                sites.push(line);
+              } else {
                 html += ("<div class='line" + (line[0] == "\t" ? " indented" : "") +"'>" + line.replace("<", "").replace(">", "") + "</div>");
+              }
             }
+            console.log(sites);
             $(".output")[0].innerHTML = html;
-            wait += 500;
+            wait *= 1.1;
             setTimeout(doPoll, wait);
         });
     }
     doPoll();
     </script>
+
   </div>
   {% else %}
   <div class="box structure-predict">
