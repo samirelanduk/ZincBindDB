@@ -24,6 +24,7 @@
         component.addRepresentation("cartoon", {sele: "polymer and not ( water or ion )/0", color: "#fff"});
         component.autoView();
         stage.setSpin(true);
+        stage.representations = {};
     }
     let storedValue = localStorage.getItem("pdb-" + {{ request.GET.job }});
     if (storedValue.length < 20) {
@@ -76,8 +77,42 @@
                 html += ("<div class='line" + (line[0] == "\t" ? " indented" : "") +"'>" + line.replace("<", "").replace(">", "") + "</div>");
               }
             }
-            console.log(sites);
             $(".output")[0].innerHTML = html;
+            if ($(".predicted-site").length != sites.length) {
+              html = "<h2>Predicted Sites</h2><div class='predicted-sites'>";
+              for (var site of sites) {
+                let resCount = (site.length - 2) / 2;
+                let ngl = [];
+                for (var i = 2; i <= resCount * 2; i = i + 2) {
+                  let atomiumId = site[i];
+                  let chainId = site[i].split(".")[0];
+                  let resId = site[i].split(".")[1];
+                  let insert = "";
+                  if (/^[A-Z]$/i.test(resId[resId.length - 1])) {
+                    insert = resId[resId.length - 1];
+                    resId = resId.slice(0, resId.length - 1)
+                  };
+                  ngl.push(`(.CA or sidechain) and (${resId}^${insert}:${chainId})`);
+                }
+                ngl = ngl.join(" or ")
+                html += (`<div class='predicted-site' data-ngl='${ngl}'><div class='site-family'>${site[0]}</div><div class='site-details'>${site[1]} ${site[2]}, ${site[3]} ${site[4]}</div><div class='site-score'>Score: ${site[5].slice(1)}</div></div>`)
+              }
+              html += "</div>";
+              $(".predict-results")[0].innerHTML = html;
+              $(".predicted-site").click(function() {
+                let nglSele = $(this).attr("data-ngl");
+                stage.setSpin(false);
+                for (rep of Object.values(stage.representations)) {
+                  rep.setVisibility(false);
+                }
+                var r = stage.component.addRepresentation("ball+stick", {
+                 sele: nglSele
+                });
+                stage.representations[nglSele] = r;
+                stage.component.autoView(nglSele);
+                console.log();
+              })
+            }
             wait *= 1.1;
             setTimeout(doPoll, wait);
         });

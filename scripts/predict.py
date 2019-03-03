@@ -70,7 +70,7 @@ try:
 
         # Create vectors
         vectors = {}
-        print_and_log(log_path, "\tCreating vectors...")
+        print("\tCreating vectors...")
         for combo in all_combos:
             res1, res2 = combo
             dist1 = round(res1.atom(name="CA").distance_to(res2.atom(name="CA")), 3)
