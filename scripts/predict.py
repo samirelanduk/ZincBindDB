@@ -70,14 +70,23 @@ try:
 
         # Create vectors
         vectors = {}
-        print("\tCreating vectors...")
+        print_and_log(log_path, "\tCreating vectors...")
         for combo in all_combos:
-            res1, res2 = combo
-            dist1 = round(res1.atom(name="CA").distance_to(res2.atom(name="CA")), 3)
-            dist2 = round(res1.atom(name="CB").distance_to(res2.atom(name="CB")), 3)
-            vectors[combo] = [dist1, dist2]
+            pairs = combinations(combo, 2)
+            CAs, CBs = [], []
+            for pair in pairs:
+                res1, res2 = pair
+                CAs.append(round(res1.atom(name="CA").distance_to(res2.atom(name="CA")), 3))
+                CBs.append(round(res1.atom(name="CB").distance_to(res2.atom(name="CB")), 3))
+            vectors[combo] = [sum(CAs) / len(CAs), sum(CBs) / len(CBs)]
+            print(CAs)
+            print(CBs)
+            print(vectors[combo])
+            if any(abs(ca - vectors[combo][0]) > 3 for ca in CAs) or any(abs(cb - vectors[combo][1]) > 3 for cb in CBs):
+                del vectors[combo]
 
         # Load energy landscape
+        print_and_log(log_path, "\tSearching energy space...")
         with open(settings.PROFILE_PATH + "/" + profile) as f:
             lines = f.read().splitlines()
             grid = eval(lines[0])
@@ -92,10 +101,11 @@ try:
                     if X[x] < vector[0] < X[x + 1] and Y[y] < vector[1] < Y[y + 1]:
                         scores[combo] = grid[x][y]
                         break
-            if combo not in scores: scores[combo] = np.inf
-        negatives = [s for s in sorted(scores.items(), key=lambda s: s[1]) if s[1] <= 0]
-        for combo, score in negatives:
-            print_and_log(log_path, f"_{profile[:-4]} {combo[0].name} {combo[0].id} {combo[1].name} {combo[1].id} {score}")
-        print_and_log(log_path, f"\tFound {len(negatives)} possible site{'' if len(negatives) == 1 else 's'}")
+            if combo not in scores: scores[combo] = -np.inf
+        positives = [s for s in reversed(sorted(scores.items(), key=lambda s: s[1])) if s[1] >= 0]
+        for combo, score in positives:
+            residues = [f"{res.name} {res.id}" for res in combo]
+            print_and_log(log_path, f"_{profile[:-4]} {' '.join(residues)} {score}")
+        print_and_log(log_path, f"\tFound {len(positives)} possible site{'' if len(positives) == 1 else 's'}")
 except Exception as e:
     print_and_log(log_path, str(e))

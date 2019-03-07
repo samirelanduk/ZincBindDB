@@ -77,6 +77,9 @@
                 html += ("<div class='line" + (line[0] == "\t" ? " indented" : "") +"'>" + line.replace("<", "").replace(">", "") + "</div>");
               }
             }
+            sites.sort(function (a, b) {
+                return parseFloat(b[b.length - 1]) - parseFloat(a[a.length - 1])
+            });
             $(".output")[0].innerHTML = html;
             if ($(".predicted-site").length != sites.length) {
               html = "<h2>Predicted Sites</h2><div class='predicted-sites'>";
@@ -92,13 +95,18 @@
                     insert = resId[resId.length - 1];
                     resId = resId.slice(0, resId.length - 1)
                   };
-                  ngl.push(`(.CA or sidechain) and (${resId}^${insert}:${chainId})`);
+                  ngl.push(`(.CA or sidechain) and (${resId}^${insert}:${chainId}) and (%A or %)`);
                 }
                 ngl = ngl.join(" or ")
-                html += (`<div class='predicted-site' data-ngl='${ngl}'><div class='site-family'>${site[0]}</div><div class='site-details'>${site[1]} ${site[2]}, ${site[3]} ${site[4]}</div><div class='site-score'>Score: ${site[5].slice(1)}</div></div>`)
+                var residues = [];
+                for (var i = 2; i <= resCount * 2; i = i + 2) {
+                  residues.push(`${site[i - 1]} ${site[i]}`)
+                }
+                residues = residues.join(", ")
+                html += (`<div class='predicted-site' data-ngl='${ngl}'><div class='site-family'>${site[0]}</div><div class='site-details'>${residues}</div><div class='site-score'>Score: ${parseFloat(site[site.length - 1]).toFixed(2)}</div></div>`)
               }
               html += "</div>";
-              $(".predict-results")[0].innerHTML = html;
+              $(".predict-results").html(html);
               $(".predicted-site").click(function() {
                 let nglSele = $(this).attr("data-ngl");
                 stage.setSpin(false);
@@ -110,7 +118,6 @@
                 });
                 stage.representations[nglSele] = r;
                 stage.component.autoView(nglSele);
-                console.log();
               })
             }
             wait *= 1.1;
