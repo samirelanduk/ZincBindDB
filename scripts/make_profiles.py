@@ -73,6 +73,9 @@ for family in FAMILIES:
     hist = [[round(np.log(val / average_count), 3) for val in row] for row in hist]
     plt.imshow([[val if val != -np.inf else 0 for val in row] for row in hist], interpolation='nearest', origin='low', extent=[x[0], x[-1], y[0], y[-1]])
     plt.colorbar()
+    plt.xlabel("C-alpha C-alpha distance (Å)")
+    plt.ylabel("C-beta C-beta distance (Å)")
+    plt.title(f"{family} distribution")
     plt.savefig(f"data/profiles/{family}.png")
     ax = plt.gca()
     ax.set_facecolor("b")
@@ -85,9 +88,10 @@ for family in FAMILIES:
 
     # Again, but smoothed
     hist = smooth_matrix(hist)
-    hist = smooth_matrix(hist)
-    hist = smooth_matrix(hist)
     plt.imshow([[val if val != -np.inf else 0 for val in row] for row in hist], interpolation='nearest', origin='low', extent=[x[0], x[-1], y[0], y[-1]])
+    plt.xlabel("C-alpha C-alpha distance (Å)")
+    plt.ylabel("C-beta C-beta distance (Å)")
+    plt.title(f"{family} distribution (smoothed)")
     plt.colorbar()
     plt.savefig(f"data/profiles/{family}_smooth.png")
     plt.clf()
