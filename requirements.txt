@@ -1,7 +1,7 @@
 django==2.0.8
 requests>=2.20.0
 atomium==0.12.1
-djangorestframework==3.8.2
+djangorestframework==3.9.1
 tqdm==4.23.3
 rjsmin==1.0.12
 rcssmin==1.0.6
