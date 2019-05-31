@@ -1,6 +1,4 @@
 # ZincBind
-[![Build Status](https://travis-ci.org/samirelanduk/ZincBind.svg)](https://travis-ci.org/samirelanduk/ZincBind)
-[![Coverage Status](https://coveralls.io/repos/github/samirelanduk/ZincBind/badge.svg)](https://coveralls.io/github/samirelanduk/ZincBind)
 
 ## About
 
@@ -12,7 +10,7 @@ To spin up your own local version of ZincBind:
 
 1. Download this repository using the button above.
 2. Unzip the folder and cd into it.
-3. Install requirements with ``pip install -r requirements.txt -r requirements-dev.txt -r requirements-test.txt``.
+3. Install requirements with ``pip install -r requirements.txt``.
 4. Create the database with ``python manage.py migrate``.
 5. Populate the database with ``python scripts/build_db.py; python scripts/cluster.py``.
 6. View local site by running ``python manage.py runserver`` and going to http://localhost:8000 in your browser.

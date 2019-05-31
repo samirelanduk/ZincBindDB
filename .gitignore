@@ -1,15 +1,6 @@
 __pycache__
 *.pyc
 .DS_Store
-.coverage
 secrets.py
-log.txt
 *.sqlite3*
-*.json
-data/*
-jobs/*
-*.css*
-*.sh
-*.png
-*.eps
-paper.py
+*.log
