@@ -18,3 +18,24 @@ class Pdb(models.Model):
     technique = models.CharField(null=True, blank=True, max_length=1024)
     assembly = models.IntegerField(null=True, blank=True)
     skeleton = models.BooleanField()
+
+
+
+class Metal(models.Model):
+    """A metal atom - usually zinc."""
+
+    class Meta:
+        db_table = "metals"
+
+    atomium_id = models.IntegerField()
+    name = models.CharField(max_length=32)
+    x = models.FloatField()
+    y = models.FloatField()
+    z = models.FloatField()
+    element = models.CharField(max_length=8)
+    residue_name = models.CharField(max_length=32)
+    residue_number = models.IntegerField()
+    insertion_code = models.CharField(max_length=128)
+    chain_id = models.CharField(max_length=128)
+    omission_reason = models.TextField(blank=True, null=True)
+    pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)

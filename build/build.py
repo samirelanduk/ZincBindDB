@@ -13,6 +13,7 @@ def main():
 
     # How many should be checked
     current_codes = Pdb.objects.all().values_list("id", flat=True)
+
     codes_to_check = [code for code in codes if code not in current_codes]
     print(f"{len(codes_to_check)} of these need to be checked")
 

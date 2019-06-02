@@ -29,11 +29,26 @@ def get_zinc_pdb_codes():
 
 
 def process_pdb_code(code):
+    from factories import create_pdb_record, create_metal_record
+
     # Get PDB
-    from factories import create_pdb_record
     pdb = atomium.fetch(code)
     model, assembly_id = get_best_model(pdb)
-    create_pdb_record(pdb, assembly_id)
+    pdb_record = create_pdb_record(pdb, assembly_id)
+
+    # Check model is usable
+    if model_is_skeleton(model):
+        for zinc in model.atoms(element="ZN"):
+            create_metal_record(zinc, pdb_record,
+             omission="No side chain information in PDB."
+            )
+        return
+
+    # Save any zincs not in model
+    for zinc in zincs_outside_model(model, pdb):
+        create_metal_record(zinc, pdb_record,
+         omission="Zinc in asymmetric unit but not biological assembly."
+        )
 
 
 def get_best_model(pdb):
@@ -49,3 +64,18 @@ def get_best_model(pdb):
         return model, assemblies[0]["id"]
     else:
         return pdb.model, None
+
+
+def model_is_skeleton(model):
+    for residue in model.residues():
+        atom_names = set([atom.name for atom in residue.atoms()])
+        for name in atom_names:
+            if name not in ["C", "N", "CA", "O"]:
+                return False
+    return True
+
+
+def zincs_outside_model(model, pdb):
+    au_zincs = pdb.model.atoms(element="ZN")
+    assembly_zinc_ids = [atom.id for atom in model.atoms(element="ZN")]
+    return [z for z in au_zincs if z.id not in assembly_zinc_ids]
