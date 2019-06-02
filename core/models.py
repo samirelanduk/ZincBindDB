@@ -10,7 +10,7 @@ class Pdb(models.Model):
     title = models.CharField(max_length=1024)
     classification = models.CharField(null=True, blank=True, max_length=1024)
     keywords = models.CharField(null=True, blank=True, max_length=2048)
-    desposition_date = models.DateField(null=True, blank=True)
+    deposition_date = models.DateField(null=True, blank=True)
     resolution = models.FloatField(null=True, blank=True)
     rvalue = models.FloatField(null=True, blank=True)
     organism = models.CharField(null=True, blank=True, max_length=1024)

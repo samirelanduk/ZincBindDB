@@ -1,5 +1,7 @@
 import os
-from .secrets import SECRET_KEY, BASE_DIR, DATABASES
+from .secrets import SECRET_KEY
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 ALLOWED_HOSTS = []
 
@@ -21,5 +23,10 @@ TIME_ZONE = "UTC"
 MIDDLEWARE = [
  "django.middleware.common.CommonMiddleware",
 ]
+
+DATABASES = {"default": {
+ "ENGINE": "django.db.backends.sqlite3",
+ "NAME": os.path.join(BASE_DIR, "data", "db.sqlite3")
+}}
 
 STATIC_URL = "/static/"
