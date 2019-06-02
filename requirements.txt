@@ -1,5 +1,6 @@
 django==2.2
 graphene_django
+requests
 atomium
 tqdm
 
