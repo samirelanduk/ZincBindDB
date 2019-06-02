@@ -1,18 +1,12 @@
-#! /usr/bin/env python3
-
-def setup_django():
-    import os, django
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
-    django.setup()
-
-
-setup_django()
 import math
 import requests
 import atomium
-from tqdm import tqdm
-from django.db import transaction
-from core.models import Pdb
+
+def setup_django():
+    import os, sys, django
+    sys.path.append(os.path.join("..", "zincbinddb"))
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
+    django.setup()
 
 
 def get_zinc_pdb_codes():
@@ -36,6 +30,7 @@ def get_zinc_pdb_codes():
 
 def process_pdb_code(code):
     # Get PDB
+    from factories import create_pdb_record
     pdb = atomium.fetch(code)
     model, assembly_id = get_best_model(pdb)
     create_pdb_record(pdb, assembly_id)
@@ -54,46 +49,3 @@ def get_best_model(pdb):
         return model, assemblies[0]["id"]
     else:
         return pdb.model, None
-
-
-def create_pdb_record(pdb, assembly_id):
-    return Pdb.objects.create(
-     id=pdb.code, rvalue=pdb.rvalue, classification=pdb.classification,
-     deposition_date=pdb.deposition_date, organism=pdb.source_organism,
-     expression_system=pdb.expression_system, technique=pdb.technique,
-     keywords=", ".join(pdb.keywords) if pdb.keywords else "", title=pdb.title,
-     resolution=pdb.resolution, skeleton=model_is_skeleton(pdb.model),
-     assembly=assembly_id
-    )
-
-
-def model_is_skeleton(model):
-    for residue in model.residues():
-        atom_names = set([atom.name for atom in residue.atoms()])
-        for name in atom_names:
-            if name not in ["C", "N", "CA", "O"]:
-                return False
-    return True
-
-
-def main():
-    # What PDBs have zinc in them?
-    codes = get_zinc_pdb_codes()
-    print(f"There are {len(codes)} PDB codes with zinc")
-
-    # How many should be checked
-    current_codes = Pdb.objects.all().values_list("id", flat=True)
-    codes_to_check = [code for code in codes if code not in current_codes]
-    print(f"{len(codes_to_check)} of these need to be checked")
-
-    # Check
-    for code in tqdm(codes_to_check[:10]):
-        with transaction.atomic():
-            process_pdb_code(code)
-
-
-
-
-print()
-main()
-print()
