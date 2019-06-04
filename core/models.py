@@ -115,4 +115,15 @@ class Atom(models.Model):
     z = models.FloatField()
     element = models.CharField(max_length=8)
     residue = models.ForeignKey(Residue, on_delete=models.CASCADE)
+
+
+
+class CoordinateBond(models.Model):
+    """A bond between a metal atom and a liganding atom."""
+
+    class Meta:
+        db_table = "bonds"
+
+    metal = models.ForeignKey(Metal, on_delete=models.CASCADE)
+    atom = models.ForeignKey(Atom, on_delete=models.CASCADE)
     
