@@ -1,7 +1,9 @@
 def get_all_chains(sites):
     chains = set()
     for site in sites:
-        chains.update(site["chains"])
+        for chain in site["chains"]:
+            if chain.id not in [c.id for c in chains]:
+                chains.add(chain)
     return chains
 
 

@@ -34,7 +34,7 @@ def get_zinc_pdb_codes():
 
 def process_pdb_code(code):
     from factories import create_pdb_record, create_metal_record
-    from factories import create_chain_record
+    from factories import create_chain_record, create_site_record
 
     # Get PDB
     pdb = atomium.fetch(code)
@@ -91,6 +91,16 @@ def process_pdb_code(code):
     for chain in chains:
         sequence = get_chain_sequence(chain, residues)
         chain_dict[chain] = create_chain_record(chain, pdb_record, sequence)
+    
+    # Save sites to database
+    for index, site in enumerate(sites, start=1):
+        # Create site record itself
+        site_record = create_site_record(site, pdb_record, index)
+
+        # Create metals
+        metals = {}
+        for metal in site["metals"].keys():
+            metals[metal.id] = create_metal_record(metal, pdb_record)
 
 
 
@@ -122,3 +132,9 @@ def zincs_outside_model(model, pdb):
     au_zincs = pdb.model.atoms(element="ZN")
     assembly_zinc_ids = [atom.id for atom in model.atoms(element="ZN")]
     return [z for z in au_zincs if z.id not in assembly_zinc_ids]
+
+
+def create_site_family(residues):
+    codes = [atomium.data.CODES.get(r.name, "X")
+     for r in residues if isinstance(r, atomium.Residue)]
+    return "".join([f"{c}{codes.count(c)}" for c in sorted(set(codes))])

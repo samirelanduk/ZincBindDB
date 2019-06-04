@@ -1,4 +1,4 @@
-from core.models import Pdb, Metal, Chain
+from core.models import Pdb, Metal, Chain, ZincSite
 
 def create_pdb_record(pdb, assembly_id):
     from utilities import model_is_skeleton
@@ -31,4 +31,13 @@ def create_chain_record(chain, pdb_record, sequence):
     return Chain.objects.create(
      id=f"{pdb_record.id}{chain.id}", pdb=pdb_record,
      sequence=sequence, atomium_id=chain.id
+    )
+
+
+def create_site_record(site_dict, pdb_record, index):
+    from utilities import create_site_family
+    return ZincSite.objects.create(
+     id=f"{pdb_record.id}-{index}",
+     family=create_site_family(site_dict["residues"]), pdb=pdb_record,
+     residue_names="".join(set([f".{r.name}." for r in site_dict["residues"]]))
     )

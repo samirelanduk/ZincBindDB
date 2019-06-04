@@ -53,3 +53,17 @@ class Chain(models.Model):
     atomium_id = models.CharField(max_length=128)
     sequence = models.TextField()
     pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
+
+
+
+class ZincSite(models.Model):
+    """A zinc binding site, with one or more zinc atoms in it."""
+
+    class Meta:
+        db_table = "zinc_sites"
+
+    id = models.CharField(primary_key=True, max_length=128)
+    family = models.CharField(max_length=128)
+    residue_names = models.CharField(max_length=512)
+    representative = models.BooleanField(default=False)
+    pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
