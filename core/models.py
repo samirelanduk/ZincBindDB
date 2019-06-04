@@ -67,3 +67,16 @@ class ZincSite(models.Model):
     residue_names = models.CharField(max_length=512)
     representative = models.BooleanField(default=False)
     pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
+
+
+
+class ChainInteraction(models.Model):
+    """An interaction between a chain and a zinc binding sites."""
+
+    class Meta:
+        db_table = "chain_interactions"
+
+    sequence = models.TextField()
+    chain = models.ForeignKey(Chain, on_delete=models.CASCADE, blank=True, null=True)
+    site = models.ForeignKey(ZincSite, on_delete=models.CASCADE, blank=True, null=True)
+    

@@ -35,6 +35,7 @@ def get_zinc_pdb_codes():
 def process_pdb_code(code):
     from factories import create_pdb_record, create_metal_record
     from factories import create_chain_record, create_site_record
+    from factories import create_chain_interaction_record
 
     # Get PDB
     pdb = atomium.fetch(code)
@@ -101,6 +102,13 @@ def process_pdb_code(code):
         metals = {}
         for metal in site["metals"].keys():
             metals[metal.id] = create_metal_record(metal, pdb_record)
+        
+        # Create chain interactions
+        for chain in chains:
+            sequence = get_chain_sequence(chain, site["residues"])
+            create_chain_interaction_record(
+             chain_dict[chain], site_record, sequence
+            )
 
 
 
