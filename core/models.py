@@ -1,3 +1,4 @@
+import atomium
 from django.db import models
 
 class Pdb(models.Model):
@@ -79,4 +80,22 @@ class ChainInteraction(models.Model):
     sequence = models.TextField()
     chain = models.ForeignKey(Chain, on_delete=models.CASCADE, blank=True, null=True)
     site = models.ForeignKey(ZincSite, on_delete=models.CASCADE, blank=True, null=True)
+
+
+
+class Residue(models.Model):
+    "A collection of atoms, usually in a row on a chain."
+
+    class Meta:
+        db_table = "residues"
+        ordering = ["residue_number"]
+
+    residue_number = models.IntegerField()
+    insertion_code = models.CharField(max_length=128)
+    name = models.CharField(max_length=128)
+    atomium_id = models.CharField(max_length=128)
+    chain_identifier = models.CharField(max_length=128)
+    chain_signature = models.CharField(max_length=128, blank=True)
+    site = models.ForeignKey(ZincSite, on_delete=models.CASCADE)
+    chain = models.ForeignKey(Chain, blank=True, null=True, on_delete=models.CASCADE)
     

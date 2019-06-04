@@ -35,6 +35,7 @@ def create_chain_record(chain, pdb_record, sequence):
 
 
 def create_site_record(site_dict, pdb_record, index):
+    # Create site record itself
     from utilities import create_site_family
     return ZincSite.objects.create(
      id=f"{pdb_record.id}-{index}",
@@ -42,8 +43,46 @@ def create_site_record(site_dict, pdb_record, index):
      residue_names="".join(set([f".{r.name}." for r in site_dict["residues"]]))
     )
 
+    # Create metals
+    metals = {}
+    for metal in site["metals"].keys():
+        metals[metal.id] = create_metal_record(metal, pdb_record)
+    
+    # Create chain interactions
+    for chain in chains:
+        sequence = get_chain_sequence(chain, site["residues"])
+        create_chain_interaction_record(
+            chain_dict[chain.id], site_record, sequence
+        )
+    
+    # Create residue records
+    atoms = {}
+    for res in site["residues"]:
+        chain_record = chain_dict[res.chain.id] if isinstance(res, atomium.Residue) else None
+        create_residue_record(res, chain_record, site_record)
+
 
 def create_chain_interaction_record(chain_record, site_record, sequence):
     return ChainInteraction.objects.create(
      sequence=sequence, chain=chain_record, site=site_record
     )
+
+
+def create_residue_record(residue, chain_record, site_record):
+    numeric_id, insertion = residue.id.split(".")[1], ""
+    while not numeric_id[-1].isdigit():
+        insertion += numeric_id[-1]
+        numeric_id = numeric_id[:-1]
+    numeric_id = int(numeric_id)
+    signature = []
+    if isinstance(residue, atomium.Residue):
+        if residue.previous: signature = [residue.previous.name.lower()]
+        signature.append(residue.name)
+        if residue.next: signature.append(residue.next.name.lower())
+    signature = ".".join(signature)
+    residue_record = Residue.objects.create(
+     residue_number=numeric_id, chain_identifier=residue.chain.id,
+     insertion_code=insertion, chain_signature=signature,
+     name=residue.name, chain=chain_record, site=site_record, atomium_id=residue.id
+    )
+    return residue_record
