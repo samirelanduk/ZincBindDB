@@ -22,6 +22,20 @@ class Pdb(models.Model):
 
 
 
+class ZincSite(models.Model):
+    """A zinc binding site, with one or more zinc atoms in it."""
+
+    class Meta:
+        db_table = "zinc_sites"
+
+    id = models.CharField(primary_key=True, max_length=128)
+    family = models.CharField(max_length=128)
+    residue_names = models.CharField(max_length=512)
+    representative = models.BooleanField(default=False)
+    pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
+
+
+
 class Metal(models.Model):
     """A metal atom - usually zinc."""
 
@@ -40,6 +54,7 @@ class Metal(models.Model):
     chain_id = models.CharField(max_length=128)
     omission_reason = models.TextField(blank=True, null=True)
     pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
+    site = models.ForeignKey(ZincSite, on_delete=models.CASCADE, blank=True, null=True)
 
 
 
@@ -53,20 +68,6 @@ class Chain(models.Model):
     id = models.CharField(primary_key=True, max_length=128)
     atomium_id = models.CharField(max_length=128)
     sequence = models.TextField()
-    pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
-
-
-
-class ZincSite(models.Model):
-    """A zinc binding site, with one or more zinc atoms in it."""
-
-    class Meta:
-        db_table = "zinc_sites"
-
-    id = models.CharField(primary_key=True, max_length=128)
-    family = models.CharField(max_length=128)
-    residue_names = models.CharField(max_length=512)
-    representative = models.BooleanField(default=False)
     pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
 
 
@@ -98,4 +99,20 @@ class Residue(models.Model):
     chain_signature = models.CharField(max_length=128, blank=True)
     site = models.ForeignKey(ZincSite, on_delete=models.CASCADE)
     chain = models.ForeignKey(Chain, blank=True, null=True, on_delete=models.CASCADE)
+
+
+
+class Atom(models.Model):
+    """An atom in a liganding residue."""
+
+    class Meta:
+        db_table = "atoms"
+
+    atomium_id = models.IntegerField()
+    name = models.CharField(max_length=32)
+    x = models.FloatField()
+    y = models.FloatField()
+    z = models.FloatField()
+    element = models.CharField(max_length=8)
+    residue = models.ForeignKey(Residue, on_delete=models.CASCADE)
     

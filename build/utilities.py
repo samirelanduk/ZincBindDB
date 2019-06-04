@@ -87,14 +87,14 @@ def process_pdb_code(code):
     
     # Create chains involved in all binding sites
     chains, residues = get_all_chains(sites), get_all_residues(sites)
-    chain_dict = {}
+    chains_dict = {}
     for chain in chains:
         sequence = get_chain_sequence(chain, residues)
-        chain_dict[chain.id] = create_chain_record(chain, pdb_record, sequence)
+        chains_dict[chain.id] = create_chain_record(chain, pdb_record, sequence)
     
     # Save sites to database
     for index, site in enumerate(sites, start=1):
-        site_record = create_site_record(site, pdb_record, index)
+        site_record = create_site_record(site, pdb_record, index, chains_dict)
 
 
 
