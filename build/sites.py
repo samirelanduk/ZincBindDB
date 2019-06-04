@@ -99,5 +99,6 @@ def get_site_chains(site):
     site_chains = set()
     for res in site["residues"]:
         if isinstance(res, atomium.Residue):
-            site_chains.add(res.chain)
+            if res.chain.id not in [c.id for c in site_chains]:
+                site_chains.add(res.chain)
     return site_chains

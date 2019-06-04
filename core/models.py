@@ -39,3 +39,17 @@ class Metal(models.Model):
     chain_id = models.CharField(max_length=128)
     omission_reason = models.TextField(blank=True, null=True)
     pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
+
+
+
+class Chain(models.Model):
+    """A chain of residues in a PDB."""
+
+    class Meta:
+        db_table = "chains"
+        ordering = ["id"]
+
+    id = models.CharField(primary_key=True, max_length=128)
+    atomium_id = models.CharField(max_length=128)
+    sequence = models.TextField()
+    pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)

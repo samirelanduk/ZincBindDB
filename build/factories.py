@@ -1,4 +1,4 @@
-from core.models import Pdb, Metal
+from core.models import Pdb, Metal, Chain
 
 def create_pdb_record(pdb, assembly_id):
     from utilities import model_is_skeleton
@@ -24,4 +24,11 @@ def create_metal_record(atom, pdb_record, omission=None):
      y=atom.y, z=atom.z, residue_number=numeric_id, insertion_code=insertion,
      chain_id=atom.chain.id, residue_name=residue.name,
      pdb=pdb_record, omission_reason=omission
+    )
+
+
+def create_chain_record(chain, pdb_record, sequence):
+    return Chain.objects.create(
+     id=f"{pdb_record.id}{chain.id}", pdb=pdb_record,
+     sequence=sequence, atomium_id=chain.id
     )

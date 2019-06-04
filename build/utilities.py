@@ -4,6 +4,7 @@ import atomium
 from sites import remove_duplicate_atoms, get_atom_liganding_atoms
 from sites import remove_salt_metals, merge_metal_groups, get_site_residues
 from sites import get_site_chains
+from chains import get_all_chains, get_all_residues, get_chain_sequence
 
 def setup_django():
     import os, sys, django
@@ -33,6 +34,7 @@ def get_zinc_pdb_codes():
 
 def process_pdb_code(code):
     from factories import create_pdb_record, create_metal_record
+    from factories import create_chain_record
 
     # Get PDB
     pdb = atomium.fetch(code)
@@ -68,7 +70,7 @@ def process_pdb_code(code):
             )
 
     # Get list of binding site dicts from the metals dict
-    sites = [{"metals": {m: v}, "residues": set(), "chains": set()} for m, v in metals.items()]
+    sites = [{"metals": {m: v}} for m, v in metals.items()]
 
     # Merge those that share residues
     merge_metal_groups(sites)
@@ -82,6 +84,13 @@ def process_pdb_code(code):
     for site in sites:
         site["residues"] = get_site_residues(site)
         site["chains"] = get_site_chains(site)
+    
+    # Create chains involved in all binding sites
+    chains, residues = get_all_chains(sites), get_all_residues(sites)
+    chain_dict = {}
+    for chain in chains:
+        sequence = get_chain_sequence(chain, residues)
+        chain_dict[chain] = create_chain_record(chain, pdb_record, sequence)
 
 
 
