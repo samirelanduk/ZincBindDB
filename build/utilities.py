@@ -1,5 +1,6 @@
 import math
 import requests
+import subprocess
 import atomium
 from sites import remove_duplicate_atoms, get_atom_liganding_atoms
 from sites import remove_salt_metals, merge_metal_groups, get_site_residues
@@ -135,3 +136,9 @@ def create_site_family(residues):
     codes = [atomium.data.CODES.get(r.name, "X")
      for r in residues if isinstance(r, atomium.Residue)]
     return "".join([f"{c}{codes.count(c)}" for c in sorted(set(codes))])
+
+
+def is_cd_hit_installed():
+    p = subprocess.Popen("which cd-hit", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    out, err = p.communicate()
+    return bool(out)

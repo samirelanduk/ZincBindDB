@@ -22,6 +22,19 @@ class Pdb(models.Model):
 
 
 
+class Group(models.Model):
+    """A collection of equivalent zinc sites."""
+
+    class Meta:
+        db_table = "groups"
+
+    id = models.CharField(primary_key=True, max_length=128)
+    family = models.CharField(max_length=128)
+    keywords = models.CharField(max_length=1024)
+    classifications = models.CharField(max_length=1024)
+
+
+
 class ZincSite(models.Model):
     """A zinc binding site, with one or more zinc atoms in it."""
 
@@ -33,6 +46,7 @@ class ZincSite(models.Model):
     residue_names = models.CharField(max_length=512)
     representative = models.BooleanField(default=False)
     pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, default=None)
 
 
 
@@ -58,6 +72,14 @@ class Metal(models.Model):
 
 
 
+class ChainCluster(models.Model):
+    """A collection of chains with similar sequence."""
+
+    class Meta:
+        db_table = "chain_clusters"
+
+
+
 class Chain(models.Model):
     """A chain of residues in a PDB."""
 
@@ -69,6 +91,7 @@ class Chain(models.Model):
     atomium_id = models.CharField(max_length=128)
     sequence = models.TextField()
     pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
+    cluster = models.ForeignKey(ChainCluster, on_delete=models.SET_NULL, null=True, default=None)
 
 
 
@@ -127,3 +150,4 @@ class CoordinateBond(models.Model):
     metal = models.ForeignKey(Metal, on_delete=models.CASCADE)
     atom = models.ForeignKey(Atom, on_delete=models.CASCADE)
     
+
