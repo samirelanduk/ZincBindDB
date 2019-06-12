@@ -88,3 +88,15 @@ def align_sequences(seq1, seq2):
         align2 += seq2[j - 1]
         j -= 1
     return align1[::-1], align2[::-1]
+
+
+def get_all_chains_fasta():
+    from core.models import Chain
+    lines = []
+    for chain in Chain.objects.all():
+        lines.append(">lcl|" + str(chain.id))
+        sequence = chain.sequence
+        while sequence:
+            lines.append(sequence[:80])
+            sequence = sequence[80:]
+    return "\n".join(lines)
