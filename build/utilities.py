@@ -80,6 +80,9 @@ def process_pdb_code(code):
      a.element for a in site["metals"].keys()
     ]]
 
+    # Sort sites to make ID allocation deterministic
+    sites.sort(key=lambda s: min(a.id for a in s["metals"].keys()))
+
     # Add residues and chains to site dicts
     for site in sites:
         site["residues"] = get_site_residues(site)

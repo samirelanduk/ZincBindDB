@@ -54,7 +54,7 @@ def remove_salt_metals(metals):
 
     useless_metals = []
     for metal, atoms in metals.items():
-        if len([a for a in atoms if isinstance(a.structure, atomium.Residue)]) < 3:
+        if len([a for a in atoms if isinstance(a.het, atomium.Residue)]) < 3:
             useless_metals.append(metal)
     for metal in useless_metals: del metals[metal]
     return useless_metals
@@ -91,7 +91,7 @@ def get_site_residues(site):
     site_residues = set()
     for atoms in site["metals"].values():
         for atom in atoms:
-            site_residues.add(atom.structure)
+            site_residues.add(atom.het)
     return site_residues
 
 
