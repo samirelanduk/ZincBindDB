@@ -1,3 +1,6 @@
+import subprocess
+import re
+
 def get_all_chains(sites):
     chains = set()
     for site in sites:
@@ -100,3 +103,15 @@ def get_all_chains_fasta():
             lines.append(sequence[:80])
             sequence = sequence[80:]
     return "\n".join(lines)
+
+
+def get_chain_clusters(sequence_identity):
+    subprocess.call(
+     "cd-hit -i chains.fasta -d 0 -o temp -c {} -n 5 -G 1 -g 1 -b 20 -s 0.0 -aL "
+     "0.0 -aS 0.0 -T 4 -M 32000".format(sequence_identity),
+     shell=True, stdout=subprocess.PIPE
+    )
+    with open("temp.clstr") as f: data = f.read()
+    clusters = data.split(">Cluster ")[1:]
+    clusters = [re.compile(r">(.+?)\.\.\.").findall(c) for c in clusters]
+    return [[chain.split("|")[1] for chain in cluster] for cluster in clusters]

@@ -110,3 +110,11 @@ def create_atom_record(atom, residue_record):
      element=atom.element, residue=residue_record
     )
 
+
+def create_chain_cluster_record(chain_ids):
+    cluster_object = ChainCluster.objects.create()
+    for chain_id in chain_ids:
+        chain = Chain.objects.get(id=chain_id)
+        chain.cluster = cluster_object
+        chain.save()
+
