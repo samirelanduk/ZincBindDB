@@ -30,3 +30,12 @@ DATABASES = {"default": {
 }}
 
 STATIC_URL = "/static/"
+
+TEMPLATES = [{
+ "BACKEND": "django.template.backends.django.DjangoTemplates",
+ "APP_DIRS": True
+}]
+
+GRAPHENE = {
+ "SCHEMA": "core.schema.schema"
+}
