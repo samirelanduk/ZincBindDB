@@ -1,15 +1,16 @@
 import sys; sys.path += ["build", "core"]
+import os
 from unittest.mock import patch, Mock, MagicMock
 from django.test import LiveServerTestCase
 from django.core.management import call_command
-from build import main
+from build.build import main
 
-class DatabaseBuildingTests(LiveServerTestCase):
+class FixtureBuildingPretendTests(LiveServerTestCase):
 
     def setUp(self):
-        self.patch1 = patch("build.get_zinc_pdb_codes")
+        self.patch1 = patch("build.build.get_zinc_pdb_codes")
         self.patch2 = patch("builtins.print")
-        self.patch3 = patch("build.tqdm")
+        self.patch3 = patch("build.build.tqdm")
         self.mock_codes = self.patch1.start()
         self.mock_print = self.patch2.start()
         self.mock_tqdm = self.patch3.start()
@@ -28,6 +29,3 @@ class DatabaseBuildingTests(LiveServerTestCase):
             sysout, sys.stdout = sys.stdout, f
             call_command("dumpdata",  "--exclude=contenttypes", verbosity=0)
         sys.stdout = sysout
-
-import unittest
-unittest.main()

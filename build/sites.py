@@ -107,16 +107,16 @@ def get_site_chains(site):
     return site_chains
 
 
-def get_site_clusters():
-    from core.models import ZincSite
-    sites = ZincSite.objects.all().annotate(date=F("pdb__deposition_date"))
-    for site in tqdm(sites):
-        site_chain_clusters = set([
-         str(res.chain.cluster.id) for res in site.residue_set.all() if res.chain
-        ])
-        site.fingerprint = "_".join(sorted(site_chain_clusters)) + "__" + "_".join(
-         [str(res.chain_signature) for res in site.residue_set.exclude(chain_signature="")]
-        )
+def add_fingerprint_to_site(site):
+    site_chain_clusters = set([
+     str(res.chain.cluster.id) for res in site.residue_set.all() if res.chain
+    ])
+    site.fingerprint = "_".join(sorted(site_chain_clusters)) + "__" + "_".join(
+     [str(res.chain_signature) for res in site.residue_set.exclude(chain_signature="")]
+    )
+
+
+def get_site_clusters(sites):
     unique_sites = {}
     for site in sites:
         try:

@@ -4,7 +4,7 @@ import sys
 import os
 from utilities import *
 from chains import get_all_chains_fasta, get_chain_clusters
-from sites import get_site_clusters
+from sites import get_site_clusters, add_fingerprint_to_site
 setup_django()
 from tqdm import tqdm
 from django.db import transaction
@@ -48,7 +48,10 @@ def main():
         
         # Cluster sites based on chain clusters
         print("Clustering zinc sites based on associated chains...")
-        site_clusters = get_site_clusters()
+        sites = ZincSite.objects.all().annotate(date=F("pdb__deposition_date"))
+        for site in tqdm(sites):
+            add_fingerprint_to_site(site)
+        site_clusters = get_site_clusters(sites)
 
         # Save zinc site clusters to database
         print("Saving these clusters to the database...")
