@@ -9,7 +9,7 @@ setup_django()
 from tqdm import tqdm
 from django.db import transaction
 from django.db.models import F
-from core.models import ChainCluster, Group, ZincSite
+from core.models import ChainCluster, Group, ZincSite, Chain
 
 SEQUENCE_IDENTITY = 0.9
 
@@ -31,7 +31,7 @@ def main():
 
         # Save temporary FASTA file
         fasta = get_all_chains_fasta()
-        with open("chains.fasta", "w") as f: f.write(fasta)
+        with open("data/chains.fasta", "w") as f: f.write(fasta)
         print("Saved current chains to chains.fasta ({:.2f} KB)".format(len(fasta) / 1024))
 
         # Run CD-HIT
@@ -40,10 +40,11 @@ def main():
 
         # Save clusters to database
         print("Saving these to the database...")
+        chain_dates = {chain.id: chain.date for chain in
+         Chain.objects.all().annotate(date=F("pdb__deposition_date"))}
         with transaction.atomic():
             for cluster in tqdm(clusters):
-                # TODO Use representative chain for cluster ID
-                create_chain_cluster_record(cluster)
+                create_chain_cluster_record(cluster, chain_dates)
         
         # Cluster sites based on chain clusters
         print("Clustering zinc sites based on associated chains...")

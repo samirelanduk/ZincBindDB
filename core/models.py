@@ -77,6 +77,8 @@ class ChainCluster(models.Model):
 
     class Meta:
         db_table = "chain_clusters"
+    
+    id = models.CharField(primary_key=True, max_length=128)
 
 
 

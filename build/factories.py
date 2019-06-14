@@ -112,8 +112,10 @@ def create_atom_record(atom, residue_record):
     )
 
 
-def create_chain_cluster_record(chain_ids):
-    cluster_object = ChainCluster.objects.create()
+def create_chain_cluster_record(chain_ids, dates):
+    dates = [dates[id] for id in chain_ids]
+    id = chain_ids[dates.index(min(dates))]
+    cluster_object = ChainCluster.objects.create(id=id)
     for chain_id in chain_ids:
         chain = Chain.objects.get(id=chain_id)
         chain.cluster = cluster_object
