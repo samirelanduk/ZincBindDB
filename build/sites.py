@@ -1,6 +1,9 @@
 import math
+from tqdm import tqdm
+from collections import Counter
 from itertools import combinations
 import atomium
+from django.db.models import F
 
 def remove_duplicate_atoms(atoms):
     """Takes a set of atoms, and removes duplicates. For each element that is
@@ -102,3 +105,49 @@ def get_site_chains(site):
             if res.chain.id not in [c.id for c in site_chains]:
                 site_chains.add(res.chain)
     return site_chains
+
+
+def get_site_clusters():
+    from core.models import ZincSite
+    sites = ZincSite.objects.all().annotate(date=F("pdb__deposition_date"))
+    for site in tqdm(sites):
+        site_chain_clusters = set([
+         str(res.chain.cluster.id) for res in site.residue_set.all() if res.chain
+        ])
+        site.fingerprint = "_".join(sorted(site_chain_clusters)) + "__" + "_".join(
+         [str(res.chain_signature) for res in site.residue_set.exclude(chain_signature="")]
+        )
+    unique_sites = {}
+    for site in sites:
+        try:
+            unique_sites[site.fingerprint].append(site)
+        except: unique_sites[site.fingerprint] = [site]
+    return unique_sites
+
+
+def get_group_information(sites):
+    pdbs = list(set([site.pdb for site in sites]))
+    classifications = []
+    keywords = []
+    for pdb in pdbs:
+        classifications.append(pdb.classification.upper())
+        keywords += pdb.keywords.upper().split(", ")
+    classifications = Counter(classifications)
+    keywords = Counter(keywords)
+    title_keywords = {}
+    bad_keywords = ["INHIBITOR", "ZINC", "ZINC ENZYME"]
+    for keyword in keywords:
+        if keyword not in bad_keywords and not keyword.isdigit():
+            count = 0
+            for pdb in pdbs:
+                if keyword in pdb.title: count += 1
+            title_keywords[keyword] = count
+    title_keywords = list(reversed(sorted(title_keywords.items(), key=lambda k: k[1])))
+    cutoff = int(len(pdbs) * 0.25)
+    classifications = [c for c, n in classifications.items() if n >= cutoff]
+    keywords = [k for k, n in keywords.items() if n >= cutoff]
+    if title_keywords:
+        if title_keywords[0][0] in keywords:
+            keywords.remove(title_keywords[0][0])
+        keywords.insert(0, title_keywords[0][0])
+    return ", ".join(keywords), ", ".join(classifications)

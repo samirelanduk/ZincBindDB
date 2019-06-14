@@ -1,5 +1,6 @@
 from core.models import *
 from chains import get_chain_sequence
+from sites import get_group_information
 
 def create_pdb_record(pdb, assembly_id):
     from utilities import model_is_skeleton
@@ -117,4 +118,17 @@ def create_chain_cluster_record(chain_ids):
         chain = Chain.objects.get(id=chain_id)
         chain.cluster = cluster_object
         chain.save()
+
+
+def create_group_record(sites):
+    oldest = sorted(sites, key=lambda s: s.date)[0]
+    keywords, classifications = get_group_information(sites)
+    group = Group.objects.create(
+     id=oldest.id, family=sites[0].family,
+     keywords=keywords, classifications=classifications
+    )
+    for site in sites:
+        site.group = group
+        if site.id == group.id: site.representative = True
+        site.save()
 

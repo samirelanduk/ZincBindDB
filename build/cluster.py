@@ -4,15 +4,17 @@ import sys
 import os
 from utilities import *
 from chains import get_all_chains_fasta, get_chain_clusters
+from sites import get_site_clusters
 setup_django()
 from tqdm import tqdm
 from django.db import transaction
-from core.models import ChainCluster, Group
+from django.db.models import F
+from core.models import ChainCluster, Group, ZincSite
 
 SEQUENCE_IDENTITY = 0.9
 
 def main():
-    from factories import create_chain_cluster_record
+    from factories import create_chain_cluster_record, create_group_record
 
     # Check if CD-HIT is installed
     if not is_cd_hit_installed():
@@ -40,8 +42,18 @@ def main():
         print("Saving these to the database...")
         with transaction.atomic():
             for cluster in tqdm(clusters):
+                # TODO Use representative chain for cluster ID
                 create_chain_cluster_record(cluster)
         
+        # Cluster sites based on chain clusters
+        print("Clustering zinc sites based on associated chains...")
+        site_clusters = get_site_clusters()
+
+        # Save zinc site clusters to database
+        print("Saving these clusters to the database...")
+        with transaction.atomic():
+            for sites in tqdm(site_clusters.values()):
+                create_group_record(sites)
 
     finally:
         # Remove any temporary files saved
