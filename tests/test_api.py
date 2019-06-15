@@ -262,3 +262,50 @@ class ResidueApiTests(ApiTest):
          {"node": {"name": "HIS", "atomiumId": "A.96"}},
          {"node": {"name": "HIS", "atomiumId": "A.119"}}
         ]}}}})
+
+
+
+class AtomApiTests(ApiTest):
+    
+    def test_can_get_atom(self):
+        data = self.client.execute("""{atom(id: 1) {
+         id atomiumId name x y z element 
+        }}""")
+        self.assertEqual(data, {"data": {"atom": {
+         "id": "1", "atomiumId": 914, "name": "N", "x": -12.014, "y": -2.627, "z": 14.976, "element": "N" 
+        }}})
+    
+
+    def test_can_get_all_atoms(self):
+        data = self.client.execute("""{atoms { count }}""")
+        self.assertEqual(data, {"data": {"atoms": {"count": 645}}})
+    
+
+    def test_can_filter_atoms(self):
+        data = self.client.execute("""{atoms(element: "CL") { count edges { node { x y z}}}}""")
+        self.assertEqual(data, {"data": {"atoms": {"count": 2, "edges": [
+         {"node": {"x": 0.0, "y": 0.0, "z": 56.498}},
+         {"node": {"x": 0.0, "y": 0.0, "z": 76.191}}
+        ]}}})
+    
+
+    def test_can_get_residue_atom(self):
+        data = self.client.execute("""{residue(id: 1) {atom(id: 1) {
+         id atomiumId name x y z element 
+        }}}""")
+        self.assertEqual(data, {"data": {"residue": {"atom": {
+         "id": "1", "atomiumId": 914, "name": "N", "x": -12.014, "y": -2.627, "z": 14.976, "element": "N" 
+        }}}})
+    
+
+    def test_can_get_residue_atoms(self):
+        data = self.client.execute("""{residue(id: 1) {atoms { count edges { node {
+         atomiumId name 
+        }}}}}""")
+        self.assertEqual(data, {"data": {"residue": {"atoms": {"count": 10, "edges": [
+         {"node": {"atomiumId": 914, "name": "N"}}, {"node": {"atomiumId": 915, "name": "CA"}},
+         {"node": {"atomiumId": 916, "name": "C"}}, {"node": {"atomiumId": 917, "name": "O"}},
+         {"node": {"atomiumId": 918, "name": "CB"}}, {"node": {"atomiumId": 919, "name": "CG"}},
+         {"node": {"atomiumId": 920, "name": "ND1"}}, {"node": {"atomiumId": 921, "name": "CD2"}},
+         {"node": {"atomiumId": 922, "name": "CE1"}}, {"node": {"atomiumId": 923, "name": "NE2"}}
+        ]}}}})
