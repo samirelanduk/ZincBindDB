@@ -44,14 +44,14 @@ def process_pdb_code(code):
 
     # Check model is usable
     if model_is_skeleton(model):
-        for zinc in model.atoms(element="ZN"):
+        for zinc in sorted(model.atoms(element="ZN"), key=lambda m: m.id):
             create_metal_record(zinc, pdb_record,
              omission="No side chain information in PDB."
             )
         return
 
     # Save any zincs not in model
-    for zinc in zincs_outside_model(model, pdb):
+    for zinc in sorted(zincs_outside_model(model, pdb), key=lambda m: m.id):
         create_metal_record(zinc, pdb_record,
          omission="Zinc in asymmetric unit but not biological assembly."
         )
@@ -64,7 +64,7 @@ def process_pdb_code(code):
 
     # Ignore metals with too few liganding atoms
     useless_metals = remove_salt_metals(metals)
-    for metal in useless_metals:
+    for metal in sorted(useless_metals, key=lambda m: m.id):
         if metal.element == "ZN":
             create_metal_record(metal, pdb_record,
              omission="Zinc has too few liganding atoms."

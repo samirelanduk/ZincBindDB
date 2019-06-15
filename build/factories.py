@@ -50,11 +50,11 @@ def create_site_record(site_dict, pdb_record, index, chains_dict):
 
     # Create metals
     metals_dict = {}
-    for metal in site_dict["metals"].keys():
+    for metal in sorted(site_dict["metals"].keys(), key=lambda m: m.id):
         metals_dict[metal.id] = create_metal_record(metal, pdb_record, site_record)
     
     # Create chain interactions
-    for chain in site_dict["chains"]:
+    for chain in sorted(site_dict["chains"], key=lambda c: c.id):
         sequence = get_chain_sequence(chain, site_dict["residues"])
         create_chain_interaction_record(
          chains_dict[chain.id], site_record, sequence
@@ -62,12 +62,12 @@ def create_site_record(site_dict, pdb_record, index, chains_dict):
     
     # Create residue records
     atoms_dict = {}
-    for res in site_dict["residues"]:
+    for res in sorted(site_dict["residues"], key=lambda r: r.id):
         chain_record = chains_dict[res.chain.id] if isinstance(res, atomium.Residue) else None
         create_residue_record(res, chain_record, site_record, atoms_dict)
     
     # Create bond records
-    for metal, atoms in site_dict["metals"].items():
+    for metal, atoms in sorted(site_dict["metals"].items(), key=lambda a: a[0].id):
         for atom in atoms:
             CoordinateBond.objects.create(
              metal=metals_dict[metal.id], atom=atoms_dict[atom]

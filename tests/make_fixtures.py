@@ -26,9 +26,25 @@ class FixtureBuildingPretendTests(LiveServerTestCase):
         self.patch2.stop()
         self.patch3.stop()
         self.patch4.stop()
+
+        for fixture in os.listdir("core/fixtures"):
+            with open(f"core/fixtures/{fixture}") as f:
+                lines = f.read().splitlines()
+            new_lines = []
+            ids = {}
+            for index, line in enumerate(lines):
+                if line.startswith('  "pk": ') and '": "' not in line:
+                    if lines[index - 1] not in ids: ids[lines[index - 1]] = 1
+                    new_lines.append(line[: 8] + str(ids[lines[index - 1]]) + ",\n")
+                    ids[lines[index - 1]] += 1
+                else:
+                    new_lines.append(line + "\n")
+            with open(f"core/fixtures/{fixture}", "w") as f:
+                f.writelines(new_lines)
+
     
 
-    def test_make_pre_cluster_fixtures(self):
+    def test_1_make_pre_cluster_fixtures(self):
         self.mock_codes.return_value = [
          "12CA", "1BNT", "1G48", # Carbonic anhydrase,
          "1MSO", "1XDA", "1IZB", # Insulin
@@ -42,7 +58,7 @@ class FixtureBuildingPretendTests(LiveServerTestCase):
         sys.stdout = sysout
     
 
-    def test_make_post_cluster_fixtures(self):
+    def test_2_make_post_cluster_fixtures(self):
         call_command("loaddata", "core/fixtures/pre-cluster.json")
         cluster_main()
         with open("core/fixtures/post-cluster.json", "w") as f:

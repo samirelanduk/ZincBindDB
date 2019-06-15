@@ -50,7 +50,7 @@ def generate_args(Model):
     args = {}
     for field in Model._meta.get_fields(include_parents=False):
         field_type = field.get_internal_type()
-        if field_type == "CharField":
+        if field_type == "CharField" or field_type == "TextField":
             add_field_to_args(args, field, graphene.String, ("contains",))
         elif field_type == "FloatField":
             add_field_to_args(
@@ -73,7 +73,45 @@ def generate_args(Model):
 
 
 
-class ZincSiteType(DjangoObjectType):
+class MetalType(DjangoObjectType):
+
+    class Meta:
+        model = Metal
+
+
+
+class MetalConnection(Connection):
+    
+    class Meta:
+        node = MetalType
+    
+    count = graphene.Int()
+
+    def resolve_count(self, info, **kwargs):
+        return len(self.edges)
+
+
+
+class MetalContainer:
+
+    metal = graphene.Field(MetalType, id=graphene.Int(required=True))
+    metals = graphene.ConnectionField(MetalConnection, **generate_args(Metal))
+
+    def resolve_metal(self, info, **kwargs):
+        return Metal.objects.get(id=kwargs["id"])
+    
+
+    def resolve_metals(self, info, **kwargs):
+        try:
+            metals = self.metal_set.filter(**process_kwargs(kwargs))
+        except:
+            metals = Metal.objects.filter(**process_kwargs(kwargs))
+        if "sort" in kwargs: metals = metals.order_by(kwargs["sort"])
+        return metals
+
+
+
+class ZincSiteType(MetalContainer, DjangoObjectType):
 
     class Meta:
         model = ZincSite
@@ -111,7 +149,7 @@ class ZincSiteContainer:
 
 
 
-class PdbType(ZincSiteContainer, DjangoObjectType):
+class PdbType(ZincSiteContainer, MetalContainer, DjangoObjectType):
 
     class Meta:
         model = Pdb
@@ -130,7 +168,7 @@ class PdbConnection(Connection):
 
 
 
-class Query(ZincSiteContainer, graphene.ObjectType):
+class Query(ZincSiteContainer, MetalContainer, graphene.ObjectType):
    
     version = graphene.String()
     pdb = graphene.Field(PdbType, id=graphene.String(required=True))
