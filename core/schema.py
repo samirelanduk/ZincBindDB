@@ -25,7 +25,7 @@ def process_kwargs(kwargs):
 
     processed = {}
     for key, value in kwargs.items():
-        if key != "sort":
+        if key not in ["sort", "first", "last"]:
             key = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", key)
             key = re.sub("([a-z0-9])([A-Z])", r"\1_\2", key).lower()
             processed[key] = value
@@ -46,7 +46,7 @@ def add_field_to_args(args, field, Type, suffixes):
 def generate_args(Model):
     """Generates a dictionary representing the fields that can be passed to a
     GraphQL field, for a given model."""
-    
+
     args = {}
     for field in Model._meta.get_fields(include_parents=False):
         field_type = field.get_internal_type()
@@ -64,12 +64,54 @@ def generate_args(Model):
             add_field_to_args(
              args, field, graphene.Int, ("lt", "gt", "lte", "gte")
             )
+        elif field_type == "BooleanField":
+            add_field_to_args(
+             args, field, graphene.Boolean, ()
+            )
     args["sort"] = graphene.String()
     return args
 
 
 
-class PdbType(DjangoObjectType):
+class ZincSiteType(DjangoObjectType):
+
+    class Meta:
+        model = ZincSite
+
+
+
+class ZincSiteConnection(Connection):
+    
+    class Meta:
+        node = ZincSiteType
+    
+    count = graphene.Int()
+
+    def resolve_count(self, info, **kwargs):
+        return len(self.edges)
+
+
+
+class ZincSiteContainer:
+
+    zincsite = graphene.Field(ZincSiteType, id=graphene.String(required=True))
+    zincsites = graphene.ConnectionField(ZincSiteConnection, **generate_args(ZincSite))
+
+    def resolve_zincsite(self, info, **kwargs):
+        return ZincSite.objects.get(id=kwargs["id"])
+    
+
+    def resolve_zincsites(self, info, **kwargs):
+        try:
+            zincsites = self.zincsite_set.filter(**process_kwargs(kwargs))
+        except:
+            zincsites = ZincSite.objects.filter(**process_kwargs(kwargs))
+        if "sort" in kwargs: zincsites = zincsites.order_by(kwargs["sort"])
+        return zincsites
+
+
+
+class PdbType(ZincSiteContainer, DjangoObjectType):
 
     class Meta:
         model = Pdb
@@ -88,11 +130,12 @@ class PdbConnection(Connection):
 
 
 
-class Query(graphene.ObjectType):
+class Query(ZincSiteContainer, graphene.ObjectType):
    
     version = graphene.String()
     pdb = graphene.Field(PdbType, id=graphene.String(required=True))
     pdbs = graphene.ConnectionField(PdbConnection, **generate_args(Pdb))
+    
 
     def resolve_version(self, info, **kwargs):
         return "1.0.0"
@@ -106,7 +149,7 @@ class Query(graphene.ObjectType):
         pdbs = Pdb.objects.filter(**process_kwargs(kwargs))
         if "sort" in kwargs: pdbs = pdbs.order_by(kwargs["sort"])
         return pdbs
-
+    
 
 schema = graphene.Schema(query=Query)
 
