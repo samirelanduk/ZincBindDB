@@ -73,6 +73,44 @@ def generate_args(Model):
 
 
 
+class ResidueType(DjangoObjectType):
+
+    class Meta:
+        model = Residue
+
+
+
+class ResidueConnection(Connection):
+    
+    class Meta:
+        node = ResidueType
+    
+    count = graphene.Int()
+
+    def resolve_count(self, info, **kwargs):
+        return len(self.edges)
+
+
+
+class ResidueContainer:
+
+    residue = graphene.Field(ResidueType, id=graphene.Int(required=True))
+    residues = graphene.ConnectionField(ResidueConnection, **generate_args(Residue))
+
+    def resolve_residue(self, info, **kwargs):
+        return Residue.objects.get(id=kwargs["id"])
+    
+
+    def resolve_residues(self, info, **kwargs):
+        try:
+            residues = self.residue_set.filter(**process_kwargs(kwargs))
+        except:
+            residues = Residue.objects.filter(**process_kwargs(kwargs))
+        if "sort" in kwargs: residues = residues.order_by(kwargs["sort"])
+        return residues
+
+
+
 class MetalType(DjangoObjectType):
 
     class Meta:
@@ -111,7 +149,7 @@ class MetalContainer:
 
 
 
-class ZincSiteType(MetalContainer, DjangoObjectType):
+class ZincSiteType(MetalContainer, ResidueContainer, DjangoObjectType):
 
     class Meta:
         model = ZincSite
@@ -168,7 +206,7 @@ class PdbConnection(Connection):
 
 
 
-class Query(ZincSiteContainer, MetalContainer, graphene.ObjectType):
+class Query(ZincSiteContainer, MetalContainer, ResidueContainer, graphene.ObjectType):
    
     version = graphene.String()
     pdb = graphene.Field(PdbType, id=graphene.String(required=True))

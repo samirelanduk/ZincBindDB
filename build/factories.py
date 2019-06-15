@@ -99,7 +99,7 @@ def create_residue_record(residue, chain_record, site_record, atoms_dict):
      insertion_code=insertion, chain_signature=signature,
      name=residue.name, chain=chain_record, site=site_record, atomium_id=residue.id
     )
-    for atom in residue.atoms():
+    for atom in sorted(residue.atoms(), key=lambda a: a.id):
         atoms_dict[atom] = create_atom_record(atom, residue_record)
     return residue_record
 
