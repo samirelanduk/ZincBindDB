@@ -68,7 +68,7 @@ def create_site_record(site_dict, pdb_record, index, chains_dict):
     
     # Create bond records
     for metal, atoms in sorted(site_dict["metals"].items(), key=lambda a: a[0].id):
-        for atom in atoms:
+        for atom in sorted(atoms, key=lambda a: a.id):
             CoordinateBond.objects.create(
              metal=metals_dict[metal.id], atom=atoms_dict[atom]
             )
