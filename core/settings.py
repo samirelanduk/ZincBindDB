@@ -5,6 +5,8 @@ except:
     import binascii
     SECRET_KEY = binascii.hexlify(os.urandom(24)).decode()
 
+VERSION = "1.0.0"
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 ALLOWED_HOSTS = []

@@ -2,6 +2,7 @@ import re
 import graphene
 from graphene_django.types import DjangoObjectType
 from graphene.relay import Connection, ConnectionField
+from django.conf import settings
 from .models import *
 
 def camel_case(string, suffix=None):
@@ -525,7 +526,7 @@ class Query(HasPdbs, HasZincSites, HasMetals, HasResidues, HasAtoms, HasChains,
     )
     
     def resolve_version(self, info, **kwargs):
-        return "1.0.0"
+        return settings.VERSION
     
 
     def resolve_blast(self, info, **kwargs):
