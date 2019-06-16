@@ -278,6 +278,47 @@ class ZincSiteContainer:
 
 
 
+class GroupType(ZincSiteContainer, DjangoObjectType):
+
+    class Meta:
+        model = Group
+
+
+
+class GroupConnection(Connection):
+    
+    class Meta:
+        node = GroupType
+    
+    count = graphene.Int()
+
+    def resolve_count(self, info, **kwargs):
+        return len(self.edges)
+
+
+
+class GroupContainer:
+
+    group = graphene.Field(GroupType, id=graphene.String(required=True))
+    groups = graphene.ConnectionField(GroupConnection, **generate_args(Group))
+
+    def resolve_group(self, info, **kwargs):
+        try:
+            return self.group_set.get(id=kwargs["id"])
+        except AttributeError:
+            return Group.objects.get(id=kwargs["id"])
+    
+
+    def resolve_groups(self, info, **kwargs):
+        try:
+            groups = self.group_set.filter(**process_kwargs(kwargs))
+        except AttributeError:
+            groups = Group.objects.filter(**process_kwargs(kwargs))
+        if "sort" in kwargs: groups = groups.order_by(kwargs["sort"])
+        return groups
+
+
+
 class PdbType(ZincSiteContainer, MetalContainer, DjangoObjectType):
 
     class Meta:
@@ -297,7 +338,7 @@ class PdbConnection(Connection):
 
 
 
-class Query(ZincSiteContainer, MetalContainer, ResidueContainer, AtomContainer, CoordinateBondContainer, graphene.ObjectType):
+class Query(ZincSiteContainer, MetalContainer, ResidueContainer, AtomContainer, CoordinateBondContainer, GroupContainer, graphene.ObjectType):
    
     version = graphene.String()
     pdb = graphene.Field(PdbType, id=graphene.String(required=True))

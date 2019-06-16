@@ -45,6 +45,8 @@ def main():
         with transaction.atomic():
             for cluster in tqdm(clusters):
                 create_chain_cluster_record(cluster, chain_dates)
+        for chain in Chain.objects.filter(cluster=None):
+            create_chain_cluster_record([chain.id], chain_dates)
         
         # Cluster sites based on chain clusters
         print("Clustering zinc sites based on associated chains...")

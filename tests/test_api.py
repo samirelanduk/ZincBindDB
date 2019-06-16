@@ -95,6 +95,23 @@ class ZincSiteApiTests(ApiTest):
         self.assertEqual(data, {"data": {"pdb": {"zincsites": {"count": 2, "edges": [
          {"node": {"id": "1XDA-1"}}, {"node": {"id": "1XDA-2"}}
         ]}}}})
+    
+
+    def test_can_get_group_zincsite(self):
+        data = self.client.execute("""{group(id: "1IZB-1") {zincsite(id: "1XDA-1") {
+         id family residueNames representative
+        }}}""")
+        self.assertEqual(data, {"data": {"group": {"zincsite": {
+         "id": "1XDA-1", "family": "H3", "residueNames": ".CL..HIS.", "representative": False
+        }}}})
+    
+
+    def test_can_get_all_group_zincsites(self):
+        data = self.client.execute("""{group(id: "1IZB-1") {zincsites { count edges { node { id }}}}}""")
+        self.assertEqual(data, {"data": {"group": {"zincsites": {"count": 6, "edges": [
+         {"node": {"id": "1IZB-1"}}, {"node": {"id": "1IZB-2"}}, {"node": {"id": "1MSO-1"}},
+         {"node": {"id": "1MSO-2"}}, {"node": {"id": "1XDA-1"}}, {"node": {"id": "1XDA-2"}}
+        ]}}}})
 
 
 
@@ -366,3 +383,37 @@ class CoordinateBondApiTests(ApiTest):
          {"node": {"id": "2", "atom": {"id": "30"}}},
          {"node": {"id": "3", "atom": {"id": "7"}}}
         ]}}}})
+
+
+
+class GroupApiTests(ApiTest):
+    
+    def test_can_get_group(self):
+        data = self.client.execute("""{group(id: "12CA-1") {
+         id family keywords classifications
+        }}""")
+        self.assertEqual(data, {"data": {"group": {
+         "id": "12CA-1", "family": "H3", "classifications": "LYASE(OXO-ACID), LYASE",
+         "keywords": "CARBONIC ANHYDRASE II, LYASE(OXO-ACID), F131V, 4-(AMINOSULFONYL)-N-[(2, 6-DIFLUOROPHENYL)METHYL]-BENZAMIDE, LYASE, CO2 HYDRATION, ZINC ENZYME",
+        }}})
+    
+
+    def test_can_get_all_groups(self):
+        data = self.client.execute("""{groups { edges { node { 
+         id family
+        }}}}""")
+        self.assertEqual(data, {"data": {"groups": {"edges": [
+         {"node": {"id": "12CA-1", "family": "H3"}}, {"node": {"id": "1IZB-1", "family": "H3"}},
+         {"node": {"id": "3HUD-1", "family": "C4"}}, {"node": {"id": "3HUD-2", "family": "C2H1"}},
+         {"node": {"id": "5Y5B-1", "family": "C1D1H4"}}, {"node": {"id": "6ISO-1", "family": "C3"}}
+        ]}}})
+    
+
+    def test_can_get_filter_groups(self):
+        data = self.client.execute("""{groups(family__contains: "H") { edges { node { 
+         id family
+        }}}}""")
+        self.assertEqual(data, {"data": {"groups": {"edges": [
+         {"node": {"id": "12CA-1", "family": "H3"}}, {"node": {"id": "1IZB-1", "family": "H3"}},
+         {"node": {"id": "3HUD-2", "family": "C2H1"}}, {"node": {"id": "5Y5B-1", "family": "C1D1H4"}}, 
+        ]}}})
