@@ -7,3 +7,4 @@ tqdm
 gunicorn
 
 kirjava
+python-coveralls

@@ -1,0 +1,19 @@
+language: python
+
+python:
+    - 3.6
+matrix:
+  include:
+    - python: 3.7
+      dist: xenial
+      sudo: true
+
+install:
+    - pip install git+https://github.com/samirelanduk/atomium.git@1.0
+    - pip install -r requirements.txt
+
+script:
+    - coverage run --source=core,build `which django-admin.py` test --pythonpath=. --settings=core.settings
+
+after_success:
+  - coveralls
