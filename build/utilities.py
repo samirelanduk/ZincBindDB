@@ -3,6 +3,7 @@
 import math
 import requests
 import subprocess
+from datetime import datetime
 import atomium
 from sites import remove_duplicate_atoms, get_atom_liganding_atoms
 from sites import remove_salt_metals, merge_metal_groups, get_site_residues
@@ -16,6 +17,15 @@ def setup_django():
     sys.path.append(os.path.join("..", "zincbinddb"))
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
     django.setup()
+
+
+def log(text):
+    """Writes a line to the log file."""
+    
+    with open("data/build.log", "a") as f:
+        f.write("{}: {}\n".format(
+         datetime.now().strftime("%Y-%m-%dT%H:%M:%S"), text
+        ))
 
 
 def get_zinc_pdb_codes():
@@ -77,7 +87,7 @@ def zincs_outside_model(model, pdb):
 
 def is_cd_hit_installed():
     """Checks if the CD-hit binary is installed."""
-    
+
     p = subprocess.Popen(
      "which cd-hit", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
     )

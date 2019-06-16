@@ -13,9 +13,11 @@ class DatabaseBuildingTests(LiveServerTestCase):
         self.patch1 = patch("build.build.get_zinc_pdb_codes")
         self.patch2 = patch("builtins.print")
         self.patch3 = patch("build.build.tqdm")
+        self.patch4 = patch("build.build.log")
         self.mock_codes = self.patch1.start()
         self.mock_print = self.patch2.start()
         self.mock_tqdm = self.patch3.start()
+        self.mock_log = self.patch4.start()
         self.mock_tqdm.side_effect = lambda l: l
 
 
@@ -23,6 +25,7 @@ class DatabaseBuildingTests(LiveServerTestCase):
         self.patch1.stop()
         self.patch2.stop()
         self.patch3.stop()
+        self.patch4.stop()
 
 
     def check_print_statement(self, fragment):

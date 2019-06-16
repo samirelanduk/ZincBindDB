@@ -10,13 +10,16 @@ from core.models import Pdb
 
 def process_pdb_code(code):
     """Builds all the relevant objects for any given PDB code."""
-    
+
     from factories import create_pdb_record, create_metal_record
     from factories import create_chain_record, create_site_record
 
     # Get PDB
+    log(f"Fetching {code}")
     pdb = atomium.fetch(code)
+    log(f"Getting best {code} assembly")
     model, assembly_id = get_best_model(pdb)
+    log(f"Saving {code} to database")
     pdb_record = create_pdb_record(pdb, assembly_id)
 
     # Check model is usable
@@ -34,6 +37,7 @@ def process_pdb_code(code):
         )
 
     # Get metals
+    log(f"Finding {code} liganding atoms")
     metals = remove_duplicate_atoms(model.atoms(is_metal=True))
 
     # Determine liganding atoms of all metals
@@ -47,6 +51,7 @@ def process_pdb_code(code):
              omission="Zinc has too few liganding atoms."
             )
 
+    log(f"Processing {code} sites")
     # Get list of binding site dicts from the metals dict
     sites = [{"metals": {m: v}} for m, v in metals.items()]
 
@@ -67,6 +72,7 @@ def process_pdb_code(code):
         site["chains"] = get_site_chains(site)
     
     # Create chains involved in all binding sites
+    log(f"Processing {code} chains")
     chains, residues = get_all_chains(sites), get_all_residues(sites)
     chains_dict = {}
     for chain in chains:
@@ -75,10 +81,12 @@ def process_pdb_code(code):
     
     # Save sites to database
     for index, site in enumerate(sites, start=1):
+        log(f"Saving {code} site")
         site_record = create_site_record(site, pdb_record, index, chains_dict)
 
 
 def main():
+    log("\n\n\nSTARTING DATABASE BUILD")
     # What PDBs have zinc in them?
     codes = get_zinc_pdb_codes()
     print(f"There are {len(codes)} PDB codes with zinc")
