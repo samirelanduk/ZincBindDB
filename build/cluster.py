@@ -1,5 +1,7 @@
 #! /usr/bin/env python3
 
+"""This script will cluster chains and sites, after removing existing ones."""
+
 import sys
 import os
 from utilities import *

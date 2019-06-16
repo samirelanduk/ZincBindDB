@@ -1,3 +1,5 @@
+"""Contains functions for processing binding sites and groups of atoms."""
+
 import math
 from tqdm import tqdm
 from collections import Counter
@@ -80,6 +82,9 @@ def merge_metal_groups(sites):
 
 
 def check_sites_have_unique_residues(sites):
+    """Takes a list of sites, and returns True if none of them have residues in
+    common."""
+
     residues = set()
     all_residues = []
     for site in sites:
@@ -91,6 +96,9 @@ def check_sites_have_unique_residues(sites):
 
 
 def get_site_residues(site):
+    """Takes a dict with metal/liganding atom information, and gets all the
+    residues assoicated with those liganding atoms."""
+
     site_residues = set()
     for atoms in site["metals"].values():
         for atom in atoms:
@@ -99,6 +107,9 @@ def get_site_residues(site):
 
 
 def get_site_chains(site):
+    """Takes a dict with residue information, and gets all the chains associated
+    with the *polymer* residues."""
+
     site_chains = set()
     for res in site["residues"]:
         if isinstance(res, atomium.Residue):
@@ -107,7 +118,18 @@ def get_site_chains(site):
     return site_chains
 
 
+def create_site_family(residues):
+    """Generates a family string (H3, C2H2 etc.) from  a list of residues."""
+
+    codes = [atomium.data.CODES.get(r.name, "X")
+     for r in residues if isinstance(r, atomium.Residue)]
+    return "".join([f"{c}{codes.count(c)}" for c in sorted(set(codes))])
+
+
 def add_fingerprint_to_site(site):
+    """Adds a fingerprint property to a ZincSite record based on its chains'
+    cluster IDs and chain signature."""
+
     site_chain_clusters = set([
      str(res.chain.cluster.id) for res in site.residue_set.all() if res.chain_signature
     ])
@@ -117,6 +139,8 @@ def add_fingerprint_to_site(site):
 
 
 def get_site_clusters(sites):
+    """Clusters sites based on their signatures and returns them as a dict."""
+
     unique_sites = {}
     for site in sites:
         try:
@@ -126,6 +150,9 @@ def get_site_clusters(sites):
 
 
 def get_group_information(sites):
+    """Takes a list of ZincSite records and tries to extract information they
+    have in common."""
+    
     pdbs = list(set([site.pdb for site in sites]))
     classifications = []
     keywords = []

@@ -1,5 +1,7 @@
 #! /usr/bin/env python3
 
+"""This script will create chains.fasta and associated BLAST files."""
+
 import sys
 import os
 import subprocess

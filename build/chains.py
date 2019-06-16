@@ -1,7 +1,11 @@
+"""Contains functions for dealing with chains and chain sequences."""
+
 import subprocess
 import re
 
 def get_all_chains(sites):
+    """Takes a list of site dicts, and gets all chains with unique IDs."""
+
     chains = set()
     for site in sites:
         for chain in site["chains"]:
@@ -11,6 +15,8 @@ def get_all_chains(sites):
 
 
 def get_all_residues(sites):
+    """Gets all residues from a list of sites."""
+
     residues = set()
     for site in sites:
         residues.update(site["residues"])
@@ -18,6 +24,9 @@ def get_all_residues(sites):
 
 
 def get_chain_sequence(chain, residues):
+    """Gets a chain's sequence as it should appear in the database - all
+    lowercase but with certain residues (those given) in upper case."""
+
     full = "".join(res.code for res in chain)
     alignment = align_sequences(full, chain.sequence)
     seq, indices, dash_count = "", [], 0
@@ -94,6 +103,8 @@ def align_sequences(seq1, seq2):
 
 
 def get_all_chains_fasta():
+    """Gets the text of a FASTA file representing all chains in the database."""
+
     from core.models import Chain
     lines = []
     for chain in Chain.objects.all():
@@ -106,6 +117,9 @@ def get_all_chains_fasta():
 
 
 def get_chain_clusters(sequence_identity):
+    """Uses the CD-Hit binary to cluster chains into chain clusters, and returns
+    these clusters as lists of chain IDs."""
+    
     subprocess.call(
      "cd-hit -i chains.fasta -d 0 -o temp -c {} -n 5 -G 1 -g 1 -b 20 -s 0.0 -aL "
      "0.0 -aS 0.0 -T 4 -M 32000".format(sequence_identity),

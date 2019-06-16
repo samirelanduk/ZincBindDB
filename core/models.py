@@ -99,6 +99,9 @@ class Chain(models.Model):
 
     @staticmethod
     def blast_search(sequence, evalue):
+        """Searches all chains using a BLAST binary. This method currently has
+        no tests."""
+        
         p = subprocess.Popen(
          'echo "{}" | blastp -db data/chains.fasta -outfmt 15 -evalue {}'.format(sequence, evalue),
          stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True

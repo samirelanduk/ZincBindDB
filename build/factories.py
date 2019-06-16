@@ -1,8 +1,12 @@
+"""Contains functions for building objects in the database."""
+
 from core.models import *
 from chains import get_chain_sequence
-from sites import get_group_information
+from sites import get_group_information, create_site_family
 
 def create_pdb_record(pdb, assembly_id):
+    """Creates a Pdb record from an atomium File and an assembly ID."""
+
     from utilities import model_is_skeleton
     return Pdb.objects.create(
      id=pdb.code, rvalue=pdb.rvalue, classification=pdb.classification,
@@ -15,6 +19,9 @@ def create_pdb_record(pdb, assembly_id):
 
 
 def create_metal_record(atom, pdb_record, site_record=None, omission=None):
+    """Creates a Metal record. You specify a Pdb record, and optionally either
+    a Site record (if part of one) or a reason for omission (if not)."""
+
     residue = atom.het
     numeric_id, insertion = residue.id.split(".")[1], ""
     while not numeric_id[-1].isdigit():
@@ -31,6 +38,9 @@ def create_metal_record(atom, pdb_record, site_record=None, omission=None):
 
 
 def create_chain_record(chain, pdb_record, sequence):
+    """Creates a Chain record from an atomium Chain, a Pdb record, and a
+    sequence."""
+
     return Chain.objects.create(
      id=f"{pdb_record.id}{chain.id}", pdb=pdb_record,
      sequence=sequence, atomium_id=chain.id
@@ -38,8 +48,12 @@ def create_chain_record(chain, pdb_record, sequence):
 
 
 def create_site_record(site_dict, pdb_record, index, chains_dict):
+    """Creates a ZincSite record and all its sub-components from a dictionary
+    representing its metals, residues and chains. The ID will be created from
+    the index provided, and the chain information from the chain dictionary
+    provided."""
+
     # Create site record itself
-    from utilities import create_site_family
     residue_names = set([f".{r.name}." for r in site_dict["residues"]])
     residue_names = sorted(list(residue_names))
     site_record = ZincSite.objects.create(
@@ -77,12 +91,17 @@ def create_site_record(site_dict, pdb_record, index, chains_dict):
 
 
 def create_chain_interaction_record(chain_record, site_record, sequence):
+    """Creates a ChainInteraction record from the information provided."""
+
     return ChainInteraction.objects.create(
      sequence=sequence, chain=chain_record, site=site_record
     )
 
 
 def create_residue_record(residue, chain_record, site_record, atoms_dict):
+    """Creates a Residue record along with its atoms, from information given. A
+    dictionary of atoms must be given to make coordinate bonds later."""
+
     numeric_id, insertion = residue.id.split(".")[1], ""
     while not numeric_id[-1].isdigit():
         insertion += numeric_id[-1]
@@ -105,6 +124,8 @@ def create_residue_record(residue, chain_record, site_record, atoms_dict):
 
 
 def create_atom_record(atom, residue_record):
+    """Creates an Atom record from the information provided."""
+
     x, y, z = atom.location
     return Atom.objects.create(
      atomium_id=atom.id, name=atom.name, x=x, y=y, z=z,
@@ -113,6 +134,9 @@ def create_atom_record(atom, residue_record):
 
 
 def create_chain_cluster_record(chain_ids, dates):
+    """Creates a ChainCluster record from the information provided. All chains
+    will be updated as required."""
+
     dates = [dates[id] for id in chain_ids]
     id = chain_ids[dates.index(min(dates))]
     cluster_object = ChainCluster.objects.create(id=id)
@@ -123,6 +147,9 @@ def create_chain_cluster_record(chain_ids, dates):
 
 
 def create_group_record(sites):
+    """Creates a Group record from the information provided. All relevant sites
+    will be updated."""
+
     oldest = sorted(sites, key=lambda s: s.date)[0]
     keywords, classifications = get_group_information(sites)
     group = Group.objects.create(
