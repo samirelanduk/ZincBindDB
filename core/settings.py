@@ -1,5 +1,9 @@
 import os
-from .secrets import SECRET_KEY
+try:
+    from .secrets import SECRET_KEY
+except:
+    import binascii
+    SECRET_KEY = binascii.hexlify(os.urandom(24)).decode()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

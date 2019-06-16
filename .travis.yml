@@ -8,6 +8,13 @@ matrix:
       dist: xenial
       sudo: true
 
+before_install:
+    - cd $HOME
+    - git clone https://github.com/weizhongli/cdhit.git
+    - cd cdhit
+    - make
+    - export PATH=$HOME/cdhit:$PATH
+
 install:
     - pip install git+https://github.com/samirelanduk/atomium.git@1.0
     - pip install -r requirements.txt
