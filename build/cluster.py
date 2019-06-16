@@ -31,7 +31,7 @@ def main():
 
         # Save temporary FASTA file
         fasta = get_all_chains_fasta()
-        with open("data/chains.fasta", "w") as f: f.write(fasta)
+        with open("chains.fasta", "w") as f: f.write(fasta)
         print("Saved current chains to chains.fasta ({:.2f} KB)".format(len(fasta) / 1024))
 
         # Run CD-HIT

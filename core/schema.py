@@ -73,9 +73,6 @@ def generate_args(Model):
 
 
 
-
-
-
 class CoordinateBondType(DjangoObjectType):
 
     class Meta:

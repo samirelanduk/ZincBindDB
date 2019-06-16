@@ -107,7 +107,7 @@ def get_all_chains_fasta():
 
 def get_chain_clusters(sequence_identity):
     subprocess.call(
-     "cd-hit -i data/chains.fasta -d 0 -o temp -c {} -n 5 -G 1 -g 1 -b 20 -s 0.0 -aL "
+     "cd-hit -i chains.fasta -d 0 -o temp -c {} -n 5 -G 1 -g 1 -b 20 -s 0.0 -aL "
      "0.0 -aS 0.0 -T 4 -M 32000".format(sequence_identity),
      shell=True, stdout=subprocess.PIPE
     )
