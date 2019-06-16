@@ -49,6 +49,40 @@ class PdbApiTests(ApiTest):
 
 
 
+class GroupApiTests(ApiTest):
+    
+    def test_can_get_group(self):
+        data = self.client.execute("""{group(id: "12CA-1") {
+         id family keywords classifications
+        }}""")
+        self.assertEqual(data, {"data": {"group": {
+         "id": "12CA-1", "family": "H3", "classifications": "LYASE(OXO-ACID), LYASE",
+         "keywords": "CARBONIC ANHYDRASE II, LYASE(OXO-ACID), F131V, 4-(AMINOSULFONYL)-N-[(2, 6-DIFLUOROPHENYL)METHYL]-BENZAMIDE, LYASE, CO2 HYDRATION, ZINC ENZYME",
+        }}})
+    
+
+    def test_can_get_all_groups(self):
+        data = self.client.execute("""{groups { edges { node { 
+         id family
+        }}}}""")
+        self.assertEqual(data, {"data": {"groups": {"edges": [
+         {"node": {"id": "12CA-1", "family": "H3"}}, {"node": {"id": "1IZB-1", "family": "H3"}},
+         {"node": {"id": "3HUD-1", "family": "C4"}}, {"node": {"id": "3HUD-2", "family": "C2H1"}},
+         {"node": {"id": "5Y5B-1", "family": "C1D1H4"}}, {"node": {"id": "6ISO-1", "family": "C3"}}
+        ]}}})
+    
+
+    def test_can_get_filter_groups(self):
+        data = self.client.execute("""{groups(family__contains: "H") { edges { node { 
+         id family
+        }}}}""")
+        self.assertEqual(data, {"data": {"groups": {"edges": [
+         {"node": {"id": "12CA-1", "family": "H3"}}, {"node": {"id": "1IZB-1", "family": "H3"}},
+         {"node": {"id": "3HUD-2", "family": "C2H1"}}, {"node": {"id": "5Y5B-1", "family": "C1D1H4"}}, 
+        ]}}})
+
+
+
 class ZincSiteApiTests(ApiTest):
     
     def test_can_get_zincsite(self):
@@ -90,7 +124,7 @@ class ZincSiteApiTests(ApiTest):
         }}}})
     
 
-    def test_can_get_all_pdb_zincsites(self):
+    def test_can_get_pdb_zincsites(self):
         data = self.client.execute("""{pdb(id: "1XDA") {zincsites { count edges { node { id }}}}}""")
         self.assertEqual(data, {"data": {"pdb": {"zincsites": {"count": 2, "edges": [
          {"node": {"id": "1XDA-1"}}, {"node": {"id": "1XDA-2"}}
@@ -106,7 +140,7 @@ class ZincSiteApiTests(ApiTest):
         }}}})
     
 
-    def test_can_get_all_group_zincsites(self):
+    def test_can_get_group_zincsites(self):
         data = self.client.execute("""{group(id: "1IZB-1") {zincsites { count edges { node { id }}}}}""")
         self.assertEqual(data, {"data": {"group": {"zincsites": {"count": 6, "edges": [
          {"node": {"id": "1IZB-1"}}, {"node": {"id": "1IZB-2"}}, {"node": {"id": "1MSO-1"}},
@@ -168,7 +202,7 @@ class MetalApiTests(ApiTest):
         }}}})
     
 
-    def test_can_get_all_pdb_metals(self):
+    def test_can_get_pdb_metals(self):
         data = self.client.execute("""{pdb(id: "12CA") {metals { count edges { node { id }}}}}""")
         self.assertEqual(data, {"data": {"pdb": {"metals": {"count": 1, "edges": [
          {"node": {"id": "1"}} 
@@ -187,10 +221,164 @@ class MetalApiTests(ApiTest):
         }}}})
     
 
-    def test_can_get_all_zincsite_metals(self):
+    def test_can_get_zincsite_metals(self):
         data = self.client.execute("""{zincsite(id: "12CA-1") {metals { count edges { node { id }}}}}""")
         self.assertEqual(data, {"data": {"zincsite": {"metals": {"count": 1, "edges": [
          {"node": {"id": "1"}} 
+        ]}}}})
+
+
+
+class ChainClusterApiTests(ApiTest):
+    
+    def test_can_get_chain_cluster(self):
+        data = self.client.execute("""{ chainCluster(id: "12CAA") { id }}""")
+        self.assertEqual(data, {"data": {"chainCluster": {"id": "12CAA"}}})
+
+
+    def test_can_all_chain_clusters(self):
+        data = self.client.execute("""{ chainClusters { count edges { node { id }}}}""")
+        self.assertEqual(data, {"data": {"chainClusters": {"count": 5, "edges": [
+         {"node": {"id": "12CAA"}}, {"node": {"id": "1IZBB"}}, {"node": {"id": "3HUDA"}},
+         {"node": {"id": "5Y5BA"}}, {"node": {"id": "6ISOA"}}
+        ]}}})
+    
+
+    def test_can_filter_chain_clusters(self):
+        data = self.client.execute("""{ chainClusters(id__contains: "1") { count edges { node { id }}}}""")
+        self.assertEqual(data, {"data": {"chainClusters": {"count": 2, "edges": [
+         {"node": {"id": "12CAA"}}, {"node": {"id": "1IZBB"}}
+        ]}}})
+
+
+
+class ChainApiTests(ApiTest):
+    
+    def test_can_get_chain(self):
+        data = self.client.execute("""{ chain(id: "1XDAF") { atomiumId sequence }}""")
+        self.assertEqual(data, {"data": {"chain": {
+         "atomiumId": "F", "sequence": "fvnqhlcgsHlvealylvcgergffytpk"
+        }}})
+    
+
+    def test_can_all_chains(self):
+        data = self.client.execute("""{ chains { count edges { node { id }}}}""")
+        self.assertEqual(data, {"data": {"chains": {"count": 15, "edges": [
+         {"node": {"id": "12CAA"}}, {"node": {"id": "1BNTA"}}, {"node": {"id": "1DEHA"}},
+         {"node": {"id": "1DEHB"}}, {"node": {"id": "1G48A"}}, {"node": {"id": "1IZBB"}},
+         {"node": {"id": "1IZBD"}}, {"node": {"id": "1MSOB"}}, {"node": {"id": "1MSOD"}},
+         {"node": {"id": "1XDAF"}}, {"node": {"id": "1XDAH"}}, {"node": {"id": "3HUDA"}},
+         {"node": {"id": "3HUDB"}}, {"node": {"id": "5Y5BA"}}, {"node": {"id": "6ISOA"}}
+        ]}}})
+    
+
+    def test_can_filter_chains(self):
+        data = self.client.execute("""{ chains(sequence__contains: "FF", atomiumId: "D") { count edges { node { id }}}}""")
+        self.assertEqual(data, {"data": {"chains": {"count": 2, "edges": [
+         {"node": {"id": "1IZBD"}}, {"node": {"id": "1MSOD"}}
+        ]}}})
+    
+    
+    def test_can_get_pdb_chain(self):
+        data = self.client.execute("""{ pdb(id: "1XDA") {chain(id: "1XDAF") { atomiumId sequence }}}""")
+        self.assertEqual(data, {"data": {"pdb": {"chain": {
+         "atomiumId": "F", "sequence": "fvnqhlcgsHlvealylvcgergffytpk"
+        }}}})
+    
+
+    def test_can_get_pdb_chains(self):
+        data = self.client.execute("""{ pdb(id: "1XDA") {chains { count edges { node { id sequence }}}}}""")
+        self.assertEqual(data, {"data": {"pdb": {"chains": {"count": 2, "edges": [
+         {"node": {"id": "1XDAF", "sequence": "fvnqhlcgsHlvealylvcgergffytpk"}},
+         {"node": {"id": "1XDAH", "sequence": "fvnqhlcgsHlvealylvcgergffytpk"}}
+        ]}}}})
+    
+
+    def test_can_get_cluster_chain(self):
+        data = self.client.execute("""{ chainCluster(id: "1IZBB") {chain(id: "1XDAF") { atomiumId sequence }}}""")
+        self.assertEqual(data, {"data": {"chainCluster": {"chain": {
+         "atomiumId": "F", "sequence": "fvnqhlcgsHlvealylvcgergffytpk"
+        }}}})
+    
+
+    def test_can_get_cluster_chains(self):
+        data = self.client.execute("""{ chainCluster(id: "1IZBB") {chains { count edges { node { id sequence }}}}}""")
+        self.assertEqual(data, {"data": {"chainCluster": {"chains": {"count": 6, "edges": [
+         {"node": {"id": "1IZBB", "sequence": "fvnqhlcgsHlvqalylvcgergffytpkt"}},
+         {"node": {"id": "1IZBD", "sequence": "fvnqhlcgsHlvqalylvcgergffytpkt"}},
+         {"node": {"id": "1MSOB", "sequence": "fvnqhlcgsHlvealylvcgergffytpkt"}},
+         {"node": {"id": "1MSOD", "sequence": "fvnqhlcgsHlvealylvcgergffytpkt"}},
+         {"node": {"id": "1XDAF", "sequence": "fvnqhlcgsHlvealylvcgergffytpk"}},
+         {"node": {"id": "1XDAH", "sequence": "fvnqhlcgsHlvealylvcgergffytpk"}}
+        ]}}}})
+
+
+
+class ChainInteractionApiTests(ApiTest):
+    
+    def test_can_get_chain_interaction(self):
+        data = self.client.execute("""{ chainInteraction(id: 6) { sequence }}""")
+        self.assertEqual(data, {"data": {"chainInteraction": {
+         "sequence": "fvnqhlcgsHlvealylvcgergffytpk"
+        }}})
+    
+
+    def test_can_all_chain_interactions(self):
+        data = self.client.execute("""{ chainInteractions { count edges { node { id }}}}""")
+        self.assertEqual(data, {"data": {"chainInteractions": {"count": 19, "edges": [
+         {"node": {"id": "1"}}, {"node": {"id": "2"}}, {"node": {"id": "3"}},
+         {"node": {"id": "4"}}, {"node": {"id": "5"}}, {"node": {"id": "6"}},
+         {"node": {"id": "7"}}, {"node": {"id": "8"}}, {"node": {"id": "9"}},
+         {"node": {"id": "10"}}, {"node": {"id": "11"}}, {"node": {"id": "12"}},
+         {"node": {"id": "13"}}, {"node": {"id": "14"}}, {"node": {"id": "15"}},
+         {"node": {"id": "16"}}, {"node": {"id": "17"}}, {"node": {"id": "18"}},
+         {"node": {"id": "19"}}
+        ]}}})
+    
+
+    def test_can_filter_chain_interactions(self):
+        data = self.client.execute("""{ chainInteractions(sequence__contains: "HH") { count edges { node { id }}}}""")
+        self.assertEqual(data, {"data": {"chainInteractions": {"count": 11, "edges": [
+         {"node": {"id": "1"}}, {"node": {"id": "2"}}, {"node": {"id": "3"}},
+         {"node": {"id": "10"}}, {"node": {"id": "11"}}, {"node": {"id": "12"}},
+         {"node": {"id": "13"}}, {"node": {"id": "14"}}, {"node": {"id": "15"}},
+         {"node": {"id": "16"}}, {"node": {"id": "17"}}
+        ]}}})
+    
+
+    def test_can_get_chain_chain_interaction(self):
+        data = self.client.execute("""{chain(id: "1XDAF") {
+         chainInteraction(id: 6) { id site { id }}
+        }}""")
+        self.assertEqual(data, {"data": {"chain": {"chainInteraction": {
+         "id": "6", "site": {"id": "1XDA-1"}
+        }}}})
+    
+
+    def test_can_get_chain_chain_interactions(self):
+        data = self.client.execute("""{chain(id: "1XDAF") {
+         chainInteractions { edges { node { id site { id }}}}
+        }}""")
+        self.assertEqual(data, {"data": {"chain": {"chainInteractions": {"edges": [
+         {"node": {"id": "6", "site": {"id": "1XDA-1"}}}
+        ]}}}})
+    
+
+    def test_can_get_site_chain_interaction(self):
+        data = self.client.execute("""{zincsite(id: "1XDA-1") {
+         chainInteraction(id: 6) { id chain { id }}
+        }}""")
+        self.assertEqual(data, {"data": {"zincsite": {"chainInteraction": {
+         "id": "6", "chain": {"id": "1XDAF"}
+        }}}})
+    
+
+    def test_can_get_site_chain_interactions(self):
+        data = self.client.execute("""{zincsite(id: "1XDA-1") {
+         chainInteractions { edges { node { id chain { id }}}}
+        }}""")
+        self.assertEqual(data, {"data": {"zincsite": {"chainInteractions": {"edges": [
+         {"node": {"id": "6", "chain": {"id": "1XDAF"}}}
         ]}}}})
 
 
@@ -270,11 +458,33 @@ class ResidueApiTests(ApiTest):
         }}}})
     
 
-    def test_can_get_zincsite_all_residues(self):
+    def test_can_get_zincsite_residues(self):
         data = self.client.execute("""{zincsite(id: "12CA-1") {residues { edges { node {
          name atomiumId
         }}}}}""")
         self.assertEqual(data, {"data": {"zincsite": {"residues": {"edges": [
+         {"node": {"name": "HIS", "atomiumId": "A.94"}},
+         {"node": {"name": "HIS", "atomiumId": "A.96"}},
+         {"node": {"name": "HIS", "atomiumId": "A.119"}}
+        ]}}}})
+
+
+    def test_can_get_chain_residue(self):
+        data = self.client.execute("""{chain(id: "12CAA") {residue(id: 1) {
+         id residueNumber insertionCode name atomiumId chainIdentifier
+         chainSignature
+        }}}""")
+        self.assertEqual(data, {"data": {"chain": {"residue": {
+         "id": "1", "residueNumber": 119, "insertionCode": "", "name": "HIS",
+         "atomiumId": "A.119", "chainIdentifier": "A", "chainSignature": "leu.HIS.leu"
+        }}}})
+    
+
+    def test_can_get_chain_residues(self):
+        data = self.client.execute("""{chain(id: "12CAA") {residues { edges { node {
+         name atomiumId
+        }}}}}""")
+        self.assertEqual(data, {"data": {"chain": {"residues": {"edges": [
          {"node": {"name": "HIS", "atomiumId": "A.94"}},
          {"node": {"name": "HIS", "atomiumId": "A.96"}},
          {"node": {"name": "HIS", "atomiumId": "A.119"}}
@@ -383,37 +593,3 @@ class CoordinateBondApiTests(ApiTest):
          {"node": {"id": "2", "atom": {"id": "30"}}},
          {"node": {"id": "3", "atom": {"id": "7"}}}
         ]}}}})
-
-
-
-class GroupApiTests(ApiTest):
-    
-    def test_can_get_group(self):
-        data = self.client.execute("""{group(id: "12CA-1") {
-         id family keywords classifications
-        }}""")
-        self.assertEqual(data, {"data": {"group": {
-         "id": "12CA-1", "family": "H3", "classifications": "LYASE(OXO-ACID), LYASE",
-         "keywords": "CARBONIC ANHYDRASE II, LYASE(OXO-ACID), F131V, 4-(AMINOSULFONYL)-N-[(2, 6-DIFLUOROPHENYL)METHYL]-BENZAMIDE, LYASE, CO2 HYDRATION, ZINC ENZYME",
-        }}})
-    
-
-    def test_can_get_all_groups(self):
-        data = self.client.execute("""{groups { edges { node { 
-         id family
-        }}}}""")
-        self.assertEqual(data, {"data": {"groups": {"edges": [
-         {"node": {"id": "12CA-1", "family": "H3"}}, {"node": {"id": "1IZB-1", "family": "H3"}},
-         {"node": {"id": "3HUD-1", "family": "C4"}}, {"node": {"id": "3HUD-2", "family": "C2H1"}},
-         {"node": {"id": "5Y5B-1", "family": "C1D1H4"}}, {"node": {"id": "6ISO-1", "family": "C3"}}
-        ]}}})
-    
-
-    def test_can_get_filter_groups(self):
-        data = self.client.execute("""{groups(family__contains: "H") { edges { node { 
-         id family
-        }}}}""")
-        self.assertEqual(data, {"data": {"groups": {"edges": [
-         {"node": {"id": "12CA-1", "family": "H3"}}, {"node": {"id": "1IZB-1", "family": "H3"}},
-         {"node": {"id": "3HUD-2", "family": "C2H1"}}, {"node": {"id": "5Y5B-1", "family": "C1D1H4"}}, 
-        ]}}})

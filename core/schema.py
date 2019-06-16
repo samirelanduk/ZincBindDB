@@ -73,6 +73,9 @@ def generate_args(Model):
 
 
 
+
+
+
 class CoordinateBondType(DjangoObjectType):
 
     class Meta:
@@ -92,7 +95,7 @@ class CoordinateBondConnection(Connection):
 
 
 
-class CoordinateBondContainer:
+class HasCoordinateBonds:
 
     coordinate_bond = graphene.Field(CoordinateBondType, id=graphene.Int(required=True))
     coordinate_bonds = graphene.ConnectionField(CoordinateBondConnection, **generate_args(CoordinateBond))
@@ -114,7 +117,7 @@ class CoordinateBondContainer:
 
 
 
-class AtomType(CoordinateBondContainer, DjangoObjectType):
+class AtomType(HasCoordinateBonds, DjangoObjectType):
 
     class Meta:
         model = Atom
@@ -133,7 +136,7 @@ class AtomConnection(Connection):
 
 
 
-class AtomContainer:
+class HasAtoms:
 
     atom = graphene.Field(AtomType, id=graphene.Int(required=True))
     atoms = graphene.ConnectionField(AtomConnection, **generate_args(Atom))
@@ -155,7 +158,7 @@ class AtomContainer:
 
 
 
-class ResidueType(AtomContainer, DjangoObjectType):
+class ResidueType(HasAtoms, DjangoObjectType):
 
     class Meta:
         model = Residue
@@ -174,7 +177,7 @@ class ResidueConnection(Connection):
 
 
 
-class ResidueContainer:
+class HasResidues:
 
     residue = graphene.Field(ResidueType, id=graphene.Int(required=True))
     residues = graphene.ConnectionField(ResidueConnection, **generate_args(Residue))
@@ -196,7 +199,7 @@ class ResidueContainer:
 
 
 
-class MetalType(CoordinateBondContainer, DjangoObjectType):
+class MetalType(HasCoordinateBonds, DjangoObjectType):
 
     class Meta:
         model = Metal
@@ -215,7 +218,7 @@ class MetalConnection(Connection):
 
 
 
-class MetalContainer:
+class HasMetals:
 
     metal = graphene.Field(MetalType, id=graphene.Int(required=True))
     metals = graphene.ConnectionField(MetalConnection, **generate_args(Metal))
@@ -237,7 +240,48 @@ class MetalContainer:
 
 
 
-class ZincSiteType(MetalContainer, ResidueContainer, DjangoObjectType):
+class ChainInteractionType(DjangoObjectType):
+
+    class Meta:
+        model = ChainInteraction
+
+
+
+class ChainInteractionConnection(Connection):
+    
+    class Meta:
+        node = ChainInteractionType
+    
+    count = graphene.Int()
+
+    def resolve_count(self, info, **kwargs):
+        return len(self.edges)
+
+
+
+class HasChainInteractions:
+
+    chain_interaction = graphene.Field(ChainInteractionType, id=graphene.Int(required=True))
+    chain_interactions = graphene.ConnectionField(ChainInteractionConnection, **generate_args(ChainInteraction))
+
+    def resolve_chain_interaction(self, info, **kwargs):
+        try:
+            return self.chaininteraction_set.get(id=kwargs["id"])
+        except AttributeError:
+            return ChainInteraction.objects.get(id=kwargs["id"])
+    
+
+    def resolve_chain_interactions(self, info, **kwargs):
+        try:
+            chaininteractions = self.chaininteraction_set.filter(**process_kwargs(kwargs))
+        except AttributeError:
+            chaininteractions = ChainInteraction.objects.filter(**process_kwargs(kwargs))
+        if "sort" in kwargs: chaininteractions = chaininteractions.order_by(kwargs["sort"])
+        return chaininteractions
+
+
+
+class ZincSiteType(HasMetals, HasResidues, HasChainInteractions, DjangoObjectType):
 
     class Meta:
         model = ZincSite
@@ -256,7 +300,7 @@ class ZincSiteConnection(Connection):
 
 
 
-class ZincSiteContainer:
+class HasZincSites:
 
     zincsite = graphene.Field(ZincSiteType, id=graphene.String(required=True))
     zincsites = graphene.ConnectionField(ZincSiteConnection, **generate_args(ZincSite))
@@ -278,7 +322,7 @@ class ZincSiteContainer:
 
 
 
-class GroupType(ZincSiteContainer, DjangoObjectType):
+class GroupType(HasZincSites, DjangoObjectType):
 
     class Meta:
         model = Group
@@ -297,7 +341,7 @@ class GroupConnection(Connection):
 
 
 
-class GroupContainer:
+class HasGroups:
 
     group = graphene.Field(GroupType, id=graphene.String(required=True))
     groups = graphene.ConnectionField(GroupConnection, **generate_args(Group))
@@ -319,7 +363,89 @@ class GroupContainer:
 
 
 
-class PdbType(ZincSiteContainer, MetalContainer, DjangoObjectType):
+class ChainType(HasResidues, HasChainInteractions, DjangoObjectType):
+
+    class Meta:
+        model = Chain
+
+
+
+class ChainConnection(Connection):
+    
+    class Meta:
+        node = ChainType
+    
+    count = graphene.Int()
+
+    def resolve_count(self, info, **kwargs):
+        return len(self.edges)
+
+
+
+class HasChains:
+
+    chain = graphene.Field(ChainType, id=graphene.String(required=True))
+    chains = graphene.ConnectionField(ChainConnection, **generate_args(Chain))
+
+    def resolve_chain(self, info, **kwargs):
+        try:
+            return self.chain_set.get(id=kwargs["id"])
+        except AttributeError:
+            return Chain.objects.get(id=kwargs["id"])
+    
+
+    def resolve_chains(self, info, **kwargs):
+        try:
+            chains = self.chain_set.filter(**process_kwargs(kwargs))
+        except AttributeError:
+            chains = Chain.objects.filter(**process_kwargs(kwargs))
+        if "sort" in kwargs: chains = chains.order_by(kwargs["sort"])
+        return chains
+
+
+
+class ChainClusterType(HasChains, DjangoObjectType):
+
+    class Meta:
+        model = ChainCluster
+
+
+
+class ChainClusterConnection(Connection):
+    
+    class Meta:
+        node = ChainClusterType
+    
+    count = graphene.Int()
+
+    def resolve_count(self, info, **kwargs):
+        return len(self.edges)
+
+
+
+class HasChainClusters:
+
+    chain_cluster = graphene.Field(ChainClusterType, id=graphene.String(required=True))
+    chain_clusters = graphene.ConnectionField(ChainClusterConnection, **generate_args(ChainCluster))
+
+    def resolve_chain_cluster(self, info, **kwargs):
+        try:
+            return self.chaincluster_set.get(id=kwargs["id"])
+        except AttributeError:
+            return ChainCluster.objects.get(id=kwargs["id"])
+    
+
+    def resolve_chain_clusters(self, info, **kwargs):
+        try:
+            chainclusters = self.chaincluster_set.filter(**process_kwargs(kwargs))
+        except AttributeError:
+            chainclusters = ChainCluster.objects.filter(**process_kwargs(kwargs))
+        if "sort" in kwargs: chainclusters = chainclusters.order_by(kwargs["sort"])
+        return chainclusters
+
+
+
+class PdbType(HasZincSites, HasMetals, HasChains, DjangoObjectType):
 
     class Meta:
         model = Pdb
@@ -338,16 +464,10 @@ class PdbConnection(Connection):
 
 
 
-class Query(ZincSiteContainer, MetalContainer, ResidueContainer, AtomContainer, CoordinateBondContainer, GroupContainer, graphene.ObjectType):
-   
-    version = graphene.String()
+class HasPdbs:
+
     pdb = graphene.Field(PdbType, id=graphene.String(required=True))
     pdbs = graphene.ConnectionField(PdbConnection, **generate_args(Pdb))
-    
-
-    def resolve_version(self, info, **kwargs):
-        return "1.0.0"
-    
 
     def resolve_pdb(self, info, **kwargs):
         try:
@@ -362,5 +482,16 @@ class Query(ZincSiteContainer, MetalContainer, ResidueContainer, AtomContainer, 
         return pdbs
     
 
+
+class Query(HasPdbs, HasZincSites, HasMetals, HasResidues, HasAtoms, HasChains,
+            HasCoordinateBonds, HasGroups, HasChainClusters,
+            HasChainInteractions, graphene.ObjectType):
+   
+    version = graphene.String()
+    
+    def resolve_version(self, info, **kwargs):
+        return "1.0.0"
+    
+    
 schema = graphene.Schema(query=Query)
 
