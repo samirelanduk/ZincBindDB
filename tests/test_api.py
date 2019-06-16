@@ -309,3 +309,60 @@ class AtomApiTests(ApiTest):
          {"node": {"atomiumId": 920, "name": "ND1"}}, {"node": {"atomiumId": 921, "name": "CD2"}},
          {"node": {"atomiumId": 922, "name": "CE1"}}, {"node": {"atomiumId": 923, "name": "NE2"}}
         ]}}}})
+
+
+
+class CoordinateBondApiTests(ApiTest):
+    
+    def test_can_get_coordinate_bond(self):
+        data = self.client.execute("""{coordinateBond(id: 1) {
+         id atom { id } metal { id }
+        }}""")
+        self.assertEqual(data, {"data": {"coordinateBond": {
+         "id": "1", "atom": {"id": "20"}, "metal": {"id": "1"}
+        }}})
+    
+
+    def test_can_get_coordinate_bonds(self):
+        data = self.client.execute("""{coordinateBonds { count }}""")
+        self.assertEqual(data, {"data": {"coordinateBonds": {"count": 85}}})
+    
+
+    def test_can_get_atom_coordinate_bond(self):
+        data = self.client.execute("""{atom(id: 20) {
+         coordinateBond(id: 1) { id metal { id }}
+        }}""")
+        self.assertEqual(data, {
+         "data": {"atom": {"coordinateBond": {"id": "1", "metal": {"id": "1"}}}}
+        })
+    
+
+    def test_can_get_atom_coordinate_bonds(self):
+        data = self.client.execute("""{atom(id: 20) {
+         coordinateBonds { edges { node { id metal { id }}}}
+        }}""")
+        self.assertEqual(data, {
+         "data": {"atom": {"coordinateBonds": {"edges": [
+          {"node": {"id": "1", "metal": {"id": "1"}}}
+         ]}}}
+        })
+    
+
+    def test_can_get_metal_coordinate_bond(self):
+        data = self.client.execute("""{metal(id: 1) {
+         coordinateBond(id: 1) { id atom { id }}
+        }}""")
+        self.assertEqual(data, {
+         "data": {"metal": {"coordinateBond": {"id": "1", "atom": {"id": "20"}}}}
+        })
+    
+
+    def test_can_get_metal_coordinate_bonds(self):
+        data = self.client.execute("""{metal(id: 1) {
+         coordinateBonds { edges { node { id atom { id }}}}
+        }}""")
+        self.assertEqual(data, {"data": {"metal": {"coordinateBonds": {"edges": [
+         {"node": {"id": "1", "atom": {"id": "20"}}},
+         {"node": {"id": "2", "atom": {"id": "30"}}},
+         {"node": {"id": "3", "atom": {"id": "7"}}}
+        ]}}}})

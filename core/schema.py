@@ -73,7 +73,48 @@ def generate_args(Model):
 
 
 
-class AtomType(DjangoObjectType):
+class CoordinateBondType(DjangoObjectType):
+
+    class Meta:
+        model = CoordinateBond
+
+
+
+class CoordinateBondConnection(Connection):
+    
+    class Meta:
+        node = CoordinateBondType
+    
+    count = graphene.Int()
+
+    def resolve_count(self, info, **kwargs):
+        return len(self.edges)
+
+
+
+class CoordinateBondContainer:
+
+    coordinate_bond = graphene.Field(CoordinateBondType, id=graphene.Int(required=True))
+    coordinate_bonds = graphene.ConnectionField(CoordinateBondConnection, **generate_args(CoordinateBond))
+
+    def resolve_coordinate_bond(self, info, **kwargs):
+        try:
+            return self.coordinatebond_set.get(id=kwargs["id"])
+        except AttributeError:
+            return CoordinateBond.objects.get(id=kwargs["id"])
+    
+
+    def resolve_coordinate_bonds(self, info, **kwargs):
+        try:
+            coordinate_bonds = self.coordinatebond_set.filter(**process_kwargs(kwargs))
+        except AttributeError:
+            coordinate_bonds = CoordinateBond.objects.filter(**process_kwargs(kwargs))
+        if "sort" in kwargs: coordinate_bonds = coordinate_bonds.order_by(kwargs["sort"])
+        return coordinate_bonds
+
+
+
+class AtomType(CoordinateBondContainer, DjangoObjectType):
 
     class Meta:
         model = Atom
@@ -98,13 +139,16 @@ class AtomContainer:
     atoms = graphene.ConnectionField(AtomConnection, **generate_args(Atom))
 
     def resolve_atom(self, info, **kwargs):
-        return Atom.objects.get(id=kwargs["id"])
+        try:
+            return self.atom_set.get(id=kwargs["id"])
+        except AttributeError:
+            return Atom.objects.get(id=kwargs["id"])
     
 
     def resolve_atoms(self, info, **kwargs):
         try:
             atoms = self.atom_set.filter(**process_kwargs(kwargs))
-        except:
+        except AttributeError:
             atoms = Atom.objects.filter(**process_kwargs(kwargs))
         if "sort" in kwargs: atoms = atoms.order_by(kwargs["sort"])
         return atoms
@@ -136,20 +180,23 @@ class ResidueContainer:
     residues = graphene.ConnectionField(ResidueConnection, **generate_args(Residue))
 
     def resolve_residue(self, info, **kwargs):
-        return Residue.objects.get(id=kwargs["id"])
+        try:
+            return self.residue_set.get(id=kwargs["id"])
+        except AttributeError:
+            return Residue.objects.get(id=kwargs["id"])
     
 
     def resolve_residues(self, info, **kwargs):
         try:
             residues = self.residue_set.filter(**process_kwargs(kwargs))
-        except:
+        except AttributeError:
             residues = Residue.objects.filter(**process_kwargs(kwargs))
         if "sort" in kwargs: residues = residues.order_by(kwargs["sort"])
         return residues
 
 
 
-class MetalType(DjangoObjectType):
+class MetalType(CoordinateBondContainer, DjangoObjectType):
 
     class Meta:
         model = Metal
@@ -174,13 +221,16 @@ class MetalContainer:
     metals = graphene.ConnectionField(MetalConnection, **generate_args(Metal))
 
     def resolve_metal(self, info, **kwargs):
-        return Metal.objects.get(id=kwargs["id"])
+        try:
+            return self.metal_set.get(id=kwargs["id"])
+        except AttributeError:
+            return Metal.objects.get(id=kwargs["id"])
     
 
     def resolve_metals(self, info, **kwargs):
         try:
             metals = self.metal_set.filter(**process_kwargs(kwargs))
-        except:
+        except AttributeError:
             metals = Metal.objects.filter(**process_kwargs(kwargs))
         if "sort" in kwargs: metals = metals.order_by(kwargs["sort"])
         return metals
@@ -212,13 +262,16 @@ class ZincSiteContainer:
     zincsites = graphene.ConnectionField(ZincSiteConnection, **generate_args(ZincSite))
 
     def resolve_zincsite(self, info, **kwargs):
-        return ZincSite.objects.get(id=kwargs["id"])
+        try:
+            return self.zincsite_set.get(id=kwargs["id"])
+        except AttributeError:
+            return ZincSite.objects.get(id=kwargs["id"])
     
 
     def resolve_zincsites(self, info, **kwargs):
         try:
             zincsites = self.zincsite_set.filter(**process_kwargs(kwargs))
-        except:
+        except AttributeError:
             zincsites = ZincSite.objects.filter(**process_kwargs(kwargs))
         if "sort" in kwargs: zincsites = zincsites.order_by(kwargs["sort"])
         return zincsites
@@ -244,7 +297,7 @@ class PdbConnection(Connection):
 
 
 
-class Query(ZincSiteContainer, MetalContainer, ResidueContainer, AtomContainer, graphene.ObjectType):
+class Query(ZincSiteContainer, MetalContainer, ResidueContainer, AtomContainer, CoordinateBondContainer, graphene.ObjectType):
    
     version = graphene.String()
     pdb = graphene.Field(PdbType, id=graphene.String(required=True))
@@ -256,7 +309,10 @@ class Query(ZincSiteContainer, MetalContainer, ResidueContainer, AtomContainer, 
     
 
     def resolve_pdb(self, info, **kwargs):
-        return Pdb.objects.get(id=kwargs["id"])
+        try:
+            return self.pdb_set.get(id=kwargs["id"])
+        except AttributeError:
+            return Pdb.objects.get(id=kwargs["id"])
     
 
     def resolve_pdbs(self, info, **kwargs):
