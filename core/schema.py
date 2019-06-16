@@ -480,14 +480,57 @@ class HasPdbs:
     
 
 
+class BlastType(graphene.ObjectType):
+    
+    id = graphene.String()
+    title = graphene.String()
+    qseq = graphene.String()
+    midline = graphene.String()
+    hseq = graphene.String()
+    bit_score = graphene.Float()
+    evalue = graphene.Float()
+    hit_from = graphene.Int()
+    hit_to = graphene.Int()
+    query_from = graphene.Int()
+    query_to = graphene.Int()
+    identity = graphene.Int()
+    score = graphene.Int()
+    chain = graphene.Field(ChainType)
+
+    def resolve_chain(self, info, **kwargs):
+        return Chain.objects.get(id=self["title"].split("|")[1])
+
+
+
+class BlastConnection(Connection):
+    
+    class Meta:
+        node = BlastType
+    
+    count = graphene.Int()
+
+    def resolve_count(self, info, **kwargs):
+        return len(self.edges)
+
+
+
 class Query(HasPdbs, HasZincSites, HasMetals, HasResidues, HasAtoms, HasChains,
             HasCoordinateBonds, HasGroups, HasChainClusters,
             HasChainInteractions, graphene.ObjectType):
    
     version = graphene.String()
+    blast = graphene.ConnectionField(
+     BlastConnection, sequence=graphene.String(required=True),
+     evalue=graphene.Float()
+    )
     
     def resolve_version(self, info, **kwargs):
         return "1.0.0"
+    
+
+    def resolve_blast(self, info, **kwargs):
+        results = Chain.blast_search(kwargs["sequence"], kwargs.get("evalue", 0.1))
+        return results
     
     
 schema = graphene.Schema(query=Query)

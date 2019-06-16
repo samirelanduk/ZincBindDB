@@ -1,3 +1,5 @@
+import subprocess
+import json
 import atomium
 from django.db import models
 
@@ -94,6 +96,25 @@ class Chain(models.Model):
     sequence = models.TextField()
     pdb = models.ForeignKey(Pdb, on_delete=models.CASCADE)
     cluster = models.ForeignKey(ChainCluster, on_delete=models.SET_NULL, null=True, default=None)
+
+    @staticmethod
+    def blast_search(sequence, evalue):
+        p = subprocess.Popen(
+         'echo "{}" | blastp -db data/chains.fasta -outfmt 15 -evalue {}'.format(sequence, evalue),
+         stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+        )
+        out, err = p.communicate()
+        results = json.loads(out
+         )["BlastOutput2"][0]["report"]["results"]["search"]["hits"]
+        ids = [r["description"][0]["title"].split("|")[1] for r in results]
+        return [{
+         "id": r["description"][0]["id"], "title": r["description"][0]["title"],
+         **{key: r["hsps"][0][key] for key in (
+          "qseq", "midline", "hseq", "bit_score", "evalue", "hit_from",
+          "hit_to", "query_from", "query_to", "identity", "score"
+         )}} for r in results]
+         
+  
 
 
 
