@@ -36,6 +36,7 @@ DATABASES = {"default": {
 }}
 
 STATIC_URL = "/static/"
+STATIC_ROOT = os.path.abspath(f"{BASE_DIR}/../static")
 
 TEMPLATES = [{
  "BACKEND": "django.template.backends.django.DjangoTemplates",
