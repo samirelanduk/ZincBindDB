@@ -499,7 +499,7 @@ class BlastType(graphene.ObjectType):
     chain = graphene.Field(ChainType)
 
     def resolve_chain(self, info, **kwargs):
-        return Chain.objects.get(id=self["title"].split("|")[1])
+        return Chain.objects.get(id=self.title.split("|")[1])
 
 
 
@@ -531,7 +531,7 @@ class Query(HasPdbs, HasZincSites, HasMetals, HasResidues, HasAtoms, HasChains,
 
     def resolve_blast(self, info, **kwargs):
         results = Chain.blast_search(kwargs["sequence"], kwargs.get("evalue", 0.1))
-        return results
+        return [BlastType(**d) for d in results]
     
     
 schema = graphene.Schema(query=Query)
