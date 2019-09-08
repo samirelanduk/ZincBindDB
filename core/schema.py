@@ -1,8 +1,10 @@
 import re
+from collections import Counter
 import graphene
 from graphene_django.types import DjangoObjectType
 from graphene.relay import Connection, ConnectionField
 from django.conf import settings
+from django.db.models import F
 from .models import *
 
 def camel_case(string, suffix=None):
@@ -515,6 +517,90 @@ class BlastConnection(Connection):
 
 
 
+class StatsPoint(graphene.ObjectType):
+
+    label = graphene.String()
+    count = graphene.Int()
+
+
+
+class Stats(graphene.ObjectType):
+
+    pdb_count = graphene.Int()
+    all_site_count = graphene.Int()
+    unique_site_count = graphene.Int()
+    residue_counts = graphene.List(StatsPoint, cutoff=graphene.Int(required=True))
+    technique_counts = graphene.List(StatsPoint, cutoff=graphene.Int(required=True))
+    species_counts = graphene.List(StatsPoint, cutoff=graphene.Int(required=True))
+    classification_counts = graphene.List(StatsPoint, cutoff=graphene.Int(required=True))
+    families_counts = graphene.List(StatsPoint, cutoff=graphene.Int(required=True))
+    resolution_counts = graphene.List(StatsPoint)
+
+    def resolve_pdb_count(self, info, **kwargs):
+        return Pdb.objects.all().count()
+    
+
+    def resolve_all_site_count(self, info, **kwargs):
+        return ZincSite.objects.all().count()
+    
+
+    def resolve_unique_site_count(self, info, **kwargs):
+        return Group.objects.all().count()
+    
+
+    def resolve_residue_counts(self, info, **kwargs):
+        names = Residue.objects.filter(site__representative=True).values_list("name")
+        counts = [[n[0], c] for n, c in Counter(names).most_common()]
+        cutoff = kwargs["cutoff"]
+        counts = counts[:cutoff] + [["OTHER", sum(n[1] for n in counts[cutoff:])]]
+        return [StatsPoint(l[0], l[1]) for l in counts]
+    
+
+    def resolve_technique_counts(self, info, **kwargs):
+        sites = ZincSite.objects.all().annotate(technique=F("pdb__technique"))
+        counts = Counter([site.technique.upper() for site in sites]).most_common()
+        cutoff = kwargs["cutoff"]
+        counts = counts[:cutoff] + [["OTHER", sum(n[1] for n in counts[cutoff:])]]
+        return [StatsPoint(l[0], l[1]) for l in counts]
+    
+
+    def resolve_species_counts(self, info, **kwargs):
+        sites = ZincSite.objects.all().annotate(organism=F("pdb__organism"))
+        counts = Counter([str(site.organism).upper() for site in sites]).most_common()
+        cutoff = kwargs["cutoff"]
+        counts = counts[:cutoff] + [["OTHER", sum(n[1] for n in counts[cutoff:])]]
+        return [StatsPoint(l[0], l[1]) for l in counts]
+    
+
+    def resolve_classification_counts(self, info, **kwargs):
+        sites = ZincSite.objects.all().annotate(classification=F("pdb__classification"))
+        counts = Counter([site.classification.upper() for site in sites]).most_common()
+        cutoff = kwargs["cutoff"]
+        counts = counts[:cutoff] + [["OTHER", sum(n[1] for n in counts[cutoff:])]]
+        return [StatsPoint(l[0], l[1]) for l in counts]
+    
+
+    def resolve_families_counts(self, info, **kwargs):
+        sites = ZincSite.objects.filter(representative=True)
+        counts = Counter([site.family.upper() for site in sites]).most_common()
+        cutoff = kwargs["cutoff"]
+        counts = counts[:cutoff] + [["OTHER", sum(n[1] for n in counts[cutoff:])]]
+        return [StatsPoint(l[0], l[1]) for l in counts]
+    
+
+    def resolve_resolution_counts(self, info, **kwargs):
+        sites = ZincSite.objects.all().annotate(resolution=F("pdb__resolution"))
+        return [
+         StatsPoint("<1.5Å", sites.filter(resolution__lt=1.5).count()),
+         StatsPoint("1.5-2.0Å", sites.filter(resolution__lt=2.0, resolution__gte=1.5).count()),
+         StatsPoint("2.0-2.5Å", sites.filter(resolution__lt=2.5, resolution__gte=2.0).count()),
+         StatsPoint("2.5-3.0Å", sites.filter(resolution__lt=3.0, resolution__gte=2.5).count()),
+         StatsPoint("3.0Å+", sites.filter(resolution__gte=3.0).count()),
+         StatsPoint("NONE", sites.filter(resolution=None).count())
+        ]
+
+
+
 class Query(HasPdbs, HasZincSites, HasMetals, HasResidues, HasAtoms, HasChains,
             HasCoordinateBonds, HasGroups, HasChainClusters,
             HasChainInteractions, graphene.ObjectType):
@@ -524,6 +610,7 @@ class Query(HasPdbs, HasZincSites, HasMetals, HasResidues, HasAtoms, HasChains,
      BlastConnection, sequence=graphene.String(required=True),
      evalue=graphene.Float()
     )
+    stats = graphene.Field(Stats)
     
     def resolve_version(self, info, **kwargs):
         return settings.VERSION
@@ -532,6 +619,10 @@ class Query(HasPdbs, HasZincSites, HasMetals, HasResidues, HasAtoms, HasChains,
     def resolve_blast(self, info, **kwargs):
         results = Chain.blast_search(kwargs["sequence"], kwargs.get("evalue", 0.1))
         return [BlastType(**d) for d in results]
+    
+
+    def resolve_stats(self, info, **kwargs):
+        return Stats()
     
     
 schema = graphene.Schema(query=Query)
