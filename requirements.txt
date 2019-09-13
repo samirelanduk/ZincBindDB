@@ -3,6 +3,7 @@ graphene_django
 requests
 atomium>=1.0
 tqdm
+django_cors_headers
 
 gunicorn
 

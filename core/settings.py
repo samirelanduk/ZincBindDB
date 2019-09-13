@@ -17,10 +17,13 @@ ROOT_URLCONF = "core.urls"
 
 INSTALLED_APPS = [
  "django.contrib.contenttypes",
+ "corsheaders",
  "django.contrib.staticfiles",
  "graphene_django",
  "core"
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 DATE_FORMAT = "D j M, Y"
 USE_TZ = True
@@ -28,6 +31,7 @@ TIME_ZONE = "UTC"
 
 MIDDLEWARE = [
  "django.middleware.common.CommonMiddleware",
+ "corsheaders.middleware.CorsMiddleware",
 ]
 
 DATABASES = {"default": {
