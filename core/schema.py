@@ -28,7 +28,7 @@ def process_kwargs(kwargs):
 
     processed = {}
     for key, value in kwargs.items():
-        if key not in ["sort", "first", "last"]:
+        if key not in ["sort", "skip", "first", "last"]:
             key = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", key)
             key = re.sub("([a-z0-9])([A-Z])", r"\1_\2", key).lower()
             processed[key] = value
@@ -72,6 +72,7 @@ def generate_args(Model):
              args, field, graphene.Boolean, ()
             )
     args["sort"] = graphene.String()
+    args["skip"] = graphene.Int()
     return args
 
 
@@ -113,6 +114,7 @@ class HasCoordinateBonds:
         except AttributeError:
             coordinate_bonds = CoordinateBond.objects.filter(**process_kwargs(kwargs))
         if "sort" in kwargs: coordinate_bonds = coordinate_bonds.order_by(kwargs["sort"])
+        if "skip" in kwargs: coordinate_bonds = coordinate_bonds[kwargs["skip"]:]
         return coordinate_bonds
 
 
@@ -154,6 +156,7 @@ class HasAtoms:
         except AttributeError:
             atoms = Atom.objects.filter(**process_kwargs(kwargs))
         if "sort" in kwargs: atoms = atoms.order_by(kwargs["sort"])
+        if "skip" in kwargs: atoms = atoms[kwargs["skip"]:]
         return atoms
 
 
@@ -195,6 +198,7 @@ class HasResidues:
         except AttributeError:
             residues = Residue.objects.filter(**process_kwargs(kwargs))
         if "sort" in kwargs: residues = residues.order_by(kwargs["sort"])
+        if "skip" in kwargs: residues = residues[kwargs["skip"]:]
         return residues
 
 
@@ -236,6 +240,7 @@ class HasMetals:
         except AttributeError:
             metals = Metal.objects.filter(**process_kwargs(kwargs))
         if "sort" in kwargs: metals = metals.order_by(kwargs["sort"])
+        if "skip" in kwargs: metals = metals[kwargs["skip"]:]
         return metals
 
 
@@ -277,6 +282,7 @@ class HasChainInteractions:
         except AttributeError:
             chaininteractions = ChainInteraction.objects.filter(**process_kwargs(kwargs))
         if "sort" in kwargs: chaininteractions = chaininteractions.order_by(kwargs["sort"])
+        if "skip" in kwargs: chaininteractions = chaininteractions[kwargs["skip"]:]
         return chaininteractions
 
 
@@ -318,6 +324,7 @@ class HasZincSites:
         except AttributeError:
             zincsites = ZincSite.objects.filter(**process_kwargs(kwargs))
         if "sort" in kwargs: zincsites = zincsites.order_by(kwargs["sort"])
+        if "skip" in kwargs: zincsites = zincsites[kwargs["skip"]:]
         return zincsites
 
 
@@ -359,6 +366,7 @@ class HasGroups:
         except AttributeError:
             groups = Group.objects.filter(**process_kwargs(kwargs))
         if "sort" in kwargs: groups = groups.order_by(kwargs["sort"])
+        if "skip" in kwargs: groups = groups[kwargs["skip"]:]
         return groups
 
 
@@ -400,6 +408,7 @@ class HasChains:
         except AttributeError:
             chains = Chain.objects.filter(**process_kwargs(kwargs))
         if "sort" in kwargs: chains = chains.order_by(kwargs["sort"])
+        if "skip" in kwargs: chains = chains[kwargs["skip"]:]
         return chains
 
 
@@ -441,6 +450,7 @@ class HasChainClusters:
         except AttributeError:
             chainclusters = ChainCluster.objects.filter(**process_kwargs(kwargs))
         if "sort" in kwargs: chainclusters = chainclusters.order_by(kwargs["sort"])
+        if "skip" in kwargs: chainclusters = chainclusters[kwargs["skip"]:]
         return chainclusters
 
 
@@ -479,6 +489,7 @@ class HasPdbs:
     def resolve_pdbs(self, info, **kwargs):
         pdbs = Pdb.objects.filter(**process_kwargs(kwargs))
         if "sort" in kwargs: pdbs = pdbs.order_by(kwargs["sort"])
+        if "skip" in kwargs: pdbs = pdbs[kwargs["skip"]:]
         return pdbs
     
 
