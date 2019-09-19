@@ -119,8 +119,6 @@ class Chain(models.Model):
          
   
 
-
-
 class ChainInteraction(models.Model):
     """An interaction between a chain and a zinc binding sites."""
 
@@ -146,6 +144,7 @@ class Residue(models.Model):
     atomium_id = models.CharField(max_length=128)
     chain_identifier = models.CharField(max_length=128)
     chain_signature = models.CharField(max_length=128, blank=True)
+    primary = models.BooleanField(default=True)
     site = models.ForeignKey(ZincSite, on_delete=models.CASCADE)
     chain = models.ForeignKey(Chain, blank=True, null=True, on_delete=models.CASCADE)
 
@@ -175,5 +174,3 @@ class CoordinateBond(models.Model):
 
     metal = models.ForeignKey(Metal, on_delete=models.CASCADE)
     atom = models.ForeignKey(Atom, on_delete=models.CASCADE)
-    
-
