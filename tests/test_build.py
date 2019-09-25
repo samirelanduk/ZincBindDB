@@ -192,7 +192,7 @@ class DatabaseBuildingTests(LiveServerTestCase):
         self.assertEqual(metal.z, 15.281)
         self.assertEqual(metal.omission_reason, None)
         
-        residues = site.residue_set.all()
+        residues = site.residue_set.filter(primary=True)
         self.assertEqual(residues.count(), 4)
         res1 = residues.get(atomium_id="A.94")
         self.assertEqual(res1.name, "HIS")

@@ -97,7 +97,7 @@ def main():
     print(f"{len(codes_to_check)} of these need to be checked")
 
     # Check
-    for code in tqdm(codes_to_check):
+    for code in tqdm(codes_to_check[:500]):
         with transaction.atomic():
             process_pdb_code(code)
 

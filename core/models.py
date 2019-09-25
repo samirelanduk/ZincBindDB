@@ -170,7 +170,18 @@ class CoordinateBond(models.Model):
     """A bond between a metal atom and a liganding atom."""
 
     class Meta:
-        db_table = "bonds"
+        db_table = "coordinate_bonds"
 
     metal = models.ForeignKey(Metal, on_delete=models.CASCADE)
     atom = models.ForeignKey(Atom, on_delete=models.CASCADE)
+
+
+
+class StabilisingBond(models.Model):
+    """A bond between a primary residie atom and a secondary residue atom."""
+
+    class Meta:
+        db_table = "stabilising_bonds"
+
+    primary_atom = models.ForeignKey(Atom, on_delete=models.CASCADE, related_name="primary_atoms")
+    secondary_atom = models.ForeignKey(Atom, on_delete=models.CASCADE, related_name="secondary_atoms")

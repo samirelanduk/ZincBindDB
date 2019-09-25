@@ -78,7 +78,20 @@ def create_site_record(site_dict, pdb_record, index, chains_dict):
     atoms_dict = {}
     for res in sorted(site_dict["residues"], key=lambda r: r.id):
         chain_record = chains_dict[res.chain.id] if isinstance(res, atomium.Residue) else None
-        create_residue_record(res, chain_record, site_record, atoms_dict)
+        create_residue_record(res, site_record, atoms_dict, chain_record)
+    
+    # Add secondary residues
+    second_residues,  stabiliser_contacts = set(), set()
+    for residue in site_dict["residues"]:
+        for atom in residue.atoms():
+            nearby = atom.nearby_atoms(3)
+            for nearby_atom in nearby:
+                if isinstance(nearby_atom.het, atomium.Residue)\
+                 and nearby_atom.het not in site_dict["residues"]:
+                    second_residues.add(nearby_atom.het)
+                    stabiliser_contacts.add((atom, nearby_atom))
+    for res in second_residues:
+        create_residue_record(res, site_record, atoms_dict, primary=False)
     
     # Create bond records
     for metal, atoms in sorted(site_dict["metals"].items(), key=lambda a: a[0].id):
@@ -86,7 +99,10 @@ def create_site_record(site_dict, pdb_record, index, chains_dict):
             CoordinateBond.objects.create(
              metal=metals_dict[metal.id], atom=atoms_dict[atom]
             )
-    
+    for primary, secondary in stabiliser_contacts:
+        StabilisingBond.objects.create(
+         primary_atom=atoms_dict[primary], secondary_atom=atoms_dict[secondary]
+        )
     return site_record
 
 
@@ -98,7 +114,7 @@ def create_chain_interaction_record(chain_record, site_record, sequence):
     )
 
 
-def create_residue_record(residue, chain_record, site_record, atoms_dict):
+def create_residue_record(residue, site_record, atoms_dict, chain_record=None, primary=True):
     """Creates a Residue record along with its atoms, from information given. A
     dictionary of atoms must be given to make coordinate bonds later."""
 
@@ -115,7 +131,7 @@ def create_residue_record(residue, chain_record, site_record, atoms_dict):
     signature = ".".join(signature)
     residue_record = Residue.objects.create(
      residue_number=numeric_id, chain_identifier=residue.chain.id,
-     insertion_code=insertion, chain_signature=signature,
+     insertion_code=insertion, chain_signature=signature, primary=primary,
      name=residue.name, chain=chain_record, site=site_record, atomium_id=residue.id
     )
     for atom in sorted(residue.atoms(), key=lambda a: a.id):
