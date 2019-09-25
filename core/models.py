@@ -51,6 +51,11 @@ class ZincSite(models.Model):
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, default=None)
 
 
+    @property
+    def stabilising_bonds(self):
+        return StabilisingBond.objects.filter(primary_atom__residue__site=self.id)
+
+
 
 class Metal(models.Model):
     """A metal atom - usually zinc."""
@@ -164,6 +169,10 @@ class Atom(models.Model):
     element = models.CharField(max_length=8)
     residue = models.ForeignKey(Residue, on_delete=models.CASCADE)
 
+    @property
+    def stabilising_bonds(self):
+        return self.primary_stabilisers.all() | self.secondary_stabilisers.all()
+
 
 
 class CoordinateBond(models.Model):
@@ -183,5 +192,5 @@ class StabilisingBond(models.Model):
     class Meta:
         db_table = "stabilising_bonds"
 
-    primary_atom = models.ForeignKey(Atom, on_delete=models.CASCADE, related_name="primary_atoms")
-    secondary_atom = models.ForeignKey(Atom, on_delete=models.CASCADE, related_name="secondary_atoms")
+    primary_atom = models.ForeignKey(Atom, on_delete=models.CASCADE, related_name="primary_stabilisers")
+    secondary_atom = models.ForeignKey(Atom, on_delete=models.CASCADE, related_name="secondary_stabilisers")

@@ -119,7 +119,52 @@ class HasCoordinateBonds:
 
 
 
-class AtomType(HasCoordinateBonds, DjangoObjectType):
+class StabilisingBondType(DjangoObjectType):
+
+    class Meta:
+        model = StabilisingBond
+
+
+
+class StabilisingBondConnection(Connection):
+    
+    class Meta:
+        node = StabilisingBondType
+    
+    count = graphene.Int()
+
+    def resolve_count(self, info, **kwargs):
+        return len(self.edges)
+
+
+
+class HasStabilisingBonds:
+
+    stabilising_bond = graphene.Field(StabilisingBondType, id=graphene.Int(required=True))
+    stabilising_bonds = graphene.ConnectionField(StabilisingBondConnection, **generate_args(StabilisingBond))
+
+    def resolve_stabilising_bond(self, info, **kwargs):
+        try:
+            return self.stabilisingbond_set.get(id=kwargs["id"])
+        except AttributeError:
+            return StabilisingBond.objects.get(id=kwargs["id"])
+    
+
+    def resolve_stabilising_bonds(self, info, **kwargs):
+        try:
+            stabilising_bonds = self.stabilisingbond_set.filter(**process_kwargs(kwargs))
+        except AttributeError:
+            try:
+                stabilising_bonds = self.stabilising_bonds.filter(**process_kwargs(kwargs))
+            except AttributeError:
+                stabilising_bonds = StabilisingBond.objects.filter(**process_kwargs(kwargs))
+        if "sort" in kwargs: stabilising_bonds = stabilising_bonds.order_by(kwargs["sort"])
+        if "skip" in kwargs: stabilising_bonds = stabilising_bonds[kwargs["skip"]:]
+        return stabilising_bonds
+
+
+
+class AtomType(HasCoordinateBonds, HasStabilisingBonds, DjangoObjectType):
 
     class Meta:
         model = Atom
@@ -287,7 +332,7 @@ class HasChainInteractions:
 
 
 
-class ZincSiteType(HasMetals, HasResidues, HasChainInteractions, DjangoObjectType):
+class ZincSiteType(HasMetals, HasResidues, HasChainInteractions, HasStabilisingBonds, DjangoObjectType):
 
     class Meta:
         model = ZincSite
@@ -614,7 +659,7 @@ class Stats(graphene.ObjectType):
 
 class Query(HasPdbs, HasZincSites, HasMetals, HasResidues, HasAtoms, HasChains,
             HasCoordinateBonds, HasGroups, HasChainClusters,
-            HasChainInteractions, graphene.ObjectType):
+            HasStabilisingBonds, HasChainInteractions, graphene.ObjectType):
    
     version = graphene.String()
     blast = graphene.ConnectionField(
