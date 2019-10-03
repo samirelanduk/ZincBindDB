@@ -5,3 +5,4 @@ secrets.py
 *.sqlite3*
 *.log
 *.fasta*
+.ipynb_checkpoints
