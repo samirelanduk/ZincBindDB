@@ -19,6 +19,7 @@ def process_pdb_code(code):
     pdb = atomium.fetch(code)
     log(f"Getting best {code} assembly")
     model, assembly_id = get_best_model(pdb)
+    model.optimise_distances()
     log(f"Saving {code} to database")
     pdb_record = create_pdb_record(pdb, assembly_id)
 
@@ -97,7 +98,7 @@ def main():
     print(f"{len(codes_to_check)} of these need to be checked")
 
     # Check
-    for code in tqdm(codes_to_check[:500]):
+    for code in tqdm(codes_to_check):
         with transaction.atomic():
             process_pdb_code(code)
 

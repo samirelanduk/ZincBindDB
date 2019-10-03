@@ -131,7 +131,7 @@ def add_fingerprint_to_site(site):
     cluster IDs and chain signature."""
 
     site_chain_clusters = set([
-     str(res.chain.cluster.id) for res in site.residue_set.all() if res.chain_signature
+     str(res.chain.cluster.id) for res in site.residue_set.filter(primary=True) if res.chain_signature
     ])
     site.fingerprint = "_".join(sorted(site_chain_clusters)) + "__" + "_".join(
      [str(res.chain_signature) for res in site.residue_set.exclude(chain_signature="")]

@@ -1,7 +1,7 @@
 django==2.2.4
 graphene_django
 requests
-atomium>=1.0
+atomium>=1.0.2
 tqdm
 django_cors_headers
 
@@ -9,3 +9,7 @@ gunicorn
 
 kirjava
 python-coveralls
+
+jupyter
+matplotlib
+numpy
