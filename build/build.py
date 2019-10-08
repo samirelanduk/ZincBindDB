@@ -5,6 +5,7 @@
 from utilities import *
 setup_django()
 from tqdm import tqdm
+import traceback
 from django.db import transaction
 from core.models import Pdb
 
@@ -98,11 +99,14 @@ def main():
     print(f"{len(codes_to_check)} of these need to be checked")
 
     # Check
+    unprocessable = {}
     for code in tqdm(codes_to_check):
-        with transaction.atomic():
-            process_pdb_code(code)
-
-
+        try:
+            with transaction.atomic(): process_pdb_code(code)
+        except Exception as e: unprocessable[code] = traceback.format_exc()
+    print("The following PDBs could not be processed:\n")
+    start, end = "\033[91m", "\033[0m"
+    for code in unprocessable: print(f"{code}\n{start}{unprocessable[code]}{end}")
 
 if __name__ == "__main__":
     print()
