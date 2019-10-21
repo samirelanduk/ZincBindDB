@@ -34,10 +34,16 @@ MIDDLEWARE = [
  "corsheaders.middleware.CorsMiddleware",
 ]
 
-DATABASES = {"default": {
- "ENGINE": "django.db.backends.sqlite3",
- "NAME": os.path.join(BASE_DIR, "data", "db.sqlite3")
-}}
+if DEBUG:
+    DATABASES = {"default": {
+     "ENGINE": "django.db.backends.sqlite3",
+     "NAME": os.path.join(BASE_DIR, "data", "db.sqlite3")
+    }}
+else:
+    DATABASES = {"default": {
+     "ENGINE": "django.db.backends.sqlite3",
+     "NAME": os.path.join(BASE_DIR, "..", "data", "db.sqlite3")
+    }}
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.abspath(f"{BASE_DIR}/../static")
