@@ -12,6 +12,8 @@ from tqdm import tqdm
 from django.db import transaction
 from django.db.models import F
 from core.models import ChainCluster, Group, ZincSite, Chain
+from django.conf import settings
+if not settings.DEBUG: tqdm = lambda l: l
 
 SEQUENCE_IDENTITY = 0.9
 

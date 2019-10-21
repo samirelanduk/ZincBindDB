@@ -15,6 +15,7 @@ def setup_django():
 
     import os, sys, django
     sys.path.append(os.path.join("..", "zincbinddb"))
+    sys.path.append(os.path.join("..", "source"))
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
     django.setup()
 

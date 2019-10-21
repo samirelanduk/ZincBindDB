@@ -8,6 +8,8 @@ from tqdm import tqdm
 import traceback
 from django.db import transaction
 from core.models import Pdb
+from django.conf import settings
+if not settings.DEBUG: tqdm = lambda l: l
 
 def process_pdb_code(code):
     """Builds all the relevant objects for any given PDB code."""
