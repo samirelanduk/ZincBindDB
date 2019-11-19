@@ -4,7 +4,7 @@ import graphene
 from graphene_django.types import DjangoObjectType
 from graphene.relay import Connection, ConnectionField
 from django.conf import settings
-from django.db.models import F
+from django.db.models import F, Q
 from .models import *
 
 def camel_case(string, suffix=None):
@@ -28,7 +28,7 @@ def process_kwargs(kwargs):
 
     processed = {}
     for key, value in kwargs.items():
-        if key not in ["sort", "skip", "first", "last"]:
+        if key not in ["sort", "skip", "first", "last", "term"]:
             key = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", key)
             key = re.sub("([a-z0-9])([A-Z])", r"\1_\2", key).lower()
             processed[key] = value
@@ -522,7 +522,7 @@ class PdbConnection(Connection):
 class HasPdbs:
 
     pdb = graphene.Field(PdbType, id=graphene.String(required=True))
-    pdbs = graphene.ConnectionField(PdbConnection, **generate_args(Pdb))
+    pdbs = graphene.ConnectionField(PdbConnection, term=graphene.String(), **generate_args(Pdb))
 
     def resolve_pdb(self, info, **kwargs):
         try:
@@ -533,6 +533,14 @@ class HasPdbs:
 
     def resolve_pdbs(self, info, **kwargs):
         pdbs = Pdb.objects.filter(**process_kwargs(kwargs))
+        if "term" in kwargs:
+            pdbs = Pdb.objects.filter(
+             Q(id=kwargs["term"].upper()) | Q(title__contains=kwargs["term"].upper())
+             | Q(classification__contains=kwargs["term"].upper())
+             | Q(technique__contains=kwargs["term"].upper())
+             | Q(organism__contains=kwargs["term"].upper())
+             | Q(keywords__contains=kwargs["term"].upper())
+            )
         if "sort" in kwargs: pdbs = pdbs.order_by(kwargs["sort"])
         if "skip" in kwargs: pdbs = pdbs[kwargs["skip"]:]
         return pdbs
