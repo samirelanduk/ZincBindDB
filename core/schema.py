@@ -664,7 +664,7 @@ class Query(HasPdbs, HasZincSites, HasMetals, HasResidues, HasAtoms, HasChains,
     version = graphene.String()
     blast = graphene.ConnectionField(
      BlastConnection, sequence=graphene.String(required=True),
-     evalue=graphene.Float()
+     evalue=graphene.Float(), skip=graphene.Int()
     )
     stats = graphene.Field(Stats)
     
@@ -674,7 +674,7 @@ class Query(HasPdbs, HasZincSites, HasMetals, HasResidues, HasAtoms, HasChains,
 
     def resolve_blast(self, info, **kwargs):
         results = Chain.blast_search(kwargs["sequence"], kwargs.get("evalue", 0.1))
-        return [BlastType(**d) for d in results]
+        return [BlastType(**d) for d in results][kwargs.get("skip", 0):]
     
 
     def resolve_stats(self, info, **kwargs):
