@@ -2,6 +2,7 @@ import subprocess
 import json
 import atomium
 from django.db import models
+from django.conf import settings
 
 class Pdb(models.Model):
     """Represents a PDB structure file."""
@@ -107,9 +108,11 @@ class Chain(models.Model):
         """Searches all chains using a BLAST binary. This method currently has
         no tests."""
         
+        location = f"{'' if settings.DEBUG else '../'}data/chains.fasta"
         p = subprocess.Popen(
-         'echo "{}" | blastp -db data/chains.fasta -outfmt 15 -evalue {}'.format(sequence, evalue),
-         stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+         'echo "{}" | blastp -db {} -outfmt 15 -evalue {}'.format(
+          sequence, location, evalue
+         ), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
         )
         out, err = p.communicate()
         results = json.loads(out
