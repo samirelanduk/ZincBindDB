@@ -35,15 +35,16 @@ def process_kwargs(kwargs):
     return processed
 
 
-def add_field_to_args(args, field, Type, suffixes):
+def add_field_to_args(args, field, Type, suffixes, prefix):
     """Takes a django model field, and adds it to a dictionary representing the
     arguments that can be passed to a GraphQL field. Variants with different
     suffixes can be specified."""
 
-    args[field.name] = Type()
+    args[prefix + field.name] = Type(name=prefix + field.name)
     for suffix in suffixes:
-        gql_field = Type(name=camel_case(field.name, suffix))
-        args[camel_case(field.name, suffix)] = gql_field
+        gql_field = Type(name=prefix + camel_case(field.name, suffix))
+        args[prefix + camel_case(field.name, suffix)] = gql_field
+    
 
 
 def generate_args(Model):
@@ -51,25 +52,30 @@ def generate_args(Model):
     GraphQL field, for a given model."""
 
     args = {}
+    fields = []
     for field in Model._meta.get_fields(include_parents=False):
+        if field.is_relation:
+            fields += field.related_model._meta.get_fields(include_parents=False)
+    for field in Model._meta.get_fields(include_parents=False) + tuple(fields):
+        prefix = "" if str(field.model) == str(Model) else field.model._meta.model_name + "__"
         field_type = field.get_internal_type()
         if field_type == "CharField" or field_type == "TextField":
-            add_field_to_args(args, field, graphene.String, ("contains",))
+            add_field_to_args(args, field, graphene.String, ("contains",), prefix)
         elif field_type == "FloatField":
             add_field_to_args(
-             args, field, graphene.Float, ("lt", "gt", "lte", "gte")
+             args, field, graphene.Float, ("lt", "gt", "lte", "gte"), prefix
             )
         elif field_type == "DateField":
             add_field_to_args(
-             args, field, graphene.String, ("lt", "gt", "lte", "gte")
+             args, field, graphene.String, ("lt", "gt", "lte", "gte"), prefix
             )
         elif field_type == "IntegerField":
             add_field_to_args(
-             args, field, graphene.Int, ("lt", "gt", "lte", "gte")
+             args, field, graphene.Int, ("lt", "gt", "lte", "gte"), prefix
             )
         elif field_type == "BooleanField":
             add_field_to_args(
-             args, field, graphene.Boolean, ()
+             args, field, graphene.Boolean, (), prefix
             )
     args["sort"] = graphene.String()
     args["skip"] = graphene.Int()
@@ -350,6 +356,8 @@ class ZincSiteConnection(Connection):
         return len(self.edges)
 
 
+from pprint import pprint
+'''pprint(generate_args(ZincSite))'''
 
 class HasZincSites:
 
@@ -690,4 +698,6 @@ class Query(HasPdbs, HasZincSites, HasMetals, HasResidues, HasAtoms, HasChains,
     
     
 schema = graphene.Schema(query=Query)
+
+pprint(sorted(Query._meta.fields["zincsites"].args.keys()))
 
