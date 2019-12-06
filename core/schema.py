@@ -356,8 +356,6 @@ class ZincSiteConnection(Connection):
         return len(self.edges)
 
 
-from pprint import pprint
-'''pprint(generate_args(ZincSite))'''
 
 class HasZincSites:
 
@@ -698,6 +696,4 @@ class Query(HasPdbs, HasZincSites, HasMetals, HasResidues, HasAtoms, HasChains,
     
     
 schema = graphene.Schema(query=Query)
-
-pprint(sorted(Query._meta.fields["zincsites"].args.keys()))
 
