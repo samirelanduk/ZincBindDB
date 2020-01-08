@@ -619,7 +619,7 @@ class Stats(graphene.ObjectType):
     
 
     def resolve_residue_counts(self, info, **kwargs):
-        names = Residue.objects.filter(site__representative=True).values_list("name")
+        names = Residue.objects.filter(site__representative=True, primary=True).values_list("name")
         counts = [[n[0], c] for n, c in Counter(names).most_common()]
         cutoff = kwargs["cutoff"]
         counts = counts[:cutoff] + [["OTHER", sum(n[1] for n in counts[cutoff:])]]
