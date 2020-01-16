@@ -547,8 +547,12 @@ class HasPdbs:
              | Q(organism__contains=kwargs["term"].upper())
              | Q(keywords__contains=kwargs["term"].upper())
             )
-        if "sort" in kwargs: pdbs = pdbs.order_by(kwargs["sort"])
-        if "skip" in kwargs: pdbs = pdbs[kwargs["skip"]:]
+        if "skip" in kwargs and "first" in kwargs:
+            pdbs = list(pdbs[kwargs["skip"]:kwargs["skip"] + kwargs["first"]])
+        elif "skip" in kwargs:
+            pdbs = pdbs[kwargs["skip"]:]
+        elif "first" in kwargs:
+            pdbs = pdbs[:kwargs["first"]]
         return pdbs
     
 
