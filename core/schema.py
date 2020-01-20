@@ -4,7 +4,7 @@ import graphene
 from graphene_django.types import DjangoObjectType
 from graphene.relay import Connection, ConnectionField
 from django.conf import settings
-from django.db.models import F, Q
+from django.db.models import F, Q, Count
 from .models import *
 
 def camel_case(string, suffix=None):
@@ -384,6 +384,13 @@ class GroupType(HasZincSites, DjangoObjectType):
 
     class Meta:
         model = Group
+    
+    site_count = graphene.Int()
+
+    def resolve_site_count(self, info, **kwargs):
+        try:
+            return self.site_count
+        except: return self.zincsite_set.count()
 
 
 
@@ -416,6 +423,7 @@ class HasGroups:
             groups = self.group_set.filter(**process_kwargs(kwargs))
         except AttributeError:
             groups = Group.objects.filter(**process_kwargs(kwargs))
+        groups = groups.annotate(site_count=Count("zincsite")).order_by("-site_count")
         if "sort" in kwargs: groups = groups.order_by(kwargs["sort"])
         if "skip" in kwargs: groups = groups[kwargs["skip"]:]
         return groups
@@ -547,12 +555,14 @@ class HasPdbs:
              | Q(organism__contains=kwargs["term"].upper())
              | Q(keywords__contains=kwargs["term"].upper())
             )
+        if "sort" in kwargs: pdbs = pdbs.order_by(kwargs["sort"])
         if "skip" in kwargs and "first" in kwargs:
             pdbs = list(pdbs[kwargs["skip"]:kwargs["skip"] + kwargs["first"]])
         elif "skip" in kwargs:
             pdbs = pdbs[kwargs["skip"]:]
         elif "first" in kwargs:
             pdbs = pdbs[:kwargs["first"]]
+       
         return pdbs
     
 
@@ -685,6 +695,7 @@ class Query(HasPdbs, HasZincSites, HasMetals, HasResidues, HasAtoms, HasChains,
      evalue=graphene.Float(), skip=graphene.Int()
     )
     stats = graphene.Field(Stats)
+    families = graphene.List(graphene.String)
     
     def resolve_version(self, info, **kwargs):
         return settings.VERSION
@@ -697,6 +708,11 @@ class Query(HasPdbs, HasZincSites, HasMetals, HasResidues, HasAtoms, HasChains,
 
     def resolve_stats(self, info, **kwargs):
         return Stats()
+    
+
+    def resolve_families(self, info, **kwargs):
+        families = Counter(Group.objects.all().values_list("family", flat=True))
+        return [f"{k}-{v}" for k, v in families.most_common()]
     
     
 schema = graphene.Schema(query=Query)
