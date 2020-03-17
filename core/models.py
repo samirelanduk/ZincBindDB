@@ -115,8 +115,10 @@ class Chain(models.Model):
          ), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
         )
         out, err = p.communicate()
-        results = json.loads(out
-         )["BlastOutput2"][0]["report"]["results"]["search"]["hits"]
+        results = sorted([item for sublist in [
+            x["report"]["results"]["search"]["hits"]\
+             for x in json.loads(out)["BlastOutput2"]
+        ] for item in sublist], key=lambda r: r["hsps"][0]["evalue"])
         ids = [r["description"][0]["title"].split("|")[1] for r in results]
         return [{
          "id": r["description"][0]["id"], "title": r["description"][0]["title"],
