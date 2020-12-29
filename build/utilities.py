@@ -3,6 +3,7 @@
 import math
 import requests
 import subprocess
+import json
 from datetime import datetime
 import atomium
 from sites import remove_duplicate_atoms, get_atom_liganding_atoms
@@ -34,17 +35,29 @@ def get_zinc_pdb_codes():
     If the response returned has an error code of 500, or if there are fewer
     than 10,000 PDB codes sent back, an error will be thrown."""
 
-    query = "<orgPdbQuery>"\
-    "<queryType>org.pdb.query.simple.ChemCompFormulaQuery</queryType>"\
-    "<formula>ZN</formula></orgPdbQuery>"
-    url = "https://www.rcsb.org//pdb/rest/search/"
-    response = requests.post(url, data=query.encode(), headers={
-     "Content-Type": "application/x-www-form-urlencoded"
-    })
+    query = {
+        "query": {
+            "type": "terminal",
+            "service": "chemical",
+            "parameters": {
+                "value": "Zn", "type": "formula", "match_subset": False
+            },
+
+        },
+        "request_options": {
+            "pager": {
+            "start": 0,
+            "rows": 1000000000
+            }
+        },
+        "return_type": "entry"
+    }
+    url = "https://search.rcsb.org/rcsbsearch/v1/query?json="
+    response = requests.get(url + json.dumps(query))
+
     if response.status_code == 200:
-        codes = response.text.split()
-        if len(codes) > 10000:
-            return response.text.split()
+        data = response.json()
+        return [d["identifier"] for d in data["result_set"]]
     raise Exception("RCSB didn't send back PDB codes")
 
 
