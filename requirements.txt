@@ -9,7 +9,3 @@ gunicorn
 
 kirjava
 python-coveralls
-
-jupyter
-matplotlib
-numpy

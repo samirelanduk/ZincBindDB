@@ -24,7 +24,8 @@ class PdbApiTests(ApiTest):
          "expressionSystem": "Saccharomyces cerevisiae",  "skeleton": False,
          "keywords": "HORMONE, METABOLIC ROLE, CHEMICAL ACTIVITY, INSULIN ALBUMIN, FATTY ACID, GLUCOSE METABOLISM, DIABETES",
          "classification": "HORMONE", "assembly": 5, "resolution": 1.8, "rvalue": 0.174,
-         "depositionDate": "1996-12-18", "technique": "X-RAY DIFFRACTION"}}})
+         "depositionDate": "1996-12-18", "technique": "X-RAY DIFFRACTION"}
+        }})
     
 
     def test_can_get_all_pdbs(self):
@@ -66,8 +67,8 @@ class GroupApiTests(ApiTest):
          id family
         }}}}""")
         self.assertEqual(data, {"data": {"groups": {"edges": [
-         {"node": {"id": "12CA-1", "family": "H3"}}, {"node": {"id": "1IZB-1", "family": "H3"}},
-         {"node": {"id": "3HUD-1", "family": "C4"}}, {"node": {"id": "3HUD-2", "family": "C2H1"}},
+         {"node": {"id": "1IZB-1", "family": "H3"}}, {"node": {"id": "3HUD-1", "family": "C4"}},
+         {"node": {"id": "3HUD-2", "family": "C2H1"}}, {"node": {"id": "12CA-1", "family": "H3"}},
          {"node": {"id": "5Y5B-1", "family": "C1D1H4"}}, {"node": {"id": "6ISO-1", "family": "C3"}}
         ]}}})
     
@@ -77,8 +78,8 @@ class GroupApiTests(ApiTest):
          id family
         }}}}""")
         self.assertEqual(data, {"data": {"groups": {"edges": [
-         {"node": {"id": "12CA-1", "family": "H3"}}, {"node": {"id": "1IZB-1", "family": "H3"}},
-         {"node": {"id": "3HUD-2", "family": "C2H1"}}, {"node": {"id": "5Y5B-1", "family": "C1D1H4"}}, 
+         {"node": {"id": "1IZB-1", "family": "H3"}}, {"node": {"id": "3HUD-2", "family": "C2H1"}},
+         {"node": {"id": "12CA-1", "family": "H3"}}, {"node": {"id": "5Y5B-1", "family": "C1D1H4"}}
         ]}}})
 
 
@@ -273,7 +274,7 @@ class ChainApiTests(ApiTest):
     
 
     def test_can_filter_chains(self):
-        data = self.client.execute("""{ chains(sequence__contains: "FF", atomiumId: "D") { count edges { node { id }}}}""")
+        data = self.client.execute("""{ chains(sequence__contains: "FF", atomium_id: "D") { count edges { node { id }}}}""")
         self.assertEqual(data, {"data": {"chains": {"count": 2, "edges": [
          {"node": {"id": "1IZBD"}}, {"node": {"id": "1MSOD"}}
         ]}}})
