@@ -42,11 +42,11 @@ if DEBUG:
 else:
     DATABASES = {"default": {
      "ENGINE": "django.db.backends.sqlite3",
-     "NAME": os.path.join(BASE_DIR, "..", "data", "db.sqlite3")
+     "NAME": "/home/app/data/db.sqlite3"
     }}
 
 STATIC_URL = "/static/"
-STATIC_ROOT = os.path.abspath(f"{BASE_DIR}/../static")
+STATIC_ROOT = os.path.abspath(f"{BASE_DIR}/static")
 
 TEMPLATES = [{
  "BACKEND": "django.template.backends.django.DjangoTemplates",

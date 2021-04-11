@@ -1,0 +1,23 @@
+FROM ubuntu
+
+RUN mkdir -p /home/app
+
+WORKDIR /home/app
+
+RUN apt update
+RUN apt -y install python3-pip
+RUN apt-get install -y cron
+COPY ./requirements.txt ./requirements.txt
+RUN pip3 install -r requirements.txt
+
+
+COPY ./core ./core
+COPY ./manage.py ./manage.py
+RUN rm ./core/secrets.py
+
+RUN sed -i s/'DEBUG = True'/'DEBUG = False'/g ./core/settings.py
+RUN sed -i s/'ALLOWED_HOSTS = \[\]'/'ALLOWED_HOSTS = \["*"]'/g ./core/settings.py
+
+RUN python3 manage.py collectstatic --noinput
+
+CMD ["gunicorn", "--bind", ":80", "--workers", "3", "core.wsgi:application"]

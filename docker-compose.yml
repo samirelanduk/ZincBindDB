@@ -1,0 +1,39 @@
+﻿version: "3.9"
+services:
+  nginx:
+    hostname: nginx
+    container_name: zincbinddb_nginx
+    build:
+      context: .
+      dockerfile: nginx-Dockerfile
+    image: samirelanduk/zincbinddb_nginx
+    volumes:
+      - static_volume:/home/app/static
+    expose:
+      - 80
+    environment:
+      - VIRTUAL_HOST=api.zincbind.net
+      - LETSENCRYPT_HOST=api.zincbind.net
+  build:
+    hostname: build
+    container_name: zincbinddb_build
+    build:
+      context: .
+    image: samirelanduk/zincbinddb_build
+    volumes:
+      - db_volume:/home/app/data
+  django:
+    hostname: django
+    container_name: zincbinddb_django
+    build:
+      context: .
+      dockerfile: django-Dockerfile
+    image: samirelanduk/zincbinddb_django
+    expose:
+      - 80
+    volumes:
+      - db_volume:/home/app/data
+      - static_volume:/home/app/static
+volumes:
+  db_volume:
+  static_volume:
