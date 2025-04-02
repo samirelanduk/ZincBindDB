@@ -41,8 +41,11 @@ if DEBUG:
     }}
 else:
     DATABASES = {"default": {
-     "ENGINE": "django.db.backends.sqlite3",
-     "NAME": "/home/app/data/db.sqlite3"
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "postgres",
+        "USER": "postgres",
+        "HOST": "postgres",
+        "PASSWORD": "postgres",
     }}
 
 STATIC_URL = "/static/"
