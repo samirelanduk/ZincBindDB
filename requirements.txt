@@ -1,4 +1,4 @@
-django==2.2.13
+django==3.1.5
 graphene_django
 requests
 atomium>=1.0.2
